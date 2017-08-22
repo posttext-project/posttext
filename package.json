@@ -1,0 +1,23 @@
+{
+  "name": "post-text",
+  "version": "0.0.0",
+  "description": "Post Text",
+  "main": "index.js",
+  "directories": {
+    "lib": "index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clitetailor/post-text.git"
+  },
+  "keywords": ["post-text", "markup-language", "preprocessor", "word-processor"],
+  "author": "clitetailor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clitetailor/post-text/issues"
+  },
+  "homepage": "https://github.com/clitetailor/post-text#readme"
+}
