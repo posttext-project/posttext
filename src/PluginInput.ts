@@ -19,11 +19,10 @@ export class PluginInput {
   }
 
   public setup() {
-    for (const [_, [plugin, pluginOptions]] of this.pluginMap) {
-      const pluginInput = this.createNewInput(
-        pluginOptions,
-        this.data
-      )
+    const data = this.data
+
+    for (const [_, [plugin, options]] of this.pluginMap) {
+      const pluginInput = this.createNewInput({ data, options })
 
       plugin.setup(pluginInput)
     }
@@ -40,7 +39,7 @@ export class PluginInput {
   public mock(
     Plugin: PluginConstructor,
     method: string,
-    middleware: Function
+    middleware: ((fn: Function) => Function)
   ) {
     const plugin = this.getPlugin(Plugin)
 
@@ -48,19 +47,20 @@ export class PluginInput {
   }
 
   public createNewInput(
-    options?: any,
-    data?: any
+    alterOptions: Partial<PluginInputOptions>
   ): PluginInput {
     return new PluginInput({
       ...(this as object),
-      data,
-      options
+      ...alterOptions
     } as PluginInputOptions)
   }
 
   public run(Plugin: PluginConstructor, data?: any) {
-    const [plugin, pluginOptions] = this.pluginMap.get(Plugin)
-    const input = this.createNewInput(pluginOptions, data)
+    const [plugin, options] = this.pluginMap.get(Plugin)
+    const input = this.createNewInput({
+      data,
+      options
+    })
 
     return plugin.run(input)
   }
