@@ -1,13 +1,17 @@
-import { ConstructorType } from './ConstructorType'
-import { PluginInput } from './PluginInput'
+import { PluginMonad } from './PluginMonad'
 
 export class Plugin {
-  constructor() {}
+  static create(options: any = {}): Plugin {
+    return new (this as { new (options: any): Plugin })(options)
+  }
 
-  setup(t: PluginInput) {}
+  constructor(options: any) {}
 
-  run(t: PluginInput) {}
+  setup(t: PluginMonad): PluginMonad {
+    return t
+  }
+
+  run(data: any) {
+    return (t: PluginMonad) => {}
+  }
 }
-
-export type PluginConstructor = ConstructorType<Plugin>
-export type PluginMap = Map<PluginConstructor, [Plugin, any]>
