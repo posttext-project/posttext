@@ -7,6 +7,11 @@ export interface PluginOptions {
 }
 
 export class PluginMonad {
+  static runMonad(fn: Function) {
+    const monad = new PluginMonad()
+    return fn(monad)
+  }
+
   private plugins: Map<any, any>
   private middlewares: Map<any, any>
   private options: Map<any, any>

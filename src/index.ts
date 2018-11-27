@@ -1,6 +1,6 @@
-import { Runner } from './Runner'
-import PostText from './PostText'
+import { PluginMonad } from "./PluginMonad";
+import { PostText } from './PostText'
 
-new Runner({
-  core: PostText({})
-}).run('Hello, World!')
+PluginMonad.runMonad(
+  PostText.transform('Hello, World!')
+)

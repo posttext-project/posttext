@@ -1,5 +1,6 @@
 import { Cursor } from './Cursor'
 import { Reader } from './Reader'
+import { PluginMonad } from './PluginMonad'
 
 export class Pattern extends Reader {
   static repeat(...fns: Function[]) {
@@ -10,11 +11,11 @@ export class Pattern extends Reader {
     }
   }
 
-  repeat(t: any, fns: Function[]) {}
+  repeat() {}
 
-  ignoreSpaces(t: any) {
-    const cursor = t.getPlugin(Cursor)
-
-    return t.setCursor(cursor.findRegexp(/[^\s]/))
+  static ignoreSpaces() {
+    return (t: PluginMonad) => {}
   }
+
+  ignoreSpaces() {}
 }
