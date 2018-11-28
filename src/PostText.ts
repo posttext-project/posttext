@@ -1,62 +1,54 @@
 import { Reader } from './Reader'
 import { Pattern } from './Pattern'
-import { PluginMonad } from './PluginMonad'
-import { Cursor } from './Cursor'
 
-export interface PostTextTransformOptions {
-  plugins?: ((t: PluginMonad) => PluginMonad)[]
+export enum Type {
+  Block = 'Block',
+  Text = 'Text'
 }
 
-export class PostText extends Reader {
-  static transform(
-    data: string,
-    options: PostTextTransformOptions = {}
-  ) {
-    return (t: PluginMonad) => {
-      const plugins = options.plugins || []
+export class PostText {
+  static transform(doc: string) {
+    const reader = Reader.from({ doc })
 
-      const monad = t.castPlugin(
-        new Cursor({
-          doc: data
-        })
-      )
-
-      const pluggedIn = plugins.reduce(
-        (all, next) => next(all),
-        monad
-      )
-
-      const postText = t.getPlugin(PostText) as PostText
-
-      return postText.transform()(pluggedIn)
-    }
-  }
-
-  transform() {
-    return PostText.build()
+    return PostText.build()(reader)
   }
 
   static build() {
-    return (t: PluginMonad) => {
-      const postText = t.getPlugin(PostText) as PostText
-
-      return postText.build()(t)
-    }
-  }
-
-  build() {
-    return Pattern.repeat(
-      Pattern.match()
+    return Pattern.repeat(() =>
+      Pattern.match(() => PostText.lookup(), [
+        Pattern.of(Type.Block, () => Block.build()),
+        Pattern.of(Type.Text, () => Text.build())
+      ])
     )
   }
 
   static lookup() {
-    return (t: any) => {
-      const postText = t.getPlugin(PostText)
+    return (t: Reader) => {
+      if (
+        t.cursor.startWith('\\') &&
+        !t.cursor.startWith('\\\\')
+      ) {
+        return Type.Block
+      }
 
-      return postText.lookup(t)
+      return Type.Text
     }
   }
+}
 
-  lookup(t: any) {}
+export class Block {
+  static build() {
+    return (t: Reader) => ({})
+  }
+}
+
+export class Text {
+  static build() {
+    return (t: Reader) => {
+      return {
+        type: Type.Text,
+        text: Pattern.readUntil('\\', ['\\\\'])(t)
+      }
+    }
+  }
 }
