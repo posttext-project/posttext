@@ -21,7 +21,14 @@ export class PostText extends Reader {
         })
       )
 
-      return plugins.reduce((all, next) => next(all), monad)
+      const pluggedIn = plugins.reduce(
+        (all, next) => next(all),
+        monad
+      )
+
+      const postText = t.getPlugin(PostText) as PostText
+
+      return postText.transform()(pluggedIn)
     }
   }
 
@@ -33,12 +40,14 @@ export class PostText extends Reader {
     return (t: PluginMonad) => {
       const postText = t.getPlugin(PostText) as PostText
 
-      return postText.build()
+      return postText.build()(t)
     }
   }
 
   build() {
-    return Pattern.repeat(PostText.lookup())
+    return Pattern.repeat(
+      Pattern.match()
+    )
   }
 
   static lookup() {
