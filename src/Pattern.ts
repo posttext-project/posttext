@@ -78,4 +78,45 @@ export class Pattern {
       return cursor.takeUntil(index)
     }
   }
+
+  static block(fns: Function[]) {
+    return (t: Reader) => {
+      let target = {}
+
+      for (const fn of fns) {
+        target = fn(target)(t)
+      }
+
+      return t
+    }
+  }
+
+  static key(name: string, fn: Function) {
+    return (target: object) => (t: Reader) => {
+      return {
+        ...target,
+        [name]: fn()(t)
+      }
+    }
+  }
+
+  static nonKey(fn: Function) {
+    return (target: object) => (t: Reader) => {
+      fn()(t)
+
+      return target
+    }
+  }
+
+  static sequence(fns: Function[]) {
+    return (t: Reader) => {
+      const results = []
+
+      for (const fn of fns) {
+        results.push(fn()(t))
+      }
+
+      return results
+    }
+  }
 }
