@@ -1,19 +1,21 @@
 import { Reader } from './Reader'
 import { Pattern } from './Pattern'
-import { Text } from './Text'
 import { Word } from './Word'
+import { PostText } from './PostText'
 
 export class Block {
   static build() {
-    return (t: Reader) => {
-      Pattern.skip(1)(t)
-
-      const name = Block.blockName()(t)
-    }
+    return Pattern.block([
+      Pattern.key('name', Block.blockName()),
+      Pattern.key('content', Block.blockContent())
+    ])
   }
 
   static blockName() {
-    return Word.build()
+    return Pattern.empty([
+      Pattern.nonKey(Pattern.skip(1)),
+      Pattern.overwrite(Word.build())
+    ])
   }
 
   static blockParams() {
@@ -25,16 +27,21 @@ export class Block {
   }
 
   static blockContent() {
-    return (t: Reader) => ({})
+    return Pattern.empty([
+      Pattern.nonKey(Block.openBrace()),
+      Pattern.overwrite(PostText.build()),
+      Pattern.nonKey(Block.closeBrace())
+    ])
   }
-}
 
-export class BlockContent {
-  static build() {
-    return (t: Reader) => {
-      Pattern.skipUntilRegExp(/\{|[^\s]/)
+  static openBrace() {
+    return Pattern.empty([
+      Pattern.nonKey(Pattern.skipUntilRegExp(/[^\s]/)),
+      Pattern.nonKey(Pattern.skip(1))
+    ])
+  }
 
-      
-    }
+  static closeBrace() {
+    return Pattern.skip(1)
   }
 }

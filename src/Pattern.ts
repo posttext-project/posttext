@@ -17,7 +17,7 @@ export class Pattern {
     return (t: Reader) => {
       const output = []
 
-      while (t.cursor.notEof() && condition()(t)) {
+      while (t.cursor.notEof() && !condition()(t)) {
         output.push(fn()(t))
       }
 
@@ -29,25 +29,104 @@ export class Pattern {
     return (t: Reader) => {
       const value = condition()(t.clone())
 
-      return Pattern._match(value, cases)
+      return Pattern._match(value, cases)(t)
     }
+  }
+
+  static isTrue() {
+    return (t: Reader) => true
   }
 
   static _match(value: any, cases: Function[]) {
-    if (cases) {
-      const [first, ...rest] = cases
+    return (t: Reader) => {
+      if (cases) {
+        const [first, ...rest] = cases
 
-      return first(value, () => Pattern._match(value, rest))
+        return first(value, () =>
+          Pattern._match(value, rest)(t)
+        )(t)
+      }
     }
   }
 
-  static of(value: any, callback: Function) {
-    return (matchValue: any, next: Function) => {
+  static of(matchValue: any, callback: Function) {
+    return (value: any, next: Function) => (t: Reader) => {
       if (value === matchValue) {
-        return callback()
+        return callback()(t)
       }
 
       return next()
+    }
+  }
+
+  static block(fns: Function[]) {
+    return (t: Reader) => {
+      let target = {}
+
+      for (const fn of fns) {
+        target = fn(target)(t)
+      }
+
+      return target
+    }
+  }
+
+  static key(name: string, fn: Function) {
+    return (target: object) => (t: Reader) => {
+      return {
+        ...target,
+        [name]: fn(t)
+      }
+    }
+  }
+
+  static nonKey(fn: Function) {
+    return (target: any) => (t: Reader) => {
+      fn(t)
+
+      return target
+    }
+  }
+
+  static sequence(fns: Function[]) {
+    return (t: Reader) => {
+      let target: any[] = []
+
+      for (const fn of fns) {
+        target = fn(target)(t)
+      }
+
+      return target
+    }
+  }
+
+  static push(fn: Function) {
+    return (target: any[]) => (t: Reader) => {
+      return [...target, fn(t)]
+    }
+  }
+
+  static reduce(reducer: Function, source: Function) {
+    return (t: Reader) => {
+      return reducer(source(t))
+    }
+  }
+
+  static empty(fns: Function[]) {
+    return (t: Reader) => {
+      let target = undefined
+
+      for (const fn of fns) {
+        target = fn(target)(t)
+      }
+
+      return target
+    }
+  }
+
+  static overwrite(fn: Function) {
+    return (target: any) => (t: Reader) => {
+      return fn(t)
     }
   }
 
@@ -76,47 +155,6 @@ export class Pattern {
       t.setCursor(cursor.setIndex(index))
 
       return cursor.takeUntil(index)
-    }
-  }
-
-  static block(fns: Function[]) {
-    return (t: Reader) => {
-      let target = {}
-
-      for (const fn of fns) {
-        target = fn(target)(t)
-      }
-
-      return t
-    }
-  }
-
-  static key(name: string, fn: Function) {
-    return (target: object) => (t: Reader) => {
-      return {
-        ...target,
-        [name]: fn()(t)
-      }
-    }
-  }
-
-  static nonKey(fn: Function) {
-    return (target: object) => (t: Reader) => {
-      fn()(t)
-
-      return target
-    }
-  }
-
-  static sequence(fns: Function[]) {
-    return (t: Reader) => {
-      const results = []
-
-      for (const fn of fns) {
-        results.push(fn()(t))
-      }
-
-      return results
     }
   }
 }

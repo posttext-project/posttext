@@ -53,16 +53,21 @@ export class Cursor {
 
   oneOf(compareStrings: string[]) {
     for (const compareString of compareStrings) {
-      this.startWith(compareString)
-
-      return compareString
+      if (this.startWith(compareString)) {
+        return compareString
+      }
     }
 
     return undefined
   }
 
   findRegExp(regExp: RegExp) {
-    const clone = new RegExp(regExp)
+    const flags = regExp.flags
+    const clone = new RegExp(
+      regExp,
+      flags.indexOf('g') === -1 ? flags + 'g' : flags
+    )
+    clone.lastIndex = this.index
 
     return clone.exec(this.doc)
   }

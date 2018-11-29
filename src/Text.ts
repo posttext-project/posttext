@@ -1,25 +1,26 @@
 import { Reader } from './Reader'
 import { Type } from './Type'
+import { Pattern } from './Pattern'
 
 export interface TextBuildOptions {
-  isTopLevel: boolean
+  isTopLevel?: boolean
 }
 
-export interface ReadTextOptions {
-  isTopLevel: boolean
+export interface TextReadTextOptions {
+  isTopLevel?: boolean
 }
 
 export class Text {
   static build({ isTopLevel }: TextBuildOptions) {
-    return (t: Reader) => {
+    return Pattern.reduce((text: string) => {
       return {
         type: Type.Text,
-        text: Text.readText({ isTopLevel })
+        text
       }
-    }
+    }, Text.readText({ isTopLevel }))
   }
 
-  static readText({ isTopLevel }: ReadTextOptions) {
+  static readText({ isTopLevel }: TextReadTextOptions) {
     if (isTopLevel) {
       return Text.readUntilAndIgnore(
         ['\\'],
@@ -38,14 +39,14 @@ export class Text {
     ignoreStrings: string[] = []
   ) {
     return (t: Reader) => {
-      if (ignoreStrings.indexOf('')) {
+      if (ignoreStrings.indexOf('') !== -1) {
         return ''
       }
 
       const mark = t.cursor
       let cursor = t.cursor
 
-      while (cursor.notEof() || !cursor.oneOf(terminators)) {
+      while (cursor.notEof() && !cursor.oneOf(terminators)) {
         const matchString = cursor.oneOf(ignoreStrings)
 
         if (!matchString) {

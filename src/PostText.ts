@@ -5,7 +5,11 @@ import { Block } from './Block'
 import { Type } from './Type'
 
 export interface PostTextBuildOptions {
-  isTopLevel: boolean
+  isTopLevel?: boolean
+}
+
+export interface PostTextIsEndOptions {
+  isTopLevel?: boolean
 }
 
 export class PostText {
@@ -15,12 +19,19 @@ export class PostText {
     return PostText.build({ isTopLevel: true })(reader)
   }
 
-  static build({ isTopLevel }: PostTextBuildOptions) {
-    return Pattern.repeat(() =>
-      Pattern.match(() => PostText.lookup(), [
-        Pattern.of(Type.Block, () => Block.build()),
-        Pattern.of(Type.Text, () => Text.build({ isTopLevel }))
-      ])
+  static build({ isTopLevel }: PostTextBuildOptions = {}) {
+    return Pattern.repeatUntil(
+      () =>
+        PostText.isEnd({
+          isTopLevel
+        }),
+      () =>
+        Pattern.match(() => PostText.lookup(), [
+          Pattern.of(Type.Block, () => Block.build()),
+          Pattern.of(Type.Text, () =>
+            Text.build({ isTopLevel })
+          )
+        ])
     )
   }
 
@@ -34,6 +45,16 @@ export class PostText {
       }
 
       return Type.Text
+    }
+  }
+
+  static isEnd({ isTopLevel }: PostTextIsEndOptions) {
+    return (t: Reader) => {
+      if (!isTopLevel) {
+        return t.cursor.startWith('}')
+      }
+
+      return false
     }
   }
 }
