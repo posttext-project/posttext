@@ -1,18 +1,31 @@
 export interface CursorOptions {
   doc: string
   index?: number
+  end?: number
 }
 
 export class Cursor {
   doc: string
   index: number
+  end?: number
 
-  constructor({ doc, index }: CursorOptions) {
+  constructor({ doc, index, end }: CursorOptions) {
     this.doc = doc
     this.index = index || 0
+    this.end = end
+      ? end < doc.length
+        ? end
+        : undefined
+      : undefined
   }
 
-  setIndex(index: number): Cursor {
+  setIndex(index?: number): Cursor {
+    if (!index) {
+      return this.clone({
+        index: this.doc.length
+      })
+    }
+
     return this.clone({
       index
     })
@@ -38,7 +51,7 @@ export class Cursor {
     )
   }
 
-  match(compareStrings: string[]) {
+  oneOf(compareStrings: string[]) {
     for (const compareString of compareStrings) {
       this.startWith(compareString)
 
@@ -58,11 +71,25 @@ export class Cursor {
     return this.index <= this.doc.length
   }
 
-  takeUntil(cursor: Cursor) {
-    if (this.doc === cursor.doc) {
-      return this.doc.substring(this.index, cursor.index)
+  endAt(index: number): Cursor {
+    if (index <= this.doc.length) {
+      if (index < 0) {
+        return this.clone({
+          end: 0
+        })
+      }
+
+      return this.clone({
+        end: index
+      })
     }
 
-    return ''
+    return this.clone({
+      end: this.doc.length
+    })
+  }
+
+  takeUntil(index?: number) {
+    return this.doc.substring(this.index, index)
   }
 }

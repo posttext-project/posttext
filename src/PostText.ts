@@ -1,23 +1,25 @@
 import { Reader } from './Reader'
 import { Pattern } from './Pattern'
+import { Text } from './Text'
+import { Block } from './Block'
+import { Type } from './Type'
 
-export enum Type {
-  Block = 'Block',
-  Text = 'Text'
+export interface PostTextBuildOptions {
+  isTopLevel: boolean
 }
 
 export class PostText {
   static transform(doc: string) {
     const reader = Reader.from({ doc })
 
-    return PostText.build()(reader)
+    return PostText.build({ isTopLevel: true })(reader)
   }
 
-  static build() {
+  static build({ isTopLevel }: PostTextBuildOptions) {
     return Pattern.repeat(() =>
       Pattern.match(() => PostText.lookup(), [
         Pattern.of(Type.Block, () => Block.build()),
-        Pattern.of(Type.Text, () => Text.build())
+        Pattern.of(Type.Text, () => Text.build({ isTopLevel }))
       ])
     )
   }
@@ -32,23 +34,6 @@ export class PostText {
       }
 
       return Type.Text
-    }
-  }
-}
-
-export class Block {
-  static build() {
-    return (t: Reader) => ({})
-  }
-}
-
-export class Text {
-  static build() {
-    return (t: Reader) => {
-      return {
-        type: Type.Text,
-        text: Pattern.readUntil('\\', ['\\\\'])(t)
-      }
     }
   }
 }

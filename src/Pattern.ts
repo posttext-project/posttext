@@ -13,6 +13,18 @@ export class Pattern {
     }
   }
 
+  static repeatUntil(condition: Function, fn: Function) {
+    return (t: Reader) => {
+      const output = []
+
+      while (t.cursor.notEof() && condition()(t)) {
+        output.push(fn()(t))
+      }
+
+      return output
+    }
+  }
+
   static match(condition: Function, cases: Function[]) {
     return (t: Reader) => {
       const value = condition()(t.clone())
@@ -39,31 +51,31 @@ export class Pattern {
     }
   }
 
-  static readUntil(
-    terminator: string,
-    ignoreStrings: string[] = []
-  ) {
+  static skip(count: number) {
     return (t: Reader) => {
-      if (ignoreStrings.indexOf('')) {
-        return ''
-      }
+      t.setCursor(t.cursor.next(count))
+    }
+  }
 
-      const mark = t.cursor
-      let cursor = t.cursor
+  static skipUntilRegExp(terminator: RegExp) {
+    return (t: Reader) => {
+      const cursor = t.cursor
+      let result = cursor.findRegExp(terminator)
+      let index = (result && result.index) || undefined
 
-      while (cursor.notEof() || !cursor.startWith(terminator)) {
-        const matchString = cursor.match(ignoreStrings)
+      t.setCursor(cursor.setIndex(index))
+    }
+  }
 
-        if (!matchString) {
-          cursor = cursor.next(1)
-        } else {
-          cursor = cursor.next(matchString.length)
-        }
-      }
+  static readUntilRegExp(terminator: RegExp) {
+    return (t: Reader) => {
+      const cursor = t.cursor
+      let result = cursor.findRegExp(terminator)
+      let index = (result && result.index) || undefined
 
-      t.setCursor(cursor)
+      t.setCursor(cursor.setIndex(index))
 
-      return mark.takeUntil(cursor)
+      return cursor.takeUntil(index)
     }
   }
 }
