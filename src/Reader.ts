@@ -15,6 +15,14 @@ export class Reader {
     return new Reader({ cursor: new Cursor({ doc }) })
   }
 
+  static run(fn: Function) {
+    return (doc: string) => {
+      const t = Reader.from({ doc })
+
+      return fn(t)
+    }
+  }
+
   constructor({ cursor }: ReaderOptions) {
     this.cursor = cursor
   }
