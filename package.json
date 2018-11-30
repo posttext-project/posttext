@@ -21,5 +21,23 @@
     "rollup": "^0.67.3",
     "rollup-plugin-typescript": "^1.0.0",
     "tslib": "^1.9.3"
-  }
+  },
+  "description": "The next generation markup language for everyone! :D",
+  "main": "out/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/clitetailor/post-text.git"
+  },
+  "keywords": [
+    "text",
+    "markup",
+    "preprocessor",
+    "html"
+  ],
+  "author": "clitetailor",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/clitetailor/post-text/issues"
+  },
+  "homepage": "https://github.com/clitetailor/post-text#readme"
 }
