@@ -26,8 +26,7 @@ function outFile() {
 }
 
 export function clean(callback) {
-  // del(outDir() + '/**').then(callback)
-  callback()
+  del(outDir() + '/**').then(() => callback())
 }
 
 export const build = gulp.series(clean, function() {
