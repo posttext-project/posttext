@@ -1,8 +1,10 @@
-# Post Text
+# PostText
 
-> The next generation markup language for everyone! :D
+The next generation markup language for everyone!
 
-## What is Post Text?
+> **Note**: This library is still under development! ⚠
+
+## What is PostText?
 
 **PostText** is a markup language and text preprocessor based on Latex. Its aim is to overcome the limitation in Markdown syntax but still keep the readability. The final target is to provide the user with a powerful content editing format without the need of any advanced WYSIWYG editor.
 

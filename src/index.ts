@@ -1,7 +1,5 @@
 import { PostText } from './PostText'
 
-const output = PostText.transform(`
-  Hello, \\bold{World}!
-`)
-
-console.log(output)
+export function transform(doc: string) {
+  return PostText.transform(doc)
+}
