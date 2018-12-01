@@ -1,20 +1,27 @@
-import { Reader } from './Reader'
+import {
+  Reader,
+  ReaderClosure,
+  ReaderClosureStatement
+} from './Reader'
 
 export class Pattern {
-  static repeat(fn: Function) {
+  static repeat(fn: ReaderClosureStatement): ReaderClosure {
     return Pattern.repeatUntil(
       () => Pattern.isTrue(),
       () => fn()
     )
   }
 
-  static repeatUntil(condition: Function, fn: Function) {
+  static repeatUntil(
+    condition: Function,
+    fn: ReaderClosureStatement
+  ): ReaderClosure {
     return (t: Reader) => {
       const output = []
 
       let lastIndex
       while (
-        t.cursor.notEof() &&
+        !t.cursor.eof() &&
         !(lastIndex && t.cursor.index === lastIndex) &&
         !condition()(t)
       ) {
@@ -27,7 +34,10 @@ export class Pattern {
     }
   }
 
-  static match(condition: Function, cases: Function[]) {
+  static match(
+    condition: ReaderClosureStatement,
+    cases: ((value: any, next: Function) => ReaderClosure)[]
+  ): ReaderClosure {
     return (t: Reader) => {
       const value = condition()(t.clone())
 
@@ -35,11 +45,18 @@ export class Pattern {
     }
   }
 
-  static isTrue() {
+  static isTrue(): ReaderClosure {
     return (t: Reader) => true
   }
 
-  static _match(value: any, cases: Function[]) {
+  static isFalse(): ReaderClosure {
+    return (t: Reader) => false
+  }
+
+  static _match(
+    value: any,
+    cases: ((value: any, next: Function) => ReaderClosure)[]
+  ): ReaderClosure {
     return (t: Reader) => {
       if (cases) {
         const [first, ...rest] = cases
@@ -51,7 +68,10 @@ export class Pattern {
     }
   }
 
-  static of(matchValue: any, callback: Function) {
+  static of(
+    matchValue: any,
+    callback: ReaderClosureStatement
+  ): ((value: any, next: Function) => ReaderClosure) {
     return (value: any, next: Function) => (t: Reader) => {
       if (value === matchValue) {
         return callback()(t)
@@ -61,7 +81,9 @@ export class Pattern {
     }
   }
 
-  static block(fns: Function[]) {
+  static block(
+    fns: ((target: any) => ReaderClosure)[]
+  ): ReaderClosure {
     return (t: Reader) => {
       let target = {}
 
@@ -73,7 +95,10 @@ export class Pattern {
     }
   }
 
-  static key(name: string, fn: Function) {
+  static key(
+    name: string,
+    fn: ReaderClosure
+  ): ((target: object) => ReaderClosure) {
     return (target: object) => (t: Reader) => {
       return {
         ...target,
@@ -82,7 +107,9 @@ export class Pattern {
     }
   }
 
-  static nonKey(fn: Function) {
+  static nonKey(
+    fn: ReaderClosure
+  ): ((target: any) => ReaderClosure) {
     return (target: any) => (t: Reader) => {
       fn(t)
 
@@ -90,7 +117,9 @@ export class Pattern {
     }
   }
 
-  static sequence(fns: Function[]) {
+  static sequence(
+    fns: ((target: any) => ReaderClosure)[]
+  ): ReaderClosure {
     return (t: Reader) => {
       let target: any[] = []
 
@@ -102,19 +131,32 @@ export class Pattern {
     }
   }
 
-  static push(fn: Function) {
+  static push(
+    fn: ReaderClosure
+  ): ((target: any[]) => ReaderClosure) {
     return (target: any[]) => (t: Reader) => {
       return [...target, fn(t)]
     }
   }
 
-  static reduce(reducer: Function, source: Function) {
+  static reduce(
+    reducer: Function,
+    source: ReaderClosure
+  ): ReaderClosure {
     return (t: Reader) => {
       return reducer(source(t))
     }
   }
 
-  static empty(fns: Function[]) {
+  static constant(value: any): ReaderClosure {
+    return (t: Reader) => {
+      return value
+    }
+  }
+
+  static empty(
+    fns: ((target: any) => ReaderClosure)[]
+  ): ReaderClosure {
     return (t: Reader) => {
       let target = undefined
 
@@ -126,19 +168,25 @@ export class Pattern {
     }
   }
 
-  static overwrite(fn: Function) {
+  static overwrite(fn: ReaderClosure): ReaderClosure {
     return (target: any) => (t: Reader) => {
       return fn(t)
     }
   }
 
-  static skip(count: number) {
+  static startWith(compareString: string): ReaderClosure {
+    return (t: Reader) => {
+      return t.cursor.startWith(compareString)
+    }
+  }
+
+  static skip(count: number): ReaderClosure {
     return (t: Reader) => {
       t.setCursor(t.cursor.next(count))
     }
   }
 
-  static skipUntilRegExp(terminator: RegExp) {
+  static skipUntilRegExp(terminator: RegExp): ReaderClosure {
     return (t: Reader) => {
       const cursor = t.cursor
       let result = cursor.findRegExp(terminator)
@@ -148,7 +196,7 @@ export class Pattern {
     }
   }
 
-  static readUntilRegExp(terminator: RegExp) {
+  static readUntilRegExp(terminator: RegExp): ReaderClosure {
     return (t: Reader) => {
       const cursor = t.cursor
       let result = cursor.findRegExp(terminator)

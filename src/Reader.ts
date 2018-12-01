@@ -8,6 +8,10 @@ export interface ReaderLike {
   doc: string
 }
 
+export type ReaderClosure = (t: Reader) => any
+
+export type ReaderClosureStatement = () => ReaderClosure
+
 export class Reader {
   cursor: Cursor
 
@@ -15,7 +19,7 @@ export class Reader {
     return new Reader({ cursor: new Cursor({ doc }) })
   }
 
-  static run(fn: Function) {
+  static run(fn: ReaderClosure) {
     return (doc: string) => {
       const t = Reader.from({ doc })
 
