@@ -19,6 +19,13 @@ export class Cursor {
       : undefined
   }
 
+  clone(options: Partial<CursorOptions>) {
+    return new Cursor({
+      ...(this as CursorOptions),
+      ...options
+    })
+  }
+
   setIndex(index?: number): Cursor {
     if (!index) {
       return this.clone({
@@ -30,40 +37,36 @@ export class Cursor {
       return this
     }
 
+    if (
+      (this.end && this.index < this.end) ||
+      index > this.doc.length
+    ) {
+      return this.clone({
+        index: this.end
+      })
+    }
+
     return this.clone({
       index
     })
   }
 
   next(offset: number): Cursor {
-    if (offset <= 0) {
-      return this
-    }
-
-    return this.clone({
-      index: this.index + offset
-    })
+    return this.setIndex(this.index + offset)
   }
 
-  clone(options: Partial<CursorOptions>) {
-    return new Cursor({
-      ...(this as CursorOptions),
-      ...options
-    })
-  }
-
-  startWith(compareString: string) {
-    return compareString === this.lookup(compareString.length)
-  }
-
-  lookup(len?: number) {
+  lookup(len?: number): string {
     return this.doc.substring(
       this.index,
       len && this.index + len
     )
   }
 
-  oneOf(compareStrings: string[]) {
+  startWith(compareString: string): boolean {
+    return compareString === this.lookup(compareString.length)
+  }
+
+  oneOf(compareStrings: string[]): string | undefined {
     for (const compareString of compareStrings) {
       if (this.startWith(compareString)) {
         return compareString
@@ -73,7 +76,7 @@ export class Cursor {
     return undefined
   }
 
-  findRegExp(regExp: RegExp) {
+  findRegExp(regExp: RegExp): RegExpExecArray | null {
     const flags = regExp.flags
     const clone = new RegExp(
       regExp,
@@ -84,8 +87,10 @@ export class Cursor {
     return clone.exec(this.doc)
   }
 
-  notEof() {
-    return this.index <= this.doc.length
+  eof(): boolean {
+    return this.end
+      ? this.index >= this.end
+      : this.index >= this.doc.length
   }
 
   endAt(index: number): Cursor {
@@ -106,7 +111,7 @@ export class Cursor {
     })
   }
 
-  takeUntil(index?: number) {
+  takeUntil(index?: number): string {
     return this.doc.substring(this.index, index)
   }
 }
