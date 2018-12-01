@@ -1,9 +1,12 @@
 {
-  "name": "post-text",
+  "name": "posttext",
   "version": "0.0.1",
   "scripts": {
     "start": "gulp run"
   },
+  "files": [
+    "out"
+  ],
   "devDependencies": {
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
