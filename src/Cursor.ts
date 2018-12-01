@@ -26,12 +26,20 @@ export class Cursor {
       })
     }
 
+    if (index <= this.index) {
+      return this
+    }
+
     return this.clone({
       index
     })
   }
 
   next(offset: number): Cursor {
+    if (offset <= 0) {
+      return this
+    }
+
     return this.clone({
       index: this.index + offset
     })
@@ -45,9 +53,13 @@ export class Cursor {
   }
 
   startWith(compareString: string) {
-    return (
-      compareString ===
-      this.doc.substr(this.index, compareString.length)
+    return compareString === this.lookup(compareString.length)
+  }
+
+  lookup(len?: number) {
+    return this.doc.substring(
+      this.index,
+      len && this.index + len
     )
   }
 

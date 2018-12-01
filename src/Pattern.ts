@@ -2,22 +2,24 @@ import { Reader } from './Reader'
 
 export class Pattern {
   static repeat(fn: Function) {
-    return (t: Reader) => {
-      const output = []
-
-      while (t.cursor.notEof()) {
-        output.push(fn()(t))
-      }
-
-      return output
-    }
+    return Pattern.repeatUntil(
+      () => Pattern.isTrue(),
+      () => fn()
+    )
   }
 
   static repeatUntil(condition: Function, fn: Function) {
     return (t: Reader) => {
       const output = []
 
-      while (t.cursor.notEof() && !condition()(t)) {
+      let lastIndex
+      while (
+        t.cursor.notEof() &&
+        !(lastIndex && t.cursor.index === lastIndex) &&
+        !condition()(t)
+      ) {
+        lastIndex = t.cursor.index
+
         output.push(fn()(t))
       }
 
