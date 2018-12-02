@@ -207,4 +207,17 @@ export class Pattern {
       return cursor.takeUntil(index)
     }
   }
+
+  static split(
+    regExp: RegExp,
+    fn: ReaderClosureStatement
+  ): ReaderClosure {
+    return (t: Reader) => {
+      return t.cursor.split(regExp).map(cursor => {
+        const reader = t.setCursor(cursor)
+
+        return fn()(t)
+      })
+    }
+  }
 }
