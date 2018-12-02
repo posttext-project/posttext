@@ -26,6 +26,10 @@ export class Cursor {
     })
   }
 
+  endIndex() {
+    return this.end || this.doc.length
+  }
+
   setIndex(index?: number): Cursor {
     if (!index) {
       return this.clone({
@@ -37,12 +41,9 @@ export class Cursor {
       return this
     }
 
-    if (
-      (this.end && this.index < this.end) ||
-      index > this.doc.length
-    ) {
+    if (this.index > this.endIndex()) {
       return this.clone({
-        index: this.end
+        index: this.endIndex()
       })
     }
 
@@ -87,10 +88,36 @@ export class Cursor {
     return clone.exec(this.doc)
   }
 
+  split(regExp: RegExp): Cursor[] {
+    const flags = regExp.flags
+    const clone = new RegExp(
+      regExp,
+      flags.indexOf('g') === -1 ? flags + 'g' : flags
+    )
+
+    clone.lastIndex = this.index
+
+    let result: RegExpExecArray | null
+    let cursors: Cursor[] = []
+    while (
+      clone.lastIndex < this.endIndex() &&
+      (result = clone.exec(this.doc))
+    ) {
+      cursors.push(
+        this.clone({
+          index: clone.lastIndex,
+          end: result.index
+        })
+      )
+
+      clone.lastIndex = result.index
+    }
+
+    return cursors
+  }
+
   eof(): boolean {
-    return this.end
-      ? this.index >= this.end
-      : this.index >= this.doc.length
+    return this.index >= this.endIndex()
   }
 
   endAt(index: number): Cursor {
