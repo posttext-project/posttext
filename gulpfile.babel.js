@@ -7,11 +7,6 @@ import { argv } from 'yargs'
 
 const tsProject = ts.createProject('tsconfig.json')
 
-function debug(arg) {
-  console.log(arg)
-  return arg
-}
-
 function outDir() {
   return path.resolve(argv.out || 'out')
 }
@@ -20,7 +15,7 @@ function outFile() {
   return path
     .join(
       outDir(),
-      path.relative('src', argv.exec || 'src/index.ts')
+      path.relative('src', argv.target || 'src/index.ts')
     )
     .replace(/\.ts$/, '.js')
 }

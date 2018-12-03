@@ -19,11 +19,23 @@ export class Reader {
     return new Reader({ cursor: new Cursor({ doc }) })
   }
 
-  static run(fn: ReaderClosure) {
-    return (doc: string) => {
-      const t = Reader.from({ doc })
+  static run(
+    fn: ReaderClosure
+  ): ((
+    doc: string | TemplateStringsArray,
+    ...rest: string[]
+  ) => any) {
+    return (
+      doc: string | TemplateStringsArray,
+      ...rest: string[]
+    ) => {
+      if (typeof doc === 'string') {
+        const t = Reader.from({ doc })
 
-      return fn(t)
+        return fn(t)
+      }
+
+      return Reader.run(fn)(String.raw(doc, ...rest))
     }
   }
 

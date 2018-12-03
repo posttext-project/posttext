@@ -25,7 +25,16 @@ export class Matcher {
   }
 
   static ignore(regExp: RegExp): ReaderClosure {
-    return (t: Reader) => ({})
+    return (t: Reader) => {
+      const cursor = t.cursor
+
+      let result
+      if ((result = cursor.findRegExp(regExp))) {
+        if (result.index === cursor.index) {
+          t.setCursor(cursor.next(result[0].length))
+        }
+      }
+    }
   }
 
   static ignoreUntil(regExp: RegExp): ReaderClosure {

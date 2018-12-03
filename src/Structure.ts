@@ -1,11 +1,12 @@
 import { Reader, ReaderClosure } from './Reader'
 
 export class Structure {
-  static block(
+  static structure(
+    container: any,
     fns: ((target: any) => ReaderClosure)[]
   ): ReaderClosure {
     return (t: Reader) => {
-      let target = {}
+      let target = container
 
       for (const fn of fns) {
         target = fn(target)(t)
@@ -13,6 +14,12 @@ export class Structure {
 
       return target
     }
+  }
+
+  static block(
+    fns: ((target: any) => ReaderClosure)[]
+  ): ReaderClosure {
+    return Structure.structure({}, fns)
   }
 
   static key(
@@ -40,15 +47,7 @@ export class Structure {
   static sequence(
     fns: ((target: any) => ReaderClosure)[]
   ): ReaderClosure {
-    return (t: Reader) => {
-      let target: any[] = []
-
-      for (const fn of fns) {
-        target = fn(target)(t)
-      }
-
-      return target
-    }
+    return Structure.structure([], fns)
   }
 
   static push(
@@ -59,26 +58,28 @@ export class Structure {
     }
   }
 
-  static empty(
-    fns: ((target: any) => ReaderClosure)[]
-  ): ReaderClosure {
-    return (t: Reader) => {
-      let target = undefined
-
-      for (const fn of fns) {
-        target = fn(target)(t)
-      }
-
-      return target
+  static unshift(
+    fn: ReaderClosure
+  ): ((target: any[]) => ReaderClosure) {
+    return (target: any[]) => (t: Reader) => {
+      return [fn(t), ...target]
     }
   }
 
-  static mutate(
-    fn: ((value: any) => ReaderClosure)
+  static empty(
+    fns: ((target: any) => ReaderClosure)[]
   ): ReaderClosure {
+    return Structure.structure(undefined, fns)
+  }
+
+  static overwrite(fn: ReaderClosure): ReaderClosure {
     return (target: any) => (t: Reader) => {
-      return fn(target)(t)
+      return fn(t)
     }
+  }
+
+  static mutate(fn: ((target: any) => ReaderClosure)) {
+    return fn
   }
 
   static transform(

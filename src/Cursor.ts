@@ -63,13 +63,13 @@ export class Cursor {
     )
   }
 
-  startWith(compareString: string): boolean {
+  startsWith(compareString: string): boolean {
     return compareString === this.lookup(compareString.length)
   }
 
   oneOf(compareStrings: string[]): string | undefined {
     for (const compareString of compareStrings) {
-      if (this.startWith(compareString)) {
+      if (this.startsWith(compareString)) {
         return compareString
       }
     }
@@ -138,7 +138,7 @@ export class Cursor {
     })
   }
 
-  takeUntil(index?: number): string {
+  takeUntil(index: number): string {
     return this.doc.substring(this.index, index)
   }
 }
