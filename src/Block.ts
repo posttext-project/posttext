@@ -1,47 +1,35 @@
-import { Reader } from './Reader'
-import { Pattern } from './Pattern'
+import { Reader, ReaderClosure } from './common/Reader'
+import { Structure } from './common/Structure'
+import { Matcher } from './common/Matcher'
 import { Word } from './Word'
-import { PostText } from './PostText'
 
 export class Block {
-  static build() {
-    return Pattern.block([
-      Pattern.key('name', Block.blockName()),
-      Pattern.key('content', Block.blockContent())
+  static build(): ReaderClosure {
+    return Structure.block([
+      Structure.key('name', Block.blockName()),
+      Structure.key('params', Block.blockParams()),
+      Structure.key('options', Block.blockOptions()),
+      Structure.key('content', Block.blockContent())
     ])
   }
 
-  static blockName() {
-    return Pattern.empty([
-      Pattern.nonKey(Pattern.skip(1)),
-      Pattern.overwrite(Word.build())
+  static blockName(): ReaderClosure {
+    return Structure.empty([
+      Structure.nonKey(Matcher.ignoreUntil(/[^=]/)),
+      Structure.nonKey(Matcher.ignoreUntil(/\S/)),
+      Structure.overwrite(Word.build())
     ])
   }
 
-  static blockParams() {
+  static blockParams(): ReaderClosure {
     return (t: Reader) => ({})
   }
 
-  static blockOptions() {
+  static blockOptions(): ReaderClosure {
     return (t: Reader) => ({})
   }
 
-  static blockContent() {
-    return Pattern.empty([
-      Pattern.nonKey(Block.openBrace()),
-      Pattern.overwrite(PostText.build()),
-      Pattern.nonKey(Block.closeBrace())
-    ])
-  }
-
-  static openBrace() {
-    return Pattern.empty([
-      Pattern.nonKey(Pattern.skipUntilRegExp(/[^\s]/)),
-      Pattern.nonKey(Pattern.skip(1))
-    ])
-  }
-
-  static closeBrace() {
-    return Pattern.skip(1)
+  static blockContent(): ReaderClosure {
+    return (t: Reader) => ({})
   }
 }

@@ -1,18 +1,16 @@
-import { Reader } from './Reader'
+import { Reader, ReaderClosure } from './common/Reader'
+import { Structure } from './common/Structure'
 import { Type } from './Type'
-import { Pattern } from './Pattern'
 
 export interface TextBuildOptions {
   isTopLevel?: boolean
 }
 
-export interface TextReadTextOptions {
-  isTopLevel?: boolean
-}
-
 export class Text {
-  static build({ isTopLevel }: TextBuildOptions) {
-    return Pattern.reduce((text: string) => {
+  static build({
+    isTopLevel
+  }: TextBuildOptions): ReaderClosure {
+    return Structure.transform((text: string) => {
       return {
         type: Type.Text,
         text
@@ -20,7 +18,9 @@ export class Text {
     }, Text.readText({ isTopLevel }))
   }
 
-  static readText({ isTopLevel }: TextReadTextOptions) {
+  static readText({
+    isTopLevel
+  }: TextBuildOptions): ReaderClosure {
     if (isTopLevel) {
       return Text.readUntilAndIgnore(
         ['\\'],
@@ -37,7 +37,7 @@ export class Text {
   static readUntilAndIgnore(
     terminators: string[],
     ignoreStrings: string[] = []
-  ) {
+  ): ReaderClosure {
     return (t: Reader) => {
       if (ignoreStrings.indexOf('') !== -1) {
         return ''
@@ -46,7 +46,7 @@ export class Text {
       const mark = t.cursor
       let cursor = t.cursor
 
-      while (cursor.notEof() && !cursor.oneOf(terminators)) {
+      while (!cursor.eof() && !cursor.oneOf(terminators)) {
         const matchString = cursor.oneOf(ignoreStrings)
 
         if (!matchString) {
