@@ -14,13 +14,17 @@ export class Matcher {
       let result
       if ((result = cursor.findRegExp(regExp))) {
         if (result.index === cursor.index) {
-          t.setCursor(cursor.next(result[0].length))
-
           return result[result.length - 1]
         }
       }
 
       return ''
+    }
+  }
+
+  static oneOf(compareStrings: string[]): ReaderClosure {
+    return (t: Reader) => {
+      return t.cursor.oneOf(compareStrings)
     }
   }
 
@@ -44,6 +48,23 @@ export class Matcher {
       let index = (result && result.index) || undefined
 
       t.setCursor(cursor.setIndex(index))
+    }
+  }
+
+  static consume(regExp: RegExp): ReaderClosure {
+    return (t: Reader) => {
+      const cursor = t.cursor
+
+      let result
+      if ((result = cursor.findRegExp(regExp))) {
+        if (result.index === cursor.index) {
+          t.setCursor(cursor.next(result[0].length))
+
+          return result[result.length - 1]
+        }
+      }
+
+      return ''
     }
   }
 

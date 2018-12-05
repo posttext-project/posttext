@@ -12,8 +12,8 @@ export class Pattern {
     )
   }
 
-  static repeatUntil(
-    condition: Function,
+  static repeatWhile(
+    condition: ReaderClosureStatement,
     fn: ReaderClosureStatement
   ): ReaderClosure {
     return (t: Reader) => {
@@ -23,7 +23,7 @@ export class Pattern {
       while (
         !t.cursor.eof() &&
         !(lastIndex && t.cursor.index === lastIndex) &&
-        !condition()(t)
+        condition()(t)
       ) {
         lastIndex = t.cursor.index
 
@@ -32,6 +32,16 @@ export class Pattern {
 
       return output
     }
+  }
+
+  static repeatUntil(
+    condition: ReaderClosureStatement,
+    fn: ReaderClosureStatement
+  ): ReaderClosure {
+    return Pattern.repeatWhile(
+      () => (t: Reader) => !condition()(t),
+      fn
+    )
   }
 
   static match(
@@ -47,7 +57,10 @@ export class Pattern {
 
   static _match(
     value: any,
-    cases: ((value: any, next: Function) => ReaderClosure)[]
+    cases: ((
+      value: any,
+      next: ReaderClosureStatement
+    ) => ReaderClosure)[]
   ): ReaderClosure {
     return (t: Reader) => {
       if (cases) {
