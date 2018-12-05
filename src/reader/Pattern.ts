@@ -92,7 +92,7 @@ export class Pattern {
   ): ReaderClosure {
     return (t: Reader) => {
       return t.cursor.split(regExp).map(cursor => {
-        const reader = t.setCursor(cursor)
+        t.setCursor(cursor)
 
         return fn()(t)
       })

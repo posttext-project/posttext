@@ -1,4 +1,4 @@
-import { Matcher } from './common/Matcher'
+import { Matcher } from './reader/Matcher'
 
 export class Word {
   static build() {

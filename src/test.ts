@@ -1,6 +1,6 @@
-import { Reader } from './common/Reader'
-import { Structure } from './common/Structure'
-import { Matcher } from './common/Matcher'
+import { Reader } from './reader/Reader'
+import { Structure } from './reader/Structure'
+import { Matcher } from './reader/Matcher'
 import { Word } from './Word'
 
 const pt = Reader.run(
