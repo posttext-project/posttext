@@ -1,8 +1,9 @@
-import { Reader, ReaderClosure } from './common/Reader'
-import { Structure } from './common/Structure'
-import { Matcher } from './common/Matcher'
-import { Word } from './Word'
+import { Brace } from './common/Brace'
 import { PostText } from './PostText'
+import { Matcher } from './reader/Matcher'
+import { Reader, ReaderClosure } from './reader/Reader'
+import { Structure } from './reader/Structure'
+import { Word } from './Word'
 
 export class Inline {
   static build(): ReaderClosure {
@@ -37,21 +38,8 @@ export class Inline {
   }
 
   static inlineContent(): ReaderClosure {
-    return Structure.empty([
-      Structure.nonKey(Inline.openBrace()),
-      Structure.overwrite(PostText.build()),
-      Structure.nonKey(Inline.closeBrace())
-    ])
-  }
-
-  static openBrace(): ReaderClosure {
-    return Structure.empty([
-      Structure.nonKey(Matcher.ignoreUntil(/\S/)),
-      Structure.nonKey(Matcher.ignoreLength(1))
-    ])
-  }
-
-  static closeBrace(): ReaderClosure {
-    return Matcher.ignoreLength(1)
+    return Brace.ignoreBraces(() =>
+      PostText.build({ isTopLevel: false })
+    )
   }
 }
