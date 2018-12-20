@@ -10,9 +10,9 @@ The next generation markup language for everyone!
 
 ## Why?
 
-- **Readability** - Everyone should be able to read and write a document in PostText.
-- **Extensibility** - Features can be added easily.
-- **Compatibility** - XML, HTML, Markdown and other markup language syntax can be translated into PostText vice and versal.
+- **Readability** - The rules are simple and easy to read and write.
+- **Extensibility** - Features can be added and be modified easily without a lot of changes.
+- **Flexibility** - It can handle other language syntax at minimum cost. 
 - **Fault Tolerance** - Syntactic error can only affect one part of the document but not the whole document.
 
 ## How it work?
