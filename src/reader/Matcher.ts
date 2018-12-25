@@ -90,7 +90,7 @@ export class Matcher {
 
   static ignoreLength(count: number): ReaderClosure {
     return (t: Reader) => {
-      return t.cursor.next(count)
+      t.setCursor(t.cursor.next(count))
     }
   }
 }

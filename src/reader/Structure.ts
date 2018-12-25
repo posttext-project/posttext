@@ -78,8 +78,10 @@ export class Structure {
     }
   }
 
-  static mutate(fn: ((target: any) => ReaderClosure)) {
-    return fn
+  static mutate(
+    fn: ((value: any) => (target: any) => ReaderClosure)
+  ) {
+    return (target: any) => fn(target)(target)
   }
 
   static transform(

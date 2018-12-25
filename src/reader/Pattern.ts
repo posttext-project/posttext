@@ -44,6 +44,36 @@ export class Pattern {
     )
   }
 
+  static takeWhile(
+    condition: ReaderClosureStatement,
+    fn: ReaderClosureStatement
+  ): ReaderClosure {
+    return (t: Reader) => {
+      const mark = t.cursor
+
+      let lastIndex
+      while (
+        !t.cursor.eof() &&
+        !(lastIndex && t.cursor.index === lastIndex) &&
+        condition()(t)
+      ) {
+        fn()(t)
+      }
+
+      return mark.takeUntil(t.cursor.index)
+    }
+  }
+
+  static takeUntil(
+    condition: ReaderClosureStatement,
+    fn: ReaderClosureStatement
+  ): ReaderClosure {
+    return Pattern.takeWhile(
+      () => (t: Reader) => !condition()(t),
+      fn
+    )
+  }
+
   static match(
     condition: ReaderClosureStatement,
     cases: ((value: any, next: Function) => ReaderClosure)[]
@@ -75,14 +105,30 @@ export class Pattern {
 
   static of(
     matchValue: any,
-    callback: ReaderClosureStatement
+    fn: ReaderClosureStatement
   ): ((value: any, next: Function) => ReaderClosure) {
     return (value: any, next: Function) => (t: Reader) => {
       if (value === matchValue) {
-        return callback()(t)
+        return fn()(t)
       }
 
       return next()
+    }
+  }
+
+  static then(fn: ReaderClosureStatement) {
+    return (value: any, next: Function) => (t: Reader) => {
+      if (value) {
+        return fn()(t)
+      }
+
+      return next()
+    }
+  }
+
+  static otherwise(fn: ReaderClosureStatement) {
+    return (value: any, next: Function) => (t: Reader) => {
+      return fn()(t)
     }
   }
 

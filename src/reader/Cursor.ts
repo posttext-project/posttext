@@ -97,21 +97,27 @@ export class Cursor {
 
     clone.lastIndex = this.index
 
-    let result: RegExpExecArray | null
     let cursors: Cursor[] = []
+    let lastIndex = clone.lastIndex
+    let result
     while (
       clone.lastIndex < this.endIndex() &&
       (result = clone.exec(this.doc))
     ) {
       cursors.push(
         this.clone({
-          index: clone.lastIndex,
+          index: lastIndex,
           end: result.index
         })
       )
-
-      clone.lastIndex = result.index
+      lastIndex = result.index
     }
+
+    cursors.push(
+      this.clone({
+        index: lastIndex
+      })
+    )
 
     return cursors
   }

@@ -4,6 +4,7 @@ import gulp from 'gulp'
 import ts from 'gulp-typescript'
 import path from 'path'
 import { argv } from 'yargs'
+import sourcemaps from 'gulp-sourcemaps'
 
 const tsProject = ts.createProject('tsconfig.json')
 
@@ -27,8 +28,10 @@ export function clean(callback) {
 export const build = gulp.series(clean, function() {
   return tsProject
     .src()
+    .pipe(sourcemaps.init())
     .pipe(tsProject())
-    .js.pipe(gulp.dest(outDir()))
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest(outDir()))
 })
 
 export const run = gulp.series(build, function(callback) {

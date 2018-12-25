@@ -1,10 +1,10 @@
-import { Reader, ReaderClosure } from './reader/Reader'
-import { Pattern } from './reader/Pattern'
-import { Matcher } from './reader/Matcher'
-import { Text } from './Text'
 import { Block } from './Block'
-import { Type } from './Type'
 import { Inline } from './Inline'
+import { Matcher } from './reader/Matcher'
+import { Pattern } from './reader/Pattern'
+import { Reader, ReaderClosure } from './reader/Reader'
+import { Text } from './Text'
+import { Type } from './Type'
 
 export interface PostTextBuildOptions {
   isTopLevel?: boolean
@@ -47,7 +47,7 @@ export class PostText {
         t.cursor.startsWith('\\') &&
         !t.cursor.startsWith('\\\\')
       ) {
-        return Type.Block
+        return Type.Inline
       }
 
       return Type.Text

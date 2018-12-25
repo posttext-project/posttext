@@ -1,13 +1,15 @@
 import { Brace } from './common/Brace'
-import { PostText } from './PostText'
+import { Escape } from './common/Escape'
 import { Matcher } from './reader/Matcher'
-import { Reader, ReaderClosure } from './reader/Reader'
+import { Pattern } from './reader/Pattern'
+import { ReaderClosure } from './reader/Reader'
 import { Structure } from './reader/Structure'
-import { Word } from './Word'
+import { Whitespace } from './common/Whitespace'
 
 export class Inline {
   static build(): ReaderClosure {
     return Structure.block([
+      Structure.nonKey(Inline.ignoreBackSlash()),
       Structure.key('name', Inline.inlineName()),
       Structure.key('params', Inline.inlineParams()),
       Structure.key('options', Inline.inlineOptions()),
@@ -15,31 +17,83 @@ export class Inline {
     ])
   }
 
+  static ignoreBackSlash() {
+    return Matcher.match(/\\/)
+  }
+
   static inlineName(): ReaderClosure {
-    return Structure.empty([
-      Structure.nonKey(Matcher.ignoreLength(1)),
-      Structure.overwrite(Word.build())
-    ])
+    return Structure.transform(
+      (sequence: string) => sequence.length,
+      Matcher.match(/\\/)
+    )
+  }
+
+  static lookupParams() {
+    return Matcher.match(/[ \t]*\(/)
   }
 
   static inlineParams(): ReaderClosure {
-    return (t: Reader) => ({})
-  }
-
-  static inlineOptions(): ReaderClosure {
-    return (t: Reader) => ({})
-  }
-
-  static lookupContent(): ReaderClosure {
-    return Structure.empty([
-      Structure.nonKey(Matcher.ignoreUntil(/\S/)),
-      Structure.overwrite(Matcher.startsWith('{'))
+    return Pattern.match(() => Inline.lookupParams(), [
+      Pattern.then(() =>
+        Structure.empty([
+          Structure.nonKey(Whitespace.ignoreSpaces()),
+          Structure.overwrite(
+            Brace.ignoreParens(() =>
+              Pattern.repeatUntil(
+                () => Matcher.startsWith(')'),
+                () =>
+                  Escape.readUntil(
+                    [',', ')'],
+                    ['\\)', '\\,', '']
+                  )
+              )
+            )
+          )
+        ])
+      ),
+      Pattern.otherwise(() => Pattern.constant([]))
     ])
   }
 
+  static lookupOptions() {
+    return Matcher.match(/[\s]*\[/)
+  }
+
+  static inlineOptions(): ReaderClosure {
+    return Pattern.match(() => Inline.lookupOptions(), [
+      Pattern.then(() =>
+        Structure.empty([
+          Structure.nonKey(Whitespace.ignoreSpaces()),
+          Structure.overwrite(
+            Brace.ignoreBrackets(() =>
+              Pattern.repeatUntil(
+                () => Matcher.startsWith(']'),
+                () =>
+                  Escape.readUntil(
+                    [',', ']'],
+                    ['\\]', '\\,', '\\;']
+                  )
+              )
+            )
+          )
+        ])
+      ),
+      Pattern.otherwise(() => Pattern.constant([]))
+    ])
+  }
+
+  static lookupContent(): ReaderClosure {
+    return Matcher.match(/[\s]*\{/)
+  }
+
   static inlineContent(): ReaderClosure {
-    return Brace.ignoreBraces(() =>
-      PostText.build({ isTopLevel: false })
-    )
+    return Pattern.match(() => Inline.lookupContent(), [
+      Brace.ignoreBraces(() =>
+        Pattern.repeatUntil(
+          () => Matcher.startsWith('}'),
+          () => Escape.readUntil(['}'], ['\\', '\\{', '\\}'])
+        )
+      )
+    ])
   }
 }

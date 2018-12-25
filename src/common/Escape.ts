@@ -7,7 +7,7 @@ export class Escape {
     terminators: string[],
     ignoreStrings: string[] = []
   ): ReaderClosure {
-    return Pattern.repeatUntil(
+    return Pattern.takeUntil(
       () => Matcher.oneOf(terminators),
       () => (t: Reader) => {
         const cursor = t.cursor

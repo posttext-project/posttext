@@ -1,16 +1,22 @@
-import { Reader } from './reader/Reader'
-import { Structure } from './reader/Structure'
-import { Matcher } from './reader/Matcher'
-import { Word } from './Word'
+import { PostText } from './PostText';
+import { Reader } from './reader/Reader';
 
 const pt = Reader.run(
-  Structure.sequence([
-    Structure.push(Word.build()),
-    Structure.nonKey(Matcher.ignoreUntil(/[^\s,]/)),
-    Structure.push(Word.build())
-  ])
+  PostText.buildTopLevel()
 )
 
-const output = pt`Hello, World!`
+const output = pt`
+== math
+
+y = 2 * x + \\sqrt { x + 5 }
+
+== language(js)
+
+console.log('Hello, World!')
+
+== paragraph
+
+Let make some \\bold{noise}!
+`
 
 console.log(output)
