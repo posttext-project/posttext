@@ -2,29 +2,31 @@
 
 The next generation markup language for everyone!
 
+> **Note**: This library is still under development! ⚠
+
 ## What is PostText?
 
-PostText is a markup language and text-preprocessing system. Its syntax is based on Latex. Its aim is to overcome the limitation of Markdown syntax but still keep the simplicity and readability. The final target is to provide the user with a powerful content editing format without the need of any advanced WYSIWYG editor.
+**PostText** is a markup language and text preprocessor based on Latex. Its aim is to overcome the limitation in Markdown syntax but still keep the readability. The final target is to provide the user with a powerful content editing format without the need of any advanced WYSIWYG editor.
 
 ## Why?
 
-- **Simple** - PostText syntax is simple.
-- **Flexible** - PostText can handle wide range of syntaxes.
-- **Extensible** - PostText features are extensible.
-- **Fault Tolerance** - Syntactic errors can only affect one part of the document but not the whole document.
+- **Readability** - The rules are simple and easy to read and write.
+- **Extensibility** - Features can be added and be modified easily without a lot of changes.
+- **Flexibility** - It can handle other language syntax at minimum cost.
+- **Fault Tolerance** - Syntactic error can only affect one part of the document but not the whole document.
 
 ## How it work?
 
-A document written in PostText will be processed by a PostText preprocessor and transformed into Abstract Syntax Tree (AST). The AST then will be consumed by editors, web-based renderers or other rendering systems. These renderers will provide theme, layout and render the content into the final form.
+Given a document written in PostText, the preprocessor will process and transform the document and return the AST of the document. Postprocessing systems like HTML generator will provide the templates and render the given AST to the final form.
 
 ## Example
 
 Text using PostText syntax:
 
 ```
-= section[] Post Text
+= title [] Post Text
 
-== subtitle[] Introduce
+== subsection [] Introduce
 
 === paragraph
 
@@ -34,7 +36,7 @@ Math Equation:
 
 === math
 
-\matrix(2, 3){
+\matrix(2, 3) {
   1   9   -13
   20  5   -6
 }
