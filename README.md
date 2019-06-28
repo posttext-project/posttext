@@ -30,7 +30,7 @@ Text using PostText syntax:
 
 === paragraph
 
-Hello, \bold{World}!
+Hello, \bold {World}!
 
 Math Equation:
 
