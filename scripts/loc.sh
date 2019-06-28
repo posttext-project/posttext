@@ -1,0 +1,1 @@
+find "$@" | xargs wc -l

@@ -1,7 +1,7 @@
-import { Pattern } from './Pattern'
+import { Matcher } from './reader/Matcher'
 
 export class Word {
   static build() {
-    return Pattern.readUntilRegExp(/\W/)
+    return Matcher.match(/\p{L}+/u)
   }
 }
