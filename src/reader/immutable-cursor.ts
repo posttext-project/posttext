@@ -1,28 +1,28 @@
-export interface CursorOptions {
+export interface ImmutableCursorOptions {
   doc: string
   index?: number
   end?: number
 }
 
-export class Cursor {
+export class ImmutableCursor {
   doc: string
   index: number
   end?: number
 
-  constructor({ doc, index, end }: CursorOptions) {
+  constructor({ doc, index, end }: ImmutableCursorOptions) {
     this.doc = doc
     this.index = index || 0
-    this.end = end ? end < doc.length ? end : undefined : undefined
+    this.end = end
+      ? end < doc.length
+        ? end
+        : undefined
+      : undefined
   }
 
-  from(doc: string): Cursor {
-    return new Cursor({ doc })
-  }
-
-  clone(options?: Partial<CursorOptions>) {
-    return new Cursor({
-      ...(this as CursorOptions),
-      ...(options ? options : {})
+  clone(options: Partial<ImmutableCursorOptions>) {
+    return new ImmutableCursor({
+      ...(this as ImmutableCursorOptions),
+      ...options
     })
   }
 
@@ -30,27 +30,30 @@ export class Cursor {
     return this.end || this.doc.length
   }
 
-  setIndex(index?: number) {
-    if (index !== 0 && !index) {
-      this.index = this.doc.length
-      return
+  setIndex(index?: number): ImmutableCursor {
+    if (!index) {
+      return this.clone({
+        index: this.doc.length
+      })
     }
 
-    if (index < 0) {
-      this.index = 0
-      return
+    if (index <= this.index) {
+      return this
     }
 
     if (index > this.endIndex()) {
-      this.index = this.endIndex()
-      return
+      return this.clone({
+        index: this.endIndex()
+      })
     }
 
-    this.index = index
+    return this.clone({
+      index
+    })
   }
 
-  next(offset: number) {
-    this.setIndex(this.index + offset)
+  next(offset: number): ImmutableCursor {
+    return this.setIndex(this.index + offset)
   }
 
   lookup(len?: number): string {
@@ -80,6 +83,7 @@ export class Cursor {
       regExp,
       flags.indexOf('g') === -1 ? flags + 'g' : flags
     )
+    clone.lastIndex = this.index
 
     return clone.exec(this.doc)
   }
@@ -88,8 +92,8 @@ export class Cursor {
     return this.index >= this.endIndex()
   }
 
-  endAt(index: number): Cursor {
-    if (index <= this.endIndex()) {
+  endAt(index: number): ImmutableCursor {
+    if (index <= this.doc.length) {
       if (index < 0) {
         return this.clone({
           end: 0
@@ -101,14 +105,12 @@ export class Cursor {
       })
     }
 
-    return this.clone()
+    return this.clone({
+      end: this.doc.length
+    })
   }
 
-  takeUntil(cursorOrIndex: Cursor | number): string {
-    if (typeof cursorOrIndex === 'number') {
-      return this.doc.substring(this.index, cursorOrIndex)
-    }
-    
-    return this.doc.substring(this.index, cursorOrIndex.index)
+  takeUntil(index: number): string {
+    return this.doc.substring(this.index, index)
   }
 }
