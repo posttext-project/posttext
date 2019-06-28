@@ -12,12 +12,12 @@ The next generation markup language for everyone!
 
 - **Readability** - The rules are simple and easy to read and write.
 - **Extensibility** - Features can be added and be modified easily without a lot of changes.
-- **Flexibility** - It can handle other language syntax at minimum cost. 
+- **Flexibility** - It can handle other language syntax at minimum cost.
 - **Fault Tolerance** - Syntactic error can only affect one part of the document but not the whole document.
 
 ## How it work?
 
-Given a document written in PostText, the preprocessor will process and transform the document and return the AST of the document. Postprocessing systems like HTML generator will provide the templates and render the given AST to the final form. 
+Given a document written in PostText, the preprocessor will process and transform the document and return the AST of the document. Postprocessing systems like HTML generator will provide the templates and render the given AST to the final form.
 
 ## Example
 
@@ -30,7 +30,7 @@ Text using PostText syntax:
 
 === paragraph
 
-Hello, \bold{World}!
+Hello, \bold {World}!
 
 Math Equation:
 
