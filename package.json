@@ -2,7 +2,8 @@
   "name": "posttext",
   "version": "0.0.1",
   "scripts": {
-    "start": "gulp run"
+    "start": "gulp run",
+    "prettier:all": "prettier --write ./src/**/*.ts"
   },
   "files": [
     "out"
@@ -15,6 +16,7 @@
     "gulp": "^4.0.0",
     "gulp-cli": "^2.0.1",
     "gulp-typescript": "^5.0.0-alpha.3",
+    "prettier": "^1.18.2",
     "tslint": "^5.11.0",
     "tslint-microsoft-contrib": "^5.2.1",
     "typescript": "^3.1.6",
