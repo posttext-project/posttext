@@ -67,6 +67,8 @@ export function parseVerbatimBlock(cursor: Cursor): BlockNode {
          */
 
         break
+      } else {
+        cursor.moveTo(lookahead)
       }
     } else {
       cursor.next(1)

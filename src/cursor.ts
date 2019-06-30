@@ -69,7 +69,7 @@ export class Cursor {
     this.setIndex(this.index + offset)
   }
 
-  lookup(len?: number): string {
+  lookahead(len?: number): string {
     return this.doc.substring(
       this.index,
       len && this.index + len
@@ -77,7 +77,7 @@ export class Cursor {
   }
 
   startsWith(compareString: string): boolean {
-    return compareString === this.lookup(compareString.length)
+    return compareString === this.lookahead(compareString.length)
   }
 
   oneOf(compareStrings: string[]): string | undefined {

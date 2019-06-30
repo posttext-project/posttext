@@ -107,6 +107,8 @@ export function parseMacroParameters(
     })
   } while (!cursor.startsWith(')') && !cursor.isEof())
 
+  cursor.next(1)
+
   return params
 }
 
@@ -148,11 +150,12 @@ export function parseMacroAttributes(
 
     const name = mark.takeUntil(cursor)
 
-    cursor.next(1)
-    mark.moveTo(cursor)
+    let value = ''
 
     if (cursor.startsWith('=') && !cursor.isEof()) {
       cursor.next(1)
+
+      mark.moveTo(cursor)
 
       while (!cursor.oneOf([';', ']']) && !cursor.isEof()) {
         if (cursor.startsWith('\\')) {
@@ -161,9 +164,9 @@ export function parseMacroAttributes(
           cursor.next(1)
         }
       }
-    }
 
-    const value = mark.takeUntil(cursor)
+      value = mark.takeUntil(cursor)
+    }
 
     attrs.push({
       type: 'MacroAttribute',
@@ -216,17 +219,19 @@ export function parseBlock(cursor: Cursor): BlockNode {
 export function parseNormalBlock(cursor: Cursor): BlockNode {
   const body: BlockChildNode[] = []
 
-  if (cursor.startsWith('}')) {
-    // do nothing
-  } else if (cursor.startsWith('\\')) {
-    const macro = parseMacro(cursor)
+  while (!cursor.startsWith('}') && !cursor.isEof()) {
+    if (cursor.startsWith('\\')) {
+      const macro = parseMacro(cursor)
 
-    body.push(macro)
-  } else {
-    const textNode = parseBlockTextNode(cursor)
+      body.push(macro)
+    } else {
+      const textNode = parseBlockTextNode(cursor)
 
-    body.push(textNode)
+      body.push(textNode)
+    }
   }
+
+  cursor.next(1)
 
   return {
     type: 'Block',
