@@ -3,7 +3,7 @@ export interface DocumentNode {
   body: DocumentChildNode[]
 }
 
-export type DocumentChildNode = TextNode | MacroNode
+export type DocumentChildNode = TextNode | TagNode
 
 export interface IdentifierNode {
   type: 'Identifier'
@@ -11,20 +11,20 @@ export interface IdentifierNode {
 }
 
 export interface TextNode {
-  type: 'TextNode'
+  type: 'Text'
   value: string
 }
 
-export interface MacroNode {
-  type: 'Macro'
+export interface TagNode {
+  type: 'Tag'
   id: IdentifierNode
   params: TextNode[]
-  attrs: MacroAttributeNode[]
+  attrs: AttributeNode[]
   body: BlockNode[]
 }
 
-export interface MacroAttributeNode {
-  type: 'MacroAttribute'
+export interface AttributeNode {
+  type: 'Attribute'
   id: IdentifierNode
   value: TextNode
 }
@@ -35,11 +35,11 @@ export interface BlockNode {
   body: BlockChildNode[]
 }
 
-export type BlockChildNode = TextNode | MacroNode
+export type BlockChildNode = TextNode | TagNode
 
 export type Node =
   | IdentifierNode
   | TextNode
-  | MacroNode
-  | MacroAttributeNode
+  | TagNode
+  | AttributeNode
   | BlockNode

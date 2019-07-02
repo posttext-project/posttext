@@ -1,10 +1,10 @@
-import { Cursor } from '../cursor'
+import { Cursor } from './cursor'
 import {
   DocumentNode,
   TextNode,
   DocumentChildNode
 } from './nodes'
-import { parseMacro } from './macro'
+import { parseTag } from './tag'
 
 export const SPECIAL_CHARACTERS = ['=', '{', '}']
 export const SPECIAL_CHARACTERS_REGEXP = new RegExp(
@@ -19,7 +19,7 @@ export function parse(doc: string): DocumentNode {
 
   while (!cursor.isEof()) {
     if (cursor.startsWith('\\')) {
-      const macro = parseMacro(cursor)
+      const macro = parseTag(cursor)
 
       body.push(macro)
     } else {
@@ -50,7 +50,7 @@ export function parseTopLevelTextNode(
     .join('')
 
   return {
-    type: 'TextNode',
+    type: 'Text',
     value
   }
 }

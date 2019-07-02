@@ -1,41 +1,49 @@
-import { Cursor } from '../cursor'
+import { Cursor } from './cursor'
 import {
   IdentifierNode,
   TextNode,
-  MacroNode,
-  MacroAttributeNode,
+  TagNode,
+  AttributeNode,
   BlockNode,
   BlockChildNode
 } from './nodes'
-import { SPECIAL_CHARACTERS_REGEXP } from './parse'
+import { SPECIAL_CHARACTERS_REGEXP } from './root'
 import { parseVerbatimBlock } from './verbatim'
 
-export function parseMacro(cursor: Cursor): MacroNode {
+export function parseTag(cursor: Cursor): TagNode {
   cursor.next(1)
 
-  const identifier = parseMacroIdentifier(cursor)
+  const identifier = parseTagIdentifier(cursor)
 
-  const hasParams = lookaheadMacroParamaters(cursor)
-  const params = hasParams ? parseMacroParameters(cursor) : []
+  let hasSemi = lookaheadSemicolon(cursor)
 
-  const hasAttrs = lookaheadMacroAttributes(cursor)
-  const attrs = hasAttrs ? parseMacroAttributes(cursor) : []
+  const hasParams = !hasSemi && lookaheadParamaters(cursor)
+  const params = hasParams ? parseParameters(cursor) : []
+
+  hasSemi = lookaheadSemicolon(cursor)
+
+  const hasAttrs = !hasSemi && lookaheadAttributes(cursor)
+  const attrs = hasAttrs ? parseAttributes(cursor) : []
+
+  hasSemi = lookaheadSemicolon(cursor)
 
   let body = []
-  do {
-    const hasMoreBlock = lookaheadBlock(cursor)
+  if (!hasSemi) {
+    while (!cursor.isEof()) {
+      const hasMoreBlock = lookaheadBlock(cursor)
 
-    if (hasMoreBlock) {
-      const block = parseBlock(cursor)
+      if (hasMoreBlock) {
+        const block = parseBlock(cursor)
 
-      body.push(block)
-    } else {
-      break
+        body.push(block)
+      } else {
+        break
+      }
     }
-  } while (!cursor.isEof())
+  }
 
   return {
-    type: 'Macro',
+    type: 'Tag',
     id: identifier,
     params,
     attrs,
@@ -43,7 +51,24 @@ export function parseMacro(cursor: Cursor): MacroNode {
   }
 }
 
-export function parseMacroIdentifier(
+export function lookaheadSemicolon(cursor: Cursor): boolean {
+  const lookahead = cursor.clone()
+
+  while (lookahead.startsWith(' ') && !lookahead.isEof()) {
+    lookahead.next(1)
+  }
+
+  if (lookahead.startsWith(';')) {
+    lookahead.next(1)
+    cursor.moveTo(lookahead)
+
+    return true
+  }
+
+  return false
+}
+
+export function parseTagIdentifier(
   cursor: Cursor
 ): IdentifierNode {
   const mark = cursor.clone()
@@ -63,9 +88,7 @@ export function parseMacroIdentifier(
   }
 }
 
-export function lookaheadMacroParamaters(
-  cursor: Cursor
-): boolean {
+export function lookaheadParamaters(cursor: Cursor): boolean {
   const lookahead = cursor.clone()
 
   while (lookahead.startsWith(' ') && !lookahead.isEof()) {
@@ -81,9 +104,7 @@ export function lookaheadMacroParamaters(
   return false
 }
 
-export function parseMacroParameters(
-  cursor: Cursor
-): TextNode[] {
+export function parseParameters(cursor: Cursor): TextNode[] {
   const params: TextNode[] = []
 
   do {
@@ -102,7 +123,7 @@ export function parseMacroParameters(
     const value = mark.takeUntil(cursor)
 
     params.push({
-      type: 'TextNode',
+      type: 'Text',
       value
     })
   } while (!cursor.startsWith(')') && !cursor.isEof())
@@ -112,9 +133,7 @@ export function parseMacroParameters(
   return params
 }
 
-export function lookaheadMacroAttributes(
-  cursor: Cursor
-): boolean {
+export function lookaheadAttributes(cursor: Cursor): boolean {
   const lookahead = cursor.clone()
 
   while (lookahead.startsWith(' ') && !lookahead.isEof()) {
@@ -130,10 +149,10 @@ export function lookaheadMacroAttributes(
   return false
 }
 
-export function parseMacroAttributes(
+export function parseAttributes(
   cursor: Cursor
-): MacroAttributeNode[] {
-  const attrs: MacroAttributeNode[] = []
+): AttributeNode[] {
+  const attrs: AttributeNode[] = []
 
   do {
     cursor.next(1)
@@ -169,13 +188,13 @@ export function parseMacroAttributes(
     }
 
     attrs.push({
-      type: 'MacroAttribute',
+      type: 'Attribute',
       id: {
         type: 'Identifier',
         name
       },
       value: {
-        type: 'TextNode',
+        type: 'Text',
         value
       }
     })
@@ -221,9 +240,9 @@ export function parseNormalBlock(cursor: Cursor): BlockNode {
 
   while (!cursor.startsWith('}') && !cursor.isEof()) {
     if (cursor.startsWith('\\')) {
-      const macro = parseMacro(cursor)
+      const tag = parseTag(cursor)
 
-      body.push(macro)
+      body.push(tag)
     } else {
       const textNode = parseBlockTextNode(cursor)
 
@@ -257,7 +276,7 @@ export function parseBlockTextNode(cursor: Cursor): TextNode {
     .join('')
 
   return {
-    type: 'TextNode',
+    type: 'Text',
     value
   }
 }

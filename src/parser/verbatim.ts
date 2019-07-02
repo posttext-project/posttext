@@ -1,4 +1,4 @@
-import { Cursor } from '../cursor'
+import { Cursor } from './cursor'
 import { BlockNode, BlockChildNode } from './nodes'
 
 export function parseVerbatimBlock(cursor: Cursor): BlockNode {
@@ -49,7 +49,7 @@ export function parseVerbatimBlock(cursor: Cursor): BlockNode {
           const value = mark.takeUntil(cursor)
 
           body.push({
-            type: 'TextNode',
+            type: 'Text',
             value
           })
         }
@@ -87,7 +87,7 @@ export function parseVerbatimBlock(cursor: Cursor): BlockNode {
     const value = mark.takeUntil(cursor)
 
     body.push({
-      type: 'TextNode',
+      type: 'Text',
       value
     })
   }
