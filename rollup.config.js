@@ -6,8 +6,9 @@ export default {
   input: 'src/index.ts',
   output: {
     dir: 'lib',
-    file: 'index.js',
-    format: 'cjs',
+    file: 'index.umd.js',
+    name: 'posttext',
+    format: 'umd',
     sourcemap: true
   },
   plugins: [typescript(), terser(), visualizer()]
