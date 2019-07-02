@@ -7,7 +7,8 @@
     "lib"
   ],
   "scripts": {
-    "build": "rollup -c rollup.config.js",
+    "build": "gulp build",
+    "test": "gulp test",
     "prettier:all": "prettier --write ./src/**/*.ts"
   },
   "author": "clitetailor",
@@ -26,23 +27,29 @@
     "@babel/core": "^7.1.6",
     "@babel/preset-env": "^7.1.6",
     "@babel/register": "^7.0.0",
+    "ava": "^2.1.0",
     "core-js": "^3.1.4",
     "del": "^3.0.0",
     "fs-extra": "^8.1.0",
     "gulp": "^4.0.0",
+    "gulp-ava": "^1.0.0",
     "gulp-cli": "^2.0.1",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typescript": "^5.0.0-alpha.3",
+    "nyc": "^14.1.1",
     "prettier": "^1.18.2",
     "regenerator-runtime": "^0.13.2",
     "rollup": "^0.67.3",
+    "rollup-plugin-terser": "^5.0.0",
     "rollup-plugin-typescript": "^1.0.0",
+    "rollup-plugin-visualizer": "^2.4.3",
     "ts-node": "^8.3.0",
-    "tslint": "^5.11.0",
-    "tslint-microsoft-contrib": "^5.2.1",
-    "typescript": "^3.1.6"
+    "tslib": "^1.10.0",
+    "typescript": "^3.5.2"
   },
-  "dependencies": {},
+  "dependencies": {
+    "rxjs": "^6.5.2"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/posttext-project/posttext.git"

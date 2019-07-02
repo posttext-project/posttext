@@ -2,40 +2,49 @@ import 'core-js/stable'
 import 'regenerator-runtime/runtime'
 
 import del from 'del'
+import path from 'path'
 import gulp from 'gulp'
 import ts from 'gulp-typescript'
-import path from 'path'
 import sourcemaps from 'gulp-sourcemaps'
+import ava from 'gulp-ava'
+import { rollup } from 'rollup'
 
-const TEST_DIR = path.resolve(__dirname, '_test')
-const LIB_DIR = path.resolve(__dirname, 'lib')
+import rollupConfig from './rollup.config'
 
-const tsProject = ts.createProject('tsconfig.json')
+const libDest = path.resolve(__dirname, rollupConfig.output.dir)
 
-export async function clean(callback) {
-  await del(LIB_DIR + '/**')
-  callback()
+export async function clean() {
+  await del(libDest)
 }
 
-export async function cleanTest(callback) {
-  await del(TEST_DIR + '/**')
-  callback()
+export async function _build() {
+  const bundle = await rollup(rollupConfig)
+
+  return bundle.write(rollupConfig.output)
 }
 
-export const build = gulp.series(clean, function() {
-  return tsProject
-    .src()
-    .pipe(sourcemaps.init())
-    .pipe(tsProject())
-    .pipe(sourcemaps.write())
-    .pipe(gulp.dest(LIB_DIR))
-})
+export const build = gulp.series(clean, _build)
 
-export const buildTest = gulp.series(cleanTest, () => {
-  return tsProject
+const testDest = path.resolve(__dirname, 'out')
+const testProject = ts.createProject('tsconfig.json')
+
+export async function cleanTest() {
+  await del(testDest)
+}
+
+export function buildTest() {
+  return testProject
     .src()
     .pipe(sourcemaps.init())
-    .pipe(tsProject())
+    .pipe(testProject())
     .pipe(sourcemaps.write())
-    .pipe(gulp.dest(TEST_DIR))
-})
+    .pipe(gulp.dest(testDest))
+}
+
+export function _test() {
+  return gulp
+    .src(testDest + '/test/*.js')
+    .pipe(ava({ verbose: true }))
+}
+
+export const test = gulp.series(cleanTest, buildTest, _test)
