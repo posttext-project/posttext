@@ -38,6 +38,7 @@ export interface BlockNode {
 export type BlockChildNode = TextNode | TagNode
 
 export type Node =
+  | DocumentNode
   | IdentifierNode
   | TextNode
   | TagNode
