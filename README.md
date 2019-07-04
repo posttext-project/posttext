@@ -1,72 +1,96 @@
 # PostText
 
-The next generation markup language for everyone!
-
 > **Note**: This library is still under development! ⚠
 
 ## What is PostText?
 
-**PostText** is a markup language and text preprocessor based on Latex. Its aim is to overcome the limitation in Markdown syntax but still keep the readability. The final target is to provide the user with a powerful content editing format without the need of any advanced WYSIWYG editor.
+**PostText** is a markup language and document preparation system. Its aim is to overcome the limitation of Markdown syntax at the minimal cost. PostText provides you with the powerful and expressive editing syntax which can be used in chatting systems, text-editors or storing rich-text in database.
 
-## Why?
+PostText is inspired greatly by Latex, Markdown, XML and other markup languages.
 
-- **Readability** - The rules are simple and easy to read and write.
-- **Extensibility** - Features can be added and be modified easily without a lot of changes.
-- **Flexibility** - It can handle other language syntax at minimum cost.
-- **Fault Tolerance** - Syntactic error can only affect one part of the document but not the whole document.
+## Features
 
-## How it work?
+### Tags
 
-Given a document written in PostText, the preprocessor will process and transform the document and return the AST of the document. Postprocessing systems like HTML generator will provide the templates and render the given AST to the final form.
+Tags are the most essential building blocks of a PostText document. A tag often consists of four parts:
 
-## Example
-
-Text using PostText syntax:
+- Tag name
+- Parameters
+- Attributes
+- Blocks
 
 ```
-= title [] Post Text
+\tag-name () [] {} {}
+ 1        2  3  4
+```
 
-== subsection [] Introduce
+An example of how to use tag to format text in PostText:
 
-=== paragraph
+```
+\title{PostText}
 
-Hello, \bold {World}!
+\section{Introduce}
 
-Math Equation:
-
-=== math
-
-\matrix(2, 3) {
-  1   9   -13
-  20  5   -6
+\p {
+  Hi! Welcome to \bold{PostText}! \emoji{smile}
 }
 ```
 
-Corresponding HTML produced by a PostText processor:
+Tag properties can be specified using parameters or attributes. Tag parameters are seperated by commas while tag attributes are seperated by semicolons:
 
-```html
-<h1>Post Text</h1>
+```
+\p[
+  font-family=Arial, Helvectica, sans-serif;
+  font-size=14px;
+] {
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+}
 
-<h2>Introduce</h2>
+\math {
+  A = \matrix(2, 3) {
+    1   2   3
+    -5  7   8
+  }
+}
+```
 
-<p>Hello, <b>World</b>!</p>
+### Namespaces and Directives
 
-<p>Math Equation:</p>
+Namespaces provide unique names for tags and attributes from possible extra packages. In additional, a directive - an attribute with namespace - can add more functionalities to the target tag, which makes PostText truely extensible.
 
-<math>
-  <mrow>
-    <mo>[</mo>
-    <mtable>
-      <mtr>
-        <mtd><mi>1</mi></mtd> <mtd><mi>9</mi></mtd>
-        <mtd><mi>-13</mi></mtd>
-      </mtr>
-      <mtr>
-        <mtd><mi>20</mi></mtd> <mtd><mi>5</mi></mtd>
-        <mtd><mi>-6</mi></mtd>
-      </mtr>
-    </mtable>
-    <mo>]</mo>
-  </mrow>
-</math>
+```
+\use{chart}
+\use{highlight}
+
+\chart:pie {
+  Apple   30%
+  Orange  40%
+  Grape   rest
+}
+
+\p [highlight:color=yellow] {
+  Caution: Please watch your step!
+}
+```
+
+### Verbatims
+
+Verbatims are non-formatted text blocks without escaping every special characters. Using verbatim is useful when you want to include source code or specify other language section inside PostText.
+
+A verbatim block is specified by prefixing and postfixing the block with the same number of "=" characters. The prefix or postfix length is arbitrary so that PostText is flexible enough to include itself inside code block.
+
+```
+\code(javascript) ==={
+  function sum(a, b) {
+    return a + b
+  }
+
+  console.log(sum(5, 6))
+}===
+
+\code(posttext) ==={
+  \code(posttext) =={
+    Nested verbatim block.
+  }==
+}===
 ```
