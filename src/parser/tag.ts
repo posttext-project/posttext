@@ -1,3 +1,4 @@
+import { ParseOptions } from './root'
 import { Cursor } from './cursor'
 import {
   IdentifierNode,
@@ -10,7 +11,10 @@ import {
 import { SPECIAL_CHARACTERS_REGEXP } from './root'
 import { parseVerbatimBlock } from './verbatim'
 
-export function parseTag(cursor: Cursor): TagNode {
+export function parseTag(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): TagNode {
   cursor.next(1)
 
   const identifier = parseTagIdentifier(cursor)
@@ -51,7 +55,10 @@ export function parseTag(cursor: Cursor): TagNode {
   }
 }
 
-export function lookaheadSemicolon(cursor: Cursor): boolean {
+export function lookaheadSemicolon(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): boolean {
   const lookahead = cursor.clone()
 
   while (lookahead.startsWith(' ') && !lookahead.isEof()) {
@@ -69,7 +76,8 @@ export function lookaheadSemicolon(cursor: Cursor): boolean {
 }
 
 export function parseTagIdentifier(
-  cursor: Cursor
+  cursor: Cursor,
+  options: ParseOptions = {}
 ): IdentifierNode {
   const mark = cursor.clone()
 
@@ -88,7 +96,10 @@ export function parseTagIdentifier(
   }
 }
 
-export function lookaheadParamaters(cursor: Cursor): boolean {
+export function lookaheadParamaters(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): boolean {
   const lookahead = cursor.clone()
 
   while (lookahead.startsWith(' ') && !lookahead.isEof()) {
@@ -104,7 +115,10 @@ export function lookaheadParamaters(cursor: Cursor): boolean {
   return false
 }
 
-export function parseParameters(cursor: Cursor): TextNode[] {
+export function parseParameters(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): TextNode[] {
   const params: TextNode[] = []
 
   do {
@@ -133,7 +147,10 @@ export function parseParameters(cursor: Cursor): TextNode[] {
   return params
 }
 
-export function lookaheadAttributes(cursor: Cursor): boolean {
+export function lookaheadAttributes(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): boolean {
   const lookahead = cursor.clone()
 
   while (lookahead.startsWith(' ') && !lookahead.isEof()) {
@@ -150,7 +167,8 @@ export function lookaheadAttributes(cursor: Cursor): boolean {
 }
 
 export function parseAttributes(
-  cursor: Cursor
+  cursor: Cursor,
+  options: ParseOptions = {}
 ): AttributeNode[] {
   const attrs: AttributeNode[] = []
 
@@ -205,7 +223,10 @@ export function parseAttributes(
   return attrs
 }
 
-export function lookaheadBlock(cursor: Cursor): boolean {
+export function lookaheadBlock(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): boolean {
   const lookahead = cursor.clone()
 
   while (lookahead.startsWith(' ') && !lookahead.isEof()) {
@@ -227,7 +248,10 @@ export function lookaheadBlock(cursor: Cursor): boolean {
   return false
 }
 
-export function parseBlock(cursor: Cursor): BlockNode {
+export function parseBlock(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): BlockNode {
   if (cursor.startsWith('=')) {
     return parseVerbatimBlock(cursor)
   }
@@ -235,7 +259,10 @@ export function parseBlock(cursor: Cursor): BlockNode {
   return parseNormalBlock(cursor)
 }
 
-export function parseNormalBlock(cursor: Cursor): BlockNode {
+export function parseNormalBlock(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): BlockNode {
   const body: BlockChildNode[] = []
 
   while (!cursor.startsWith('}') && !cursor.isEof()) {
@@ -259,7 +286,10 @@ export function parseNormalBlock(cursor: Cursor): BlockNode {
   }
 }
 
-export function parseBlockTextNode(cursor: Cursor): TextNode {
+export function parseBlockTextNode(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): TextNode {
   const mark = cursor.clone()
 
   while (

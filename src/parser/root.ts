@@ -6,22 +6,27 @@ import {
 } from './nodes'
 import { parseTag } from './tag'
 
+export interface ParseOptions {}
+
 export const SPECIAL_CHARACTERS = ['=', '{', '}']
 export const SPECIAL_CHARACTERS_REGEXP = new RegExp(
   `[${SPECIAL_CHARACTERS.join()}]+`,
   'g'
 )
 
-export function parse(doc: string): DocumentNode {
+export function parse(
+  doc: string,
+  options: ParseOptions
+): DocumentNode {
   const cursor = Cursor.from({ doc })
 
   const body: DocumentChildNode[] = []
 
   while (!cursor.isEof()) {
     if (cursor.startsWith('\\')) {
-      const macro = parseTag(cursor)
+      const tag = parseTag(cursor)
 
-      body.push(macro)
+      body.push(tag)
     } else {
       const textNode = parseTopLevelTextNode(cursor)
 
@@ -36,7 +41,8 @@ export function parse(doc: string): DocumentNode {
 }
 
 export function parseTopLevelTextNode(
-  cursor: Cursor
+  cursor: Cursor,
+  options: ParseOptions = {}
 ): TextNode {
   const mark = cursor.clone()
 

@@ -1,7 +1,11 @@
 import { Cursor } from './cursor'
 import { BlockNode, BlockChildNode } from './nodes'
+import { ParseOptions } from './root'
 
-export function parseVerbatimBlock(cursor: Cursor): BlockNode {
+export function parseVerbatimBlock(
+  cursor: Cursor,
+  options: ParseOptions = {}
+): BlockNode {
   /**
    * ```
    * \code(md) ==={ Hello, World! }===
@@ -99,7 +103,10 @@ export function parseVerbatimBlock(cursor: Cursor): BlockNode {
   }
 }
 
-export function verbatimPostfixLevel(cursor: Cursor) {
+export function verbatimPostfixLevel(
+  cursor: Cursor,
+  options: ParseOptions = {}
+) {
   let verbatimPostfix = 0
 
   while (cursor.startsWith('=') && !cursor.isEof()) {
