@@ -1,6 +1,6 @@
 # PostText
 
-> **Note**: This library is still under development! ⚠
+> **Note**: This library is still under construction! ⚠
 
 ## What is PostText?
 
