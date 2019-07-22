@@ -1,4 +1,4 @@
-import { Node } from '../parser';
+import { Node } from '../parser'
 
 export interface PrintOptions {
   indent: number

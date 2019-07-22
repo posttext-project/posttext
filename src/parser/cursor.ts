@@ -77,7 +77,9 @@ export class Cursor {
   }
 
   startsWith(compareString: string): boolean {
-    return compareString === this.lookahead(compareString.length)
+    return (
+      compareString === this.lookahead(compareString.length)
+    )
   }
 
   oneOf(compareStrings: string[]): string | undefined {

@@ -1,3 +1,3 @@
-export { Registry } from './registry'
-export { Package } from './package'
-export { Scope, ScopeItem } from './scope'
+export * from './registry'
+export * from './package'
+export * from './scope'

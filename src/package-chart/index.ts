@@ -1,5 +1,5 @@
 import { Package } from '../registry'
 
-const pkg = Package.create()
-
-export { pkg }
+export default function(pkg: Package) {
+  return pkg
+}

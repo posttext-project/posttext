@@ -11,6 +11,20 @@ export interface ScopeItem {
   clone(): ScopeItem
 }
 
+export interface ScopeOptions {
+  items: Map<Symbol, ScopeItem>
+
+  preprocessors: ((ast: Node, scope: Scope) => Node)[]
+  postprocessors: ((ast: Node, scope: Scope) => Node)[]
+
+  registry: Registry
+
+  globalPackage: Package
+  namespacedPackages: Map<string, Package>
+
+  id: number
+}
+
 export class Scope {
   items: Map<Symbol, ScopeItem>
 
@@ -22,28 +36,21 @@ export class Scope {
   globalPackage: Package
   namespacedPackages: Map<string, Package>
 
-  id: number = 1
+  id: number
 
-  constructor(scope?: Scope) {
-    this.items = scope ? new Map(scope.items) : new Map()
+  constructor(scope: Partial<ScopeOptions> = {}) {
+    this.items = scope.items ? new Map(scope.items) : new Map()
 
-    if (scope) {
-      this.registry = scope.registry
+    this.registry = scope.registry || Registry.create()
 
-      this.globalPackage = scope.globalPackage
-      this.namespacedPackages = scope.namespacedPackages
+    this.globalPackage = Package.create()
+    this.namespacedPackages =
+      scope.namespacedPackages || new Map()
 
-      this.preprocessors = scope.preprocessors
-      this.postprocessors = scope.postprocessors
-    } else {
-      this.registry = new Registry()
+    this.preprocessors = scope.preprocessors || []
+    this.postprocessors = scope.postprocessors || []
 
-      this.globalPackage = Package.create()
-      this.namespacedPackages = new Map()
-
-      this.preprocessors = []
-      this.postprocessors = []
-    }
+    this.id = scope.id || 1
   }
 
   static create() {
@@ -76,7 +83,11 @@ export class Scope {
     return () => {
       const index = this.preprocessors.indexOf(callback)
 
-      this.preprocessors.splice(index, 1)
+      if (index > -1) {
+        this.preprocessors = this.preprocessors
+          .slice(0, index)
+          .concat(this.preprocessors.slice(index + 1))
+      }
     }
   }
 
@@ -86,7 +97,11 @@ export class Scope {
     return () => {
       const index = this.postprocessors.indexOf(callback)
 
-      this.postprocessors.splice(index, 1)
+      if (index > -1) {
+        this.postprocessors = this.postprocessors
+          .slice(0, index)
+          .concat(this.postprocessors.slice(index + 1))
+      }
     }
   }
 
