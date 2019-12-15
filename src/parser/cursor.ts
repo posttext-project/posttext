@@ -1,4 +1,4 @@
-export interface CursorOptions {
+export interface CursorStruct {
   doc: string
   index?: number
   end?: number
@@ -13,7 +13,7 @@ export class Cursor {
   index: number
   end?: number
 
-  constructor({ doc, index, end }: CursorOptions) {
+  constructor({ doc, index, end }: CursorStruct) {
     this.doc = doc
     this.index = index || 0
     this.end = end
@@ -27,9 +27,9 @@ export class Cursor {
     return new Cursor({ doc })
   }
 
-  clone(options?: Partial<CursorOptions>) {
+  clone(options?: Partial<CursorStruct>) {
     return new Cursor({
-      ...(this as CursorOptions),
+      ...(this as CursorStruct),
       ...(options ? options : {})
     })
   }
@@ -106,7 +106,7 @@ export class Cursor {
     return this.index >= this.endIndex()
   }
 
-  endAt(index: number): Cursor {
+  setEndIndex(index: number): Cursor {
     if (index <= this.endIndex()) {
       if (index < 0) {
         return this.clone({

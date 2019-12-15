@@ -1,18 +1,17 @@
-import { AttributeNode, TagNode, TextNode } from '../parser'
+import { AttributeNode, BlockChildNode } from '../parser'
 import {
   createTagNode,
-  createTextNode,
   createBlock
-} from '../fmt/builder'
+} from '../builder'
 
 export function createHtmlElement(
   elementName: string,
   attrs: AttributeNode[],
-  body: (TagNode | TextNode)[]
+  body: BlockChildNode[]
 ) {
   return createTagNode(
     'html-element',
-    [createTextNode(elementName)],
+    [elementName],
     attrs,
     [createBlock(body)]
   )

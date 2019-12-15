@@ -1,8 +1,8 @@
 import { Printer, PrintOptions } from './printer'
-import { DocumentNode } from '../parser'
+import { PTDocument } from '../parser'
 
 export function print(
-  ast: DocumentNode,
+  ast: PTDocument,
   options: PrintOptions
 ): string {
   const printer = new Printer()

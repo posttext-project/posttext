@@ -1,6 +1,3 @@
-import 'core-js/stable'
-import 'regenerator-runtime/runtime'
-
 import fs from 'fs-extra'
 import del from 'del'
 import path from 'path'
@@ -32,7 +29,7 @@ export async function clean() {
 
 export async function _buildUmd() {
   const bundle = await rollup(rollupConfig)
-
+                
   return await bundle.write(rollupConfig.output)
 }
 

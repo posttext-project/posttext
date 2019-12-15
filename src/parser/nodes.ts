@@ -1,46 +1,54 @@
-export interface DocumentNode {
+export interface BaseNode {
+  type: string
+}
+
+export interface DocumentNode extends BaseNode {
   type: 'Document'
-  body: DocumentChildNode[]
+  body: ChildNode[]
 }
 
-export type DocumentChildNode = TextNode | TagNode
-
-export interface IdentifierNode {
-  type: 'Identifier'
-  name: string
-}
-
-export interface TextNode {
+export interface TextNode extends BaseNode {
   type: 'Text'
   value: string
 }
 
-export interface TagNode {
+export interface TagNode extends BaseNode {
   type: 'Tag'
-  id: IdentifierNode
-  params: TextNode[]
+  namespace?: string
+  name: string
+  params: string[]
   attrs: AttributeNode[]
   body: BlockNode[]
 }
 
-export interface AttributeNode {
+export interface AttributeNode extends BaseNode {
   type: 'Attribute'
-  id: IdentifierNode
-  value: TextNode
+  namespace?: string
+  name: string
+  value: string
 }
 
-export interface BlockNode {
+export interface BlockNode extends BaseNode {
   type: 'Block'
   verbatim: boolean
-  body: BlockChildNode[]
+  body: ChildNode[]
 }
 
-export type BlockChildNode = TextNode | TagNode
+export interface IdentifierNode extends BaseNode {
+  type: 'Identifier'
+  name: string
+  namespace?: string
+}
+
+export type ChildNode =
+  | TagNode
+  | TextNode
 
 export type Node =
+  | BaseNode
   | DocumentNode
-  | IdentifierNode
-  | TextNode
   | TagNode
   | AttributeNode
   | BlockNode
+  | TextNode
+  | IdentifierNode

@@ -1,121 +1,87 @@
 import { Registry } from './registry'
-import {
-  Package,
-  TagResolver,
-  DirectiveResolver
-} from './package'
-import { TagNode, TextNode } from '../parser'
-import { resolveIdentifier } from './identifier'
+import { Package, MacroResolver, AstProcessor } from './package'
+import { BlockChildNode, Node } from '../parser'
+import { resolveIdentifier } from './helpers'
+import { createDocumentNode } from '../builder'
+import { DocumentNode, TagNode } from '../parser/nodes'
 
-export interface ScopeItem {
-  clone(): ScopeItem
+export interface ScopeFeature {
+  clone(): ScopeFeature
 }
 
-export interface ScopeOptions {
-  items: Map<Symbol, ScopeItem>
-
-  preprocessors: ((ast: Node, scope: Scope) => Node)[]
-  postprocessors: ((ast: Node, scope: Scope) => Node)[]
-
-  registry: Registry
-
-  globalPackage: Package
-  namespacedPackages: Map<string, Package>
-
-  id: number
+export interface Scope {
+  clone(): Scope
 }
 
-export class Scope {
-  items: Map<Symbol, ScopeItem>
-
-  preprocessors: ((ast: Node, scope: Scope) => Node)[]
-  postprocessors: ((ast: Node, scope: Scope) => Node)[]
-
+export interface MacroScopeStruct {
+  features: Map<Symbol, ScopeFeature>
   registry: Registry
+  globalPackages: [string, Package][]
+  packages: Map<string, Package>
+}
 
-  globalPackage: Package
-  namespacedPackages: Map<string, Package>
+export interface ResolverScopeStruct {
+  features: Map<Symbol, ScopeFeature>
+  packages: Map<string, Package>
+}
 
-  id: number
+export class MacroScope {
+  features: Map<Symbol, ScopeFeature>
+  registry: Registry
+  globalPackages: [string, Package][]
+  packages: Map<string, Package>
 
-  constructor(scope: Partial<ScopeOptions> = {}) {
-    this.items = scope.items ? new Map(scope.items) : new Map()
+  constructor(scope?: MacroScopeStruct) {
+    if (scope) {
+      const {
+        features,
+        registry,
+        globalPackages,
+        packages
+      } = scope
 
-    this.registry = scope.registry || Registry.create()
-
-    this.globalPackage = Package.create()
-    this.namespacedPackages =
-      scope.namespacedPackages || new Map()
-
-    this.preprocessors = scope.preprocessors || []
-    this.postprocessors = scope.postprocessors || []
-
-    this.id = scope.id || 1
-  }
-
-  static create() {
-    return new Scope()
-  }
-
-  clone() {
-    return new Scope(this)
-  }
-
-  getItem(symbol: Symbol): ScopeItem {
-    return this.items.get(symbol)
-  }
-
-  setItem(symbol: Symbol, item: ScopeItem) {
-    return this.items.set(symbol, item)
-  }
-
-  setRegistry(registry: Registry) {
-    this.registry = registry
-  }
-
-  getRegistry() {
-    return this.registry
-  }
-
-  preprocess(callback: (ast: Node, scope: Scope) => Node) {
-    this.preprocessors.push(callback)
-
-    return () => {
-      const index = this.preprocessors.indexOf(callback)
-
-      if (index > -1) {
-        this.preprocessors = this.preprocessors
-          .slice(0, index)
-          .concat(this.preprocessors.slice(index + 1))
-      }
+      this.features = features
+      this.registry = registry
+      this.globalPackages = globalPackages
+      this.packages = packages
+    } else {
+      this.features = new Map()
+      this.registry = Registry.create()
+      this.globalPackages = []
+      this.packages = new Map()
     }
   }
 
-  postprocess(callback: (ast: Node, scope: Scope) => Node) {
-    this.postprocessors.push(callback)
-
-    return () => {
-      const index = this.postprocessors.indexOf(callback)
-
-      if (index > -1) {
-        this.postprocessors = this.postprocessors
-          .slice(0, index)
-          .concat(this.postprocessors.slice(index + 1))
-      }
-    }
+  static create(): MacroScope {
+    return new MacroScope()
   }
 
-  generateId() {
-    ++this.id
+  static fromRegistry(registry: Registry): MacroScope {
+    return new MacroScope({
+      features: new Map<Symbol, ScopeFeature>(),
+      registry,
+      globalPackages: <[string, Package][]>[],
+      packages: new Map<string, Package>()
+    })
+  }
 
-    return this.id
+  clone(): MacroScope {
+    return new MacroScope(this)
+  }
+
+  getFeature(symbol: Symbol): ScopeFeature {
+    return this.features.get(symbol)
+  }
+
+  setFeature(symbol: Symbol, feature: ScopeFeature) {
+    return this.features.set(symbol, feature)
   }
 
   usePackage(packageName: string) {
     const pkg = this.registry.findPackage(packageName)
 
     if (pkg) {
-      this.namespacedPackages.set(packageName, pkg)
+      this.packages.set(packageName, pkg)
     }
   }
 
@@ -123,81 +89,78 @@ export class Scope {
     const pkg = this.registry.findPackage(packageName)
 
     if (pkg) {
-      this.globalPackage = this.globalPackage.merge(pkg)
+      this.globalPackages.unshift([packageName, pkg])
     }
   }
 
-  findTagResolver(tagIdentifier: string): TagResolver | false {
-    const [namespace, tagName] = resolveIdentifier(
-      tagIdentifier
-    )
-
-    if (namespace) {
-      const pkg = this.namespacedPackages.get(namespace)
-
-      if (!pkg) {
-        return false
-      }
-
-      const resolver = pkg.findTagResolver(tagName)
-
-      return resolver ? resolver : false
-    }
-
-    const resolver = this.globalPackage.findTagResolver(tagName)
-
-    return resolver ? resolver : false
+  toResolverScope(): ResolverScope {
+    return new ResolverScope({
+      features: this.features,
+      packages: this.packages
+    })
   }
 
-  findDirectiveResolver(
-    directiveIdentifier: string
-  ): DirectiveResolver | false {
-    const [namespace, tagName] = resolveIdentifier(
-      directiveIdentifier
-    )
-
-    if (namespace) {
-      const pkg = this.namespacedPackages.get(namespace)
-
-      if (!pkg) {
-        return false
-      }
-
-      const resolver = pkg.findDirectiveResolver(tagName)
-
-      return resolver ? resolver : false
+  expand(doc: DocumentNode): DocumentNode {
+    return {
+      type: 'Document',
+      body: this.expandNodes(doc.body)
     }
-
-    const resolver = this.globalPackage.findDirectiveResolver(
-      tagName
-    )
-
-    return resolver ? resolver : false
   }
 
-  resolve(
-    nodes: (TagNode | TextNode)[],
-    options: Object = {}
-  ): (TagNode | TextNode)[] {
-    return <(TagNode | TextNode)[]>nodes
-      .map(node => {
-        switch (node.type) {
-          case 'Tag':
-            const scope = this.clone()
-            const resolver = this.findTagResolver(node.id.name)
+  expandNode(node: BlockChildNode): BlockChildNode[] {
+    if (is)
+  }
 
-            const pkg = Package.create()
+  expandNodes(nodes: BlockChildNode[]): BlockChildNode[] {
 
-            return resolver
-              ? resolver(node, scope, pkg, options)
-              : node
+  }
 
-          case 'Text':
-            return node
-        }
+  expandMacro(tag: TagNode): BlockChildNode[] {
 
-        return node
-      })
-      .filter(node => !!node)
+  }
+
+  expandMacros(macros: TagNode[]): BlockChildNode[] {
+
+  }
+
+  expandTag(tag: TagNode): BlockChildNode[] {
+    return [tag]
+  }
+}
+
+export class ResolverScope {
+  features: Map<Symbol, ScopeFeature>
+  packages: Map<string, Package>
+
+  constructor(scope?: ResolverScopeStruct) {
+    if (scope) {
+      const { features, packages } = scope
+
+      this.features = features
+      this.packages = packages
+    } else {
+      this.features = new Map()
+      this.packages = new Map()
+    }
+  }
+
+  static create(): ResolverScope {
+    return new ResolverScope()
+  }
+
+  clone(): ResolverScope {
+    return new ResolverScope(this)
+  }
+
+  getFeature(symbol: Symbol): ScopeFeature {
+    return this.features.get(symbol)
+  }
+
+  setFeature(symbol: Symbol, feature: ScopeFeature) {
+    return this.features.set(symbol, feature)
+  }
+
+  resolve() {
+
   }
 }

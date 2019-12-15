@@ -1,5 +1,5 @@
 import { Cursor } from './cursor'
-import { BlockNode, BlockChildNode } from './nodes'
+import { BlockNode, ChildNode } from './nodes'
 import { ParseOptions } from './root'
 
 export function parseVerbatimBlock(
@@ -14,7 +14,7 @@ export function parseVerbatimBlock(
    * ```
    */
   let verbatimPrefix = 0
-  const body: BlockChildNode[] = []
+  const body: ChildNode[] = []
 
   while (cursor.startsWith('=') && !cursor.isEof()) {
     cursor.next(1)
@@ -30,7 +30,7 @@ export function parseVerbatimBlock(
    *               cursor
    * ```
    */
-  const mark = cursor.clone()
+  const marker = cursor.clone()
 
   while (!cursor.isEof()) {
     if (cursor.startsWith('}')) {
@@ -45,12 +45,12 @@ export function parseVerbatimBlock(
          * ```
          * \code(md) ==={ Hello, World! }===
          *               ^              ^   ^
-         *               mark           |   lookahead
+         *               marker         |   lookahead
          *                              cursor
          * ```
          */
-        if (mark.index !== cursor.index) {
-          const value = mark.takeUntil(cursor)
+        if (marker.index !== cursor.index) {
+          const value = marker.takeUntil(cursor)
 
           body.push({
             type: 'Text',
@@ -59,14 +59,14 @@ export function parseVerbatimBlock(
         }
 
         cursor.moveTo(lookahead)
-        mark.moveTo(cursor)
+        marker.moveTo(cursor)
         /**
          * ```
          * \code(md) ==={ Hello, World! }===
          *                                  ^
          *                                  lookahead
          *                                  cursor
-         *                                  mark
+         *                                  marker
          * ```
          */
 
@@ -79,16 +79,16 @@ export function parseVerbatimBlock(
     }
   }
 
-  if (mark.index !== cursor.index) {
+  if (marker.index !== cursor.index) {
     /**
      * ```
      * \code(md) ==={ Hello, World!
      *               ^             ^
-     *               mark          EOF
+     *               marker        EOF
      *                             cursor
      * ```
      */
-    const value = mark.takeUntil(cursor)
+    const value = marker.takeUntil(cursor)
 
     body.push({
       type: 'Text',

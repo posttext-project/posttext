@@ -1,15 +1,18 @@
 import { ParseOptions } from './root'
 import { Cursor } from './cursor'
 import {
-  IdentifierNode,
   TextNode,
   TagNode,
   AttributeNode,
   BlockNode,
-  BlockChildNode
+  ChildNode
 } from './nodes'
 import { SPECIAL_CHARACTERS_REGEXP } from './root'
 import { parseVerbatimBlock } from './verbatim'
+import {
+  parseTagIdentifier,
+  parseAttributeIdentifier
+} from './identifier'
 
 export function parseTag(
   cursor: Cursor,
@@ -17,7 +20,7 @@ export function parseTag(
 ): TagNode {
   cursor.next(1)
 
-  const identifier = parseTagIdentifier(cursor)
+  const { name, namespace } = parseTagIdentifier(cursor)
 
   let hasSemi = lookaheadSemicolon(cursor)
 
@@ -31,7 +34,7 @@ export function parseTag(
 
   hasSemi = lookaheadSemicolon(cursor)
 
-  let body = []
+  const body: BlockNode[] = []
   if (!hasSemi) {
     while (!cursor.isEof()) {
       const hasMoreBlock = lookaheadBlock(cursor)
@@ -48,7 +51,8 @@ export function parseTag(
 
   return {
     type: 'Tag',
-    id: identifier,
+    name,
+    namespace,
     params,
     attrs,
     body
@@ -75,27 +79,6 @@ export function lookaheadSemicolon(
   return false
 }
 
-export function parseTagIdentifier(
-  cursor: Cursor,
-  options: ParseOptions = {}
-): IdentifierNode {
-  const mark = cursor.clone()
-
-  while (
-    !cursor.oneOf([' ', '(', '=', '[', ';']) &&
-    !cursor.isEof()
-  ) {
-    cursor.next(1)
-  }
-
-  const name = mark.takeUntil(cursor)
-
-  return {
-    type: 'Identifier',
-    name
-  }
-}
-
 export function lookaheadParamaters(
   cursor: Cursor,
   options: ParseOptions = {}
@@ -118,13 +101,13 @@ export function lookaheadParamaters(
 export function parseParameters(
   cursor: Cursor,
   options: ParseOptions = {}
-): TextNode[] {
-  const params: TextNode[] = []
+): string[] {
+  const params: string[] = []
 
   do {
     cursor.next(1)
 
-    const mark = cursor.clone()
+    const marker = cursor.clone()
 
     while (!cursor.oneOf([',', ')']) && !cursor.isEof()) {
       if (cursor.startsWith('\\')) {
@@ -134,12 +117,9 @@ export function parseParameters(
       }
     }
 
-    const value = mark.takeUntil(cursor)
+    const value = marker.takeUntil(cursor)
 
-    params.push({
-      type: 'Text',
-      value
-    })
+    params.push(value)
   } while (!cursor.startsWith(')') && !cursor.isEof())
 
   cursor.next(1)
@@ -175,24 +155,14 @@ export function parseAttributes(
   do {
     cursor.next(1)
 
-    const mark = cursor.clone()
-
-    while (!cursor.oneOf(['=', ';', ']']) && !cursor.isEof()) {
-      if (cursor.startsWith('\\')) {
-        cursor.next(2)
-      } else {
-        cursor.next(1)
-      }
-    }
-
-    const name = mark.takeUntil(cursor)
+    const { name, namespace } = parseAttributeIdentifier(cursor)
 
     let value = ''
 
     if (cursor.startsWith('=') && !cursor.isEof()) {
       cursor.next(1)
 
-      mark.moveTo(cursor)
+      const marker = cursor.clone()
 
       while (!cursor.oneOf([';', ']']) && !cursor.isEof()) {
         if (cursor.startsWith('\\')) {
@@ -202,19 +172,14 @@ export function parseAttributes(
         }
       }
 
-      value = mark.takeUntil(cursor)
+      value = marker.takeUntil(cursor)
     }
 
     attrs.push({
       type: 'Attribute',
-      id: {
-        type: 'Identifier',
-        name
-      },
-      value: {
-        type: 'Text',
-        value
-      }
+      name,
+      namespace,
+      value
     })
   } while (!cursor.startsWith(']') && !cursor.isEof())
 
@@ -233,14 +198,14 @@ export function lookaheadBlock(
     lookahead.next(1)
   }
 
-  const mark = lookahead.clone()
+  const marker = lookahead.clone()
 
   while (lookahead.startsWith('=') && !lookahead.isEof()) {
     lookahead.next(1)
   }
 
   if (lookahead.startsWith('{')) {
-    cursor.moveTo(mark)
+    cursor.moveTo(marker)
 
     return true
   }
@@ -263,7 +228,7 @@ export function parseNormalBlock(
   cursor: Cursor,
   options: ParseOptions = {}
 ): BlockNode {
-  const body: BlockChildNode[] = []
+  const body: ChildNode[] = []
 
   while (!cursor.startsWith('}') && !cursor.isEof()) {
     if (cursor.startsWith('\\')) {
@@ -290,7 +255,7 @@ export function parseBlockTextNode(
   cursor: Cursor,
   options: ParseOptions = {}
 ): TextNode {
-  const mark = cursor.clone()
+  const marker = cursor.clone()
 
   while (
     !cursor.startsWith('\\') &&
@@ -300,7 +265,7 @@ export function parseBlockTextNode(
     cursor.next(1)
   }
 
-  const value = mark
+  const value = marker
     .takeUntil(cursor)
     .split(SPECIAL_CHARACTERS_REGEXP)
     .join('')

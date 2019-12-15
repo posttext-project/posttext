@@ -1,46 +1,59 @@
-import { TagNode, TextNode } from '../parser'
+import { TagNode, BlockChildNode, DocumentNode } from '../parser'
 import { Scope } from './scope'
+
+export type MacroResolver = (
+  tagNode: TagNode,
+  scope: Scope,
+  options?: Object
+) => IterableIterator<BlockChildNode>
 
 export type TagResolver = (
   tagNode: TagNode,
   scope: Scope,
-  pkg: Package,
   options?: Object
-) => TagNode | TextNode | false
+) => IterableIterator<BlockChildNode>
 
 export type DirectiveResolver = (
   tagNode: TagNode,
   scope: Scope,
-  pkg: Package,
   options?: Object
-) => TagNode | TextNode | false
+) => IterableIterator<BlockChildNode>
+
+export type AstProcessor = (
+  ast: DocumentNode,
+  scope: Scope,
+  options?: Object
+) => DocumentNode
 
 export interface DependencyDescriptor {
   name: string
-  type?: string
+  type: string
   version?: string
   link?: string
 }
 
 export interface PackageOptions {
-  namespace?: string
   deps?: DependencyDescriptor[]
+  macroResolvers?: Map<string, MacroResolver>
   tagResolvers?: Map<string, TagResolver>
   directiveResolvers?: Map<string, DirectiveResolver>
 }
 
 export class Package {
-  namespace: string | false
-
   deps: DependencyDescriptor[]
+
+  macroResolvers: Map<string, MacroResolver>
 
   tagResolvers: Map<string, TagResolver>
   directiveResolvers: Map<string, DirectiveResolver>
 
-  constructor(options: PackageOptions = {}) {
-    this.namespace = options.namespace || false
+  preprocessors: AstProcessor[] = []
+  postprocessors: AstProcessor[] = []
 
+  constructor(options: PackageOptions = {}) {
     this.deps = options.deps || []
+
+    this.macroResolvers = options.macroResolvers || new Map()
 
     this.tagResolvers = options.tagResolvers || new Map()
     this.directiveResolvers =
@@ -51,14 +64,6 @@ export class Package {
     return new Package()
   }
 
-  merge(pkg: Package): Package {
-    return Package.create()
-  }
-
-  setNamespace(namespace: string | false) {
-    this.namespace = namespace
-  }
-
   defineDeps(deps: DependencyDescriptor[]) {
     for (const dep of deps) {
       this.defineDep(dep)
@@ -67,6 +72,50 @@ export class Package {
 
   defineDep(dep: DependencyDescriptor) {
     this.deps.push(dep)
+  }
+
+  addPreprocessor(callback: AstProcessor) {
+    this.preprocessors.push(callback)
+  }
+
+  addPostprocessor(callback: AstProcessor) {
+    this.postprocessors.push(callback)
+  }
+
+  getPreprocessors() {
+    return this.preprocessors
+  }
+
+  getPostprocessors() {
+    return this.postprocessors
+  }
+
+  removePreprocessors() {
+    this.preprocessors = []
+  }
+
+  removePostprocessors() {
+    this.postprocessors = []
+  }
+
+  defineMacros(macroResolvers: Record<string, MacroResolver>) {
+    for (const [macroName, resolver] of Object.entries(
+      macroResolvers
+    )) {
+      this.defineMacro(macroName, resolver)
+    }
+  }
+
+  defineMacro(macroName: string, resolver: MacroResolver) {
+    this.macroResolvers.set(macroName, resolver)
+  }
+
+  hasMacro(macroName: string): boolean {
+    return this.macroResolvers.has(macroName)
+  }
+
+  getMacro(macroName: string): MacroResolver {
+    return this.macroResolvers.get(macroName)
   }
 
   defineTags(tagResolvers: Record<string, TagResolver>) {
@@ -81,11 +130,15 @@ export class Package {
     this.tagResolvers.set(tagName, resolver)
   }
 
+  hasTag(tagName: string) {
+    return this.tagResolvers.has(tagName)
+  }
+
   removeTag(tagName: string) {
     this.tagResolvers.delete(tagName)
   }
 
-  findTagResolver(tagName: string): TagResolver {
+  getTag(tagName: string): TagResolver {
     return this.tagResolvers.get(tagName)
   }
 
@@ -110,7 +163,7 @@ export class Package {
     this.directiveResolvers.delete(tagName)
   }
 
-  findDirectiveResolver(tagName: string): DirectiveResolver {
+  getDirective(tagName: string): DirectiveResolver {
     return this.directiveResolvers.get(tagName)
   }
 }

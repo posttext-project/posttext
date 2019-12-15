@@ -1,5 +1,5 @@
 import { Registry, Scope } from '../registry'
-import { DocumentNode, Node } from '../parser'
+import { PTDocument, Node } from '../parser'
 
 export interface PrintOptions {
   indent?: number
@@ -24,36 +24,39 @@ export class Printer {
     return this.initialScope.getRegistry()
   }
 
-  print(ast: DocumentNode, options: PrintOptions = {}): string {
-    const docNode = <DocumentNode>ast
+  print(ast: PTDocument, options: PrintOptions = {}): string {
+    const docNode = <PTDocument>ast
 
-    const htmlAst: DocumentNode = {
+    const htmlAst: PTDocument = {
       type: 'Document',
-      body: this.initialScope.resolve(docNode.body, options)
+      body: this.initialScope.resolveBlockChildNodes(
+        docNode.body,
+        options
+      )
     }
 
-    return this.render(htmlAst)
+    return this.printAst(htmlAst)
   }
 
-  render(ast: Node): string {
+  printAst(ast: Node): string {
     switch (ast.type) {
       case 'Document': {
-        return ast.body.map(node => this.render(node)).join('')
-      }
-
-      case 'Block': {
-        return ast.body.map(node => this.render(node)).join('')
+        return ast.body
+          .map(node => this.printAst(node))
+          .join('')
       }
 
       case 'Tag': {
-        if (ast.id.name === 'html-element') {
-          const htmlTagName = ast.params[0].value || 'div'
+        if (ast.name === 'html-element') {
+          const htmlTagName = ast.params[0] || 'div'
 
           const openTag = '<' + htmlTagName + '>'
 
           const content =
             ast.body && ast.body[0]
-              ? this.render(ast.body[0])
+              ? ast.body[0].body
+                  .map(node => this.printAst(node))
+                  .join('')
               : ''
 
           const closeTag = '</' + htmlTagName + '>'

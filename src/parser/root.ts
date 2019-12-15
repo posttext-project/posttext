@@ -2,7 +2,7 @@ import { Cursor } from './cursor'
 import {
   DocumentNode,
   TextNode,
-  DocumentChildNode
+  ChildNode,
 } from './nodes'
 import { parseTag } from './tag'
 
@@ -20,7 +20,7 @@ export function parse(
 ): DocumentNode {
   const cursor = Cursor.from({ doc })
 
-  const body: DocumentChildNode[] = []
+  const body: ChildNode[] = []
 
   while (!cursor.isEof()) {
     if (cursor.startsWith('\\')) {
@@ -44,13 +44,13 @@ export function parseTopLevelTextNode(
   cursor: Cursor,
   options: ParseOptions = {}
 ): TextNode {
-  const mark = cursor.clone()
+  const marker = cursor.clone()
 
   while (!cursor.startsWith('\\') && !cursor.isEof()) {
     cursor.next(1)
   }
 
-  const value = mark
+  const value = marker
     .takeUntil(cursor)
     .split(SPECIAL_CHARACTERS_REGEXP)
     .join('')

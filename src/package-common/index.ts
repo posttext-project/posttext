@@ -1,117 +1,113 @@
 import { Package, Scope } from '../registry'
 import { createHtmlElement } from '../html'
-import { createTextNode, nodesToString } from '../fmt'
-import { TagNode, TextNode } from '../parser'
+import { nodesToString } from '../fmt'
+import { TagNode, BlockChildNode, DocumentNode } from '../parser'
+import { createTextNode, createDocumentNode } from '../builder'
 
 export default function(pkg: Package) {
   pkg.defineTags({
-    use(tagNode: TagNode, scope: Scope): false {
+    *use(
+      tagNode: TagNode,
+      scope: Scope
+    ): IterableIterator<BlockChildNode> {
       if (tagNode.body && tagNode.body[0]) {
         const pkgKey = nodesToString(tagNode.body[0].body)
 
         scope.usePackage(pkgKey)
       }
-
-      return false
     },
 
-    import(tagNode: TagNode, scope: Scope): false {
+    *import(
+      tagNode: TagNode,
+      scope: Scope
+    ): IterableIterator<BlockChildNode> {
       if (tagNode.body && tagNode.body[0]) {
         const pkgKey = nodesToString(tagNode.body[0].body)
 
         scope.importPackage(pkgKey)
       }
-
-      return false
     },
 
-    tableofcontents(tagNode: TagNode, scope: Scope): TagNode {
-      return tagNode
+    *tableofcontents(tagNode: TagNode, scope: Scope) {
+      yield tagNode
     },
 
-    section(tagNode: TagNode, scope: Scope): TagNode {
-      return createHtmlElement(
+    *section(tagNode: TagNode, scope: Scope) {
+      yield createHtmlElement(
         'h1',
         tagNode.attrs,
-        scope.resolve(
-          tagNode.body &&
-            tagNode.body[0] &&
-            tagNode.body[0].body
-        )
+        tagNode.body &&
+          tagNode.body[0] &&
+          tagNode.body[0].body
+            .map(
+              childNode =>
+                <BlockChildNode[]>(
+                  Array.from(scope.resolve(childNode))
+                )
+            )
+            .reduce((prev, next) => prev.concat(next), [])
       )
     },
 
-    subsection(tagNode: TagNode, scope: Scope): TagNode {
-      return createHtmlElement(
+    *subsection(tagNode: TagNode, scope: Scope) {
+      yield createHtmlElement(
         'h2',
         tagNode.attrs,
-        scope.resolve(
-          tagNode.body &&
-            tagNode.body[0] &&
-            tagNode.body[0].body
-        )
+        tagNode.body && tagNode.body[0] && tagNode.body[0].body
       )
     },
 
-    subsubsection(tagNode: TagNode, scope: Scope): TagNode {
-      return createHtmlElement(
+    *subsubsection(tagNode: TagNode, scope: Scope) {
+      yield createHtmlElement(
         'h3',
         tagNode.attrs,
-        scope.resolve(
-          tagNode.body &&
-            tagNode.body[0] &&
-            tagNode.body[0].body
-        )
+        tagNode.body &&
+          tagNode.body[0] &&
+          scope.resolveTags(tagNode.body[0].body)
       )
     },
 
-    p(tagNode: TagNode, scope: Scope): TagNode {
-      return createHtmlElement(
+    *p(tagNode: TagNode, scope: Scope) {
+      yield createHtmlElement(
         'p',
         tagNode.attrs,
-        scope.resolve(
-          tagNode.body &&
-            tagNode.body[0] &&
-            tagNode.body[0].body
-        )
+        tagNode.body &&
+          tagNode.body[0] &&
+          scope.resolveTags(tagNode.body[0].body)
       )
     },
 
-    bold(tagNode: TagNode, scope: Scope): TagNode {
-      return createHtmlElement(
+    *bold(tagNode: TagNode, scope: Scope) {
+      yield createHtmlElement(
         'b',
         tagNode.attrs,
-        scope.resolve(
-          tagNode.body &&
-            tagNode.body[0] &&
-            tagNode.body[0].body
-        )
+        tagNode.body &&
+          tagNode.body[0] &&
+          scope.resolveTags(tagNode.body[0].body)
       )
     },
 
-    italic(tagNode: TagNode, scope: Scope): TagNode {
-      return createHtmlElement(
+    *italic(tagNode: TagNode, scope: Scope) {
+      yield createHtmlElement(
         'i',
         tagNode.attrs,
-        scope.resolve(
-          tagNode.body &&
-            tagNode.body[0] &&
-            tagNode.body[0].body
-        )
+        tagNode.body &&
+          tagNode.body[0] &&
+          scope.resolveTags(tagNode.body[0].body)
       )
     },
 
-    s(tagNode: TagNode): TextNode | false {
+    *s(tagNode: TagNode) {
       const count =
         parseInt(
           tagNode.params &&
             tagNode.params[0] &&
-            tagNode.params[0].value
+            tagNode.params[0]
         ) || 0
 
-      return count
-        ? createTextNode('&nbsp;'.repeat(count))
-        : false
+      if (count) {
+        yield createTextNode('&nbsp;'.repeat(count))
+      }
     }
   })
 

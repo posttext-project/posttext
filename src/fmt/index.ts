@@ -1,2 +1,2 @@
 export * from './print'
-export * from './builder'
+export * from './string'
