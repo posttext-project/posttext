@@ -1,2 +1,0 @@
-import Sqrl from 'squirrelly'
-

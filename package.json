@@ -48,6 +48,7 @@
     "typescript": "^3.5.2"
   },
   "dependencies": {
+    "cursornext": "^0.2.0",
     "squirrelly": "^7.5.0"
   },
   "repository": {

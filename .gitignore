@@ -1,5 +1,7 @@
 stats.html
 
-out
-lib
-node_modules
+out/
+lib/
+node_modules/
+
+.vscode/
