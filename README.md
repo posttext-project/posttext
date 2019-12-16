@@ -1,6 +1,6 @@
 # PostText
 
-> **Note**: This library is still a work-in-progress. Some features are not available yet.
+> **Note**: This library is a work-in-progress. Some features are not available yet.
 
 ## What is PostText?
 
@@ -20,20 +20,20 @@ Tags are the most essential building blocks of a PostText document. A tag often 
 - Blocks
 
 ```
-\tag-name () [] {} {}
+\tag-name () [] {} {};
  1        2  3  4
 ```
 
 An example of how to use tag to format text in PostText:
 
 ```
-\title{PostText}
+\title{PostText};
 
-\section{Introduce}
+\section{Introduce};
 
 \p {
-  Hi! Welcome to \bold{PostText}! \emoji{smile}
-}
+  Hi! Welcome to \bold{PostText};! \emoji{smile};
+};
 ```
 
 Tag properties can be specified using parameters or attributes. Tag parameters are seperated by commas while tag attributes are seperated by semicolons:
@@ -44,14 +44,14 @@ Tag properties can be specified using parameters or attributes. Tag parameters a
   font-size=14px;
 ] {
   Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-}
+};
 
 \math {
   A = \matrix(2, 3) {
     1   2   3
     -5  7   8
-  }
-}
+  };
+};
 ```
 
 ### Namespaces and Directives
@@ -59,18 +59,18 @@ Tag properties can be specified using parameters or attributes. Tag parameters a
 Namespaces provide unique names for tags and attributes from possible extra packages. In additional, a directive - an attribute with namespace - can add more functionalities to the target tag, which makes PostText truely extensible.
 
 ```
-\use{chart}
-\use{highlight}
+\use{chart};
+\use{highlight};
 
 \chart:pie {
   Apple   30%
   Orange  40%
   Grape   rest
-}
+};
 
 \p [highlight:color=yellow] {
   Caution: Please watch your step!
-}
+};
 ```
 
 ### Verbatims
@@ -83,14 +83,14 @@ A verbatim block is specified by prefixing and postfixing the block with the sam
 \code(javascript) ==={
   function sum(a, b) {
     return a + b
-  }
+  };
 
   console.log(sum(5, 6))
-}===
+}===;
 
 \code(posttext) ==={
   \code(posttext) =={
     Nested verbatim block.
-  }==
-}===
+  }==;
+}===;
 ```
