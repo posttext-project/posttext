@@ -5,7 +5,7 @@ import {
   DocumentNode,
   IdentifierNode,
   Node
-} from './nodes'
+} from '../ast'
 
 export class Parser {
   parse(input: string) {
