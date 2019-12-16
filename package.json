@@ -1,15 +1,17 @@
 {
-  "name": "posttext",
+  "name": "@posttext/postext",
   "version": "0.0.1",
-  "description": "The next generation markup language for everyone! :D",
+  "description": "The next generation markup language for everyone!",
   "main": "./src/index.ts",
+  "bin": "./lib/index.js",
   "files": [
     "lib"
   ],
   "scripts": {
-    "build": "gulp build",
+    "start": "ts-node src/index.ts",
+    "build": "gulp clean && yarn format && gulp build",
     "test": "gulp test",
-    "prettier:all": "prettier --write ./src/**/*.ts"
+    "format": "prettier --write **/*.{ts,json,js}"
   },
   "author": "clitetailor",
   "keywords": [
@@ -24,32 +26,29 @@
   },
   "homepage": "https://github.com/posttext-project/posttext#readme",
   "devDependencies": {
-    "@babel/core": "^7.1.6",
-    "@babel/preset-env": "^7.1.6",
-    "@babel/register": "^7.0.0",
+    "@types/fs-extra": "^8.0.1",
     "@types/squirrelly": "^7.1.0",
     "ava": "^2.1.0",
-    "core-js": "^3.1.4",
     "del": "^3.0.0",
     "fs-extra": "^8.1.0",
-    "gulp-ava": "^1.0.0",
-    "gulp-cli": "^2.0.1",
+    "gulp": "^4.0.2",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typescript": "^5.0.0-alpha.3",
     "nyc": "^14.1.1",
     "prettier": "^1.18.2",
-    "regenerator-runtime": "^0.13.2",
     "rollup": "^0.67.3",
     "rollup-plugin-terser": "^5.0.0",
     "rollup-plugin-typescript": "^1.0.0",
     "rollup-plugin-visualizer": "^2.4.3",
     "ts-node": "^8.3.0",
-    "tslib": "^1.10.0",
     "typescript": "^3.5.2"
   },
   "dependencies": {
-    "cursornext": "^0.2.0",
-    "squirrelly": "^7.5.0"
+    "chalk": "^3.0.0",
+    "cursornext": "0.2.1",
+    "meow": "^6.0.0",
+    "squirrelly": "^7.5.0",
+    "tslib": "^1.10.0"
   },
   "repository": {
     "type": "git",
