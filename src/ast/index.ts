@@ -1,5 +1,3 @@
-import { Loc } from 'cursornext'
-
 export interface BaseNode {
   type: string
 }
@@ -25,7 +23,4 @@ export interface TextNode extends BaseNode {
   value: string
 }
 
-export type Node =
-  | DocumentNode
-  | TagNode
-  | TextNode
+export type Node = DocumentNode | TagNode | TextNode
