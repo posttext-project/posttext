@@ -25,24 +25,14 @@ export class Compiler {
     this.generator = new Generator()
   }
 
-  async compile() {
+  async compile(): Promise<string> {
     const { file } = this.options.input
 
     const input = await fs.readFile(file, 'utf8')
     const ast = this.parser.parse(input)
 
-    const outputPath = path.parse(file)
+    const outputHtml = this.generator.generate({ ast, input })
 
-    this.generator.generate(
-      { ast, input },
-      {
-        output: {
-          file: path.resolve(
-            outputPath.dir,
-            outputPath.name + '.html'
-          )
-        }
-      }
-    )
+    return outputHtml
   }
 }

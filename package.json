@@ -2,31 +2,50 @@
   "name": "@posttext/postext",
   "version": "0.0.1",
   "description": "The next generation markup language for everyone!",
-  "main": "./src/index.ts",
-  "bin": "./lib/index.js",
-  "files": [
-    "lib"
-  ],
-  "scripts": {
-    "start": "ts-node src/index.ts",
-    "build": "gulp clean && yarn format && gulp build",
-    "test": "gulp test",
-    "format": "prettier --write **/*.{ts,json,js}"
-  },
-  "author": "clitetailor",
   "keywords": [
     "text",
     "markup",
     "preprocessor",
     "html"
   ],
-  "license": "MIT",
+  "homepage": "https://github.com/posttext-project/posttext#readme",
   "bugs": {
     "url": "https://github.com/posttext-project/posttext/issues"
   },
-  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
+  "license": "MIT",
+  "author": "clitetailor",
+  "files": [
+    "lib"
+  ],
+  "type": "commonjs",
+  "exports": {
+    ".": "./index.js"
+  },
+  "main": "./src/index.ts",
+  "bin": {
+    "pt": "./index.js"
+  },
+  "scripts": {
+    "build": "gulp clean && yarn format && gulp build",
+    "format": "prettier -c .prettierrc.yaml --write **/*.{ts,json,js}",
+    "start": "ts-node src/index.ts",
+    "test": "gulp test"
+  },
+  "dependencies": {
+    "chalk": "^3.0.0",
+    "cursornext": "0.2.1",
+    "koa": "^2.11.0",
+    "meow": "^6.0.0",
+    "squirrelly": "^7.5.0",
+    "tslib": "^1.10.0"
+  },
   "devDependencies": {
     "@types/fs-extra": "^8.0.1",
+    "@types/koa": "^2.11.0",
     "@types/squirrelly": "^7.1.0",
     "ava": "^2.1.0",
     "del": "^3.0.0",
@@ -42,16 +61,5 @@
     "rollup-plugin-visualizer": "^2.4.3",
     "ts-node": "^8.3.0",
     "typescript": "^3.5.2"
-  },
-  "dependencies": {
-    "chalk": "^3.0.0",
-    "cursornext": "0.2.1",
-    "meow": "^6.0.0",
-    "squirrelly": "^7.5.0",
-    "tslib": "^1.10.0"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/posttext-project/posttext.git"
   }
 }

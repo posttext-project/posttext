@@ -1,5 +1,3 @@
-import fs from 'fs-extra'
-
 import { DocumentNode, TagNode, TextNode, Node } from '../ast'
 
 export interface GeneratorInput {
@@ -7,28 +5,28 @@ export interface GeneratorInput {
   input: string
 }
 
-export interface GeneratorOptions {
-  output: {
-    file: string
-  }
-}
-
 export class Generator {
-  generate(
-    { ast, input }: GeneratorInput,
-    options: GeneratorOptions
-  ) {
-    const outputHtml = this.generateHtml(ast)
-
-    fs.outputFile(options.output.file, outputHtml)
+  generate({ ast }: GeneratorInput) {
+    return this.generateHtml(ast)
   }
 
-  generateHtml(node: DocumentNode): string {
-    return (
-      node.body
-        .map(node => this.generateRootNode(node))
-        .join('') + '\n'
-    )
+  generateHtml(node: Node): string {
+    switch (node.type) {
+      case 'Document':
+        return (
+          node.body
+            .map(node => this.generateRootNode(node))
+            .join('') + '\n'
+        )
+
+      case 'Tag':
+        return this.generateTag(node)
+
+      case 'Text':
+        return this.generateText(node)
+    }
+
+    throw new Error('Unsupported node type')
   }
 
   generateRootNode(node: Node): string {
@@ -45,6 +43,9 @@ export class Generator {
 
   generateTag(node: TagNode): string {
     switch (node.id.name.toLocaleLowerCase()) {
+      case 'section':
+        return this.generateSection(node)
+
       case 'title':
         return this.generateTitle(node)
 
@@ -53,33 +54,96 @@ export class Generator {
 
       case 'italic':
         return this.generateItalic(node)
+
+      case 'paragraph':
+        return this.generateParagraph(node)
     }
 
     return ''
   }
 
-  generateText(node: TextNode): string {
+  isInlineNode(node: Node): boolean {
+    if (node.type === 'Tag') {
+      return (
+        ['title', 'bold', 'italic', 'paragraph'].findIndex(
+          name => node.id.name === name
+        ) !== -1
+      )
+    }
+
+    return false
+  }
+
+  generateSection(node: Node): string {
+    return '<section>' + this.htmlContent(node) + '</section>'
+  }
+
+  generateText(node: Node): string {
     return this.textContent(node)
   }
 
   generateTitle(node: Node): string {
-    return '<h1>' + this.textContent(node) + '</h1>'
+    return '<h1>' + this.inlineContent(node) + '</h1>'
   }
 
   generateBold(node: Node): string {
-    return '<b>' + this.textContent(node) + '</b>'
+    return '<b>' + this.inlineContent(node) + '</b>'
   }
 
   generateItalic(node: Node): string {
-    return '<i>' + this.textContent(node) + '</i>'
+    return '<i>' + this.inlineContent(node) + '</i>'
   }
 
   generateParagraph(node: Node): string {
     if (this.textContent(node).match(/[^ \t\r\n]+/)) {
-      return '<p>' + this.textContent(node) + '</p>'
+      return '<p>' + this.inlineContent(node) + '</p>'
     }
 
     return ''
+  }
+
+  htmlContent(node: Node): string {
+    switch (node.type) {
+      case 'Document':
+        return node.body
+          .map(node => this.inlineContent(node))
+          .join('')
+
+      case 'Tag':
+        return node.children
+          .map(node => this.generateHtml(node))
+          .join('')
+
+      case 'Text':
+        return node.value
+    }
+
+    throw new Error('Unsupported node type')
+  }
+
+  inlineContent(node: Node): string {
+    switch (node.type) {
+      case 'Document':
+        return node.body
+          .map(node => this.inlineContent(node))
+          .join('')
+
+      case 'Tag':
+        return node.children
+          .map(node => {
+            if (this.isInlineNode(node)) {
+              return this.generateTag(<TagNode>node)
+            }
+
+            return this.textContent(node)
+          })
+          .join('')
+
+      case 'Text':
+        return node.value
+    }
+
+    throw new Error('Unsupported node type')
   }
 
   textContent(node: Node): string {

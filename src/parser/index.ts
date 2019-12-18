@@ -54,8 +54,9 @@ export class Parser {
 
     this.skip(cursor)
 
-    const children = this.parseVerbatimBlock(cursor) ?? this.parseBlock(cursor)
-    
+    const children =
+      this.parseVerbatimBlock(cursor) ?? this.parseBlock(cursor)
+
     this.skip(cursor)
 
     if (cursor.startsWith(';')) {

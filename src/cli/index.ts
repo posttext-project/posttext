@@ -1,8 +1,11 @@
+import Koa from 'koa'
+import fs from 'fs-extra'
 import meow from 'meow'
 import path from 'path'
 import chalk from 'chalk'
 
 import { Compiler } from '../compiler'
+import { Context } from 'koa'
 
 export class Cli {
   cli: meow.Result<any>
@@ -54,11 +57,38 @@ export class Cli {
       })
       compiler.init()
 
-      await compiler.compile()
+      const outputHtml = await compiler.compile()
+
+      const inputPath = path.parse(this.cli.input[1])
+      fs.outputFile(
+        path.resolve(inputPath.dir, inputPath.name + '.html'),
+        outputHtml
+      )
     } catch (err) {
       console.log(chalk.red('error'), err)
     }
   }
 
-  serve() {}
+  serve() {
+    const app = new Koa()
+
+    app.use(async (ctx: Context) => {
+      const compiler = new Compiler({
+        input: {
+          file: path.resolve(process.cwd(), this.cli.input[1])
+        }
+      })
+      compiler.init()
+
+      ctx.body = await compiler.compile()
+    })
+
+    app.listen(8080, () => {
+      console.log(
+        '\n    ',
+        chalk.yellow('serve'),
+        '    http://localhost:8080\n'
+      )
+    })
+  }
 }
