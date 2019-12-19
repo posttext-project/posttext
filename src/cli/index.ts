@@ -2,6 +2,7 @@ import Koa from 'koa'
 import fs from 'fs-extra'
 import meow from 'meow'
 import path from 'path'
+import boxen from 'boxen'
 import chalk from 'chalk'
 
 import { Compiler } from '../compiler'
@@ -65,7 +66,7 @@ export class Cli {
         outputHtml
       )
     } catch (err) {
-      console.log(chalk.red('error'), err)
+      console.log(chalk.red('error') + '  ' + err)
     }
   }
 
@@ -85,9 +86,16 @@ export class Cli {
 
     app.listen(8080, () => {
       console.log(
-        '\n    ',
-        chalk.yellow('serve'),
-        '    http://localhost:8080\n'
+        boxen(
+          chalk.yellow('serve') +
+            '      ' +
+            'http://localhost:8080',
+          {
+            borderColor: 'yellow',
+            margin: 1,
+            padding: 1
+          }
+        )
       )
     })
   }
