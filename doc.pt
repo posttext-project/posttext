@@ -1,0 +1,9 @@
+\section {
+  \title {
+    Hello, World!
+  };
+
+  \paragraph {
+    This is an example document in \bold {PostText};!
+  };
+};
