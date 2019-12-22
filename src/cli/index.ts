@@ -1,17 +1,22 @@
 import Koa from 'koa'
 import fs from 'fs-extra'
+import ws from 'ws'
+import dot from 'dot'
+import http from 'http'
 import meow from 'meow'
 import path from 'path'
 import boxen from 'boxen'
 import chalk from 'chalk'
+import Router from '@koa/router'
+import chokidar from 'chokidar'
 
-import { Compiler } from '../compiler'
 import { Context } from 'koa'
+import { Compiler } from '../compiler'
 
-export class Cli {
+export class CLI {
   cli: meow.Result<any>
 
-  init() {
+  run() {
     this.cli = meow(
       `
         Usage
@@ -70,21 +75,67 @@ export class Cli {
     }
   }
 
-  serve() {
+  async serve() {
     const app = new Koa()
 
-    app.use(async (ctx: Context) => {
+    const server = http.createServer(app.callback())
+    const wss = new ws.Server({ server })
+
+    const router = new Router()
+
+    const template = await fs.readFile(
+      path.resolve(__dirname, 'template.html'),
+      'utf8'
+    )
+    const render = dot.template(template)
+
+    const bundle = await fs.readFile(
+      path.resolve(__dirname, 'bundle.js'),
+      'utf8'
+    )
+
+    const file = path.resolve(process.cwd(), this.cli.input[1])
+
+    router.get('/', async (ctx: Context) => {
       const compiler = new Compiler({
         input: {
-          file: path.resolve(process.cwd(), this.cli.input[1])
+          file
         }
       })
       compiler.init()
 
-      ctx.body = await compiler.compile()
+      const content = await compiler.compile()
+
+      ctx.body = render({
+        content
+      })
     })
 
-    app.listen(8080, () => {
+    router.get('/bundle.js', async (ctx: Context) => {
+      ctx.type = 'text/javascript'
+      ctx.body = bundle
+    })
+
+    app.use(router.routes())
+
+    wss.on('connection', ws => {
+      chokidar
+        .watch(path.resolve(__dirname, file))
+        .on('change', async event => {
+          const compiler = new Compiler({
+            input: {
+              file
+            }
+          })
+          compiler.init()
+
+          const content = await compiler.compile()
+
+          ws.send(content)
+        })
+    })
+
+    server.listen(8080, () => {
       console.log(
         boxen(
           chalk.yellow('serve') +
