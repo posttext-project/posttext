@@ -1,5 +1,5 @@
 import { CLI } from './cli'
 
-const cli = new CLI()
+const cli = CLI.new()
 
 cli.run()

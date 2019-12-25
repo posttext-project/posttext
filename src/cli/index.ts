@@ -1,23 +1,16 @@
-import Koa from 'koa'
-import fs from 'fs-extra'
-import ws from 'ws'
-import dot from 'dot'
-import http from 'http'
 import meow from 'meow'
-import path from 'path'
-import boxen from 'boxen'
-import chalk from 'chalk'
-import Router from '@koa/router'
-import chokidar from 'chokidar'
-
-import { Context } from 'koa'
-import { Compiler } from '../compiler'
+import { CompileCommand } from './compile'
+import { ServeCommand } from './serve'
 
 export class CLI {
-  cli: meow.Result<any>
+  private cli: meow.Result<any>
 
-  run() {
-    this.cli = meow(
+  constructor({ cli }: { cli: meow.Result<any> }) {
+    this.cli = cli
+  }
+
+  static new() {
+    const cli = meow(
       `
         Usage
           $ pt [command] <input>
@@ -40,13 +33,24 @@ export class CLI {
       }
     )
 
-    switch (this.cli?.input?.[0]?.toLowerCase()) {
+    return new CLI({
+      cli
+    })
+  }
+
+  async run() {
+    const args = this.cli.input.slice(1)
+    const command = this.cli.input[0].toLowerCase()
+
+    switch (command) {
       case 'compile':
-        this.compile()
+        await this.compile(args)
+
         return
 
       case 'serve':
-        this.serve()
+        await this.serve(args)
+
         return
 
       default:
@@ -54,100 +58,27 @@ export class CLI {
     }
   }
 
-  async compile() {
-    try {
-      const compiler = new Compiler({
-        input: {
-          file: path.resolve(process.cwd(), this.cli.input[1])
-        }
-      })
-      compiler.init()
+  async compile(
+    args: string[],
+    flags: meow.Options<any> = {}
+  ): Promise<any> {
+    const command = CompileCommand.new({
+      args,
+      flags
+    })
 
-      const outputHtml = await compiler.compile()
-
-      const inputPath = path.parse(this.cli.input[1])
-      fs.outputFile(
-        path.resolve(inputPath.dir, inputPath.name + '.html'),
-        outputHtml
-      )
-    } catch (err) {
-      console.log(chalk.red('error') + '  ' + err)
-    }
+    command.run()
   }
 
-  async serve() {
-    const app = new Koa()
-
-    const server = http.createServer(app.callback())
-    const wss = new ws.Server({ server })
-
-    const router = new Router()
-
-    const template = await fs.readFile(
-      path.resolve(__dirname, 'template.html'),
-      'utf8'
-    )
-    const render = dot.template(template)
-
-    const bundle = await fs.readFile(
-      path.resolve(__dirname, 'bundle.js'),
-      'utf8'
-    )
-
-    const file = path.resolve(process.cwd(), this.cli.input[1])
-
-    router.get('/', async (ctx: Context) => {
-      const compiler = new Compiler({
-        input: {
-          file
-        }
-      })
-      compiler.init()
-
-      const content = await compiler.compile()
-
-      ctx.body = render({
-        content
-      })
+  async serve(
+    args: string[],
+    flags: meow.Options<any> = {}
+  ): Promise<any> {
+    const command = ServeCommand.new({
+      args,
+      flags
     })
 
-    router.get('/bundle.js', async (ctx: Context) => {
-      ctx.type = 'text/javascript'
-      ctx.body = bundle
-    })
-
-    app.use(router.routes())
-
-    wss.on('connection', ws => {
-      chokidar
-        .watch(path.resolve(__dirname, file))
-        .on('change', async event => {
-          const compiler = new Compiler({
-            input: {
-              file
-            }
-          })
-          compiler.init()
-
-          const content = await compiler.compile()
-
-          ws.send(content)
-        })
-    })
-
-    server.listen(8080, () => {
-      console.log(
-        boxen(
-          chalk.yellow('serve') +
-            '      ' +
-            'http://localhost:8080',
-          {
-            borderColor: 'yellow',
-            margin: 1,
-            padding: 1
-          }
-        )
-      )
-    })
+    command.run()
   }
 }
