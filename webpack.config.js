@@ -1,4 +1,5 @@
 import path from 'path'
+import webpack from 'webpack'
 
 export default {
   entry: path.resolve(__dirname, './src/cli/assets/bundle.ts'),
@@ -6,7 +7,8 @@ export default {
     path: path.resolve(__dirname, 'lib/cli/assets'),
     filename: 'bundle.js'
   },
-  mode: 'production',
+  mode: 'development',
+  devtool: false,
   target: 'web',
   module: {
     rules: [{ test: /\.ts$/, use: 'ts-loader' }]
@@ -14,5 +16,10 @@ export default {
   resolve: {
     modules: ['node_modules', path.resolve(__dirname, 'src')],
     extensions: ['.ts']
-  }
+  },
+  plugins: [
+    new webpack.SourceMapDevToolPlugin({
+      filename: 'bundle.js.map'
+    })
+  ]
 }

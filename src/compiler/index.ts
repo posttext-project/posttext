@@ -30,8 +30,8 @@ export class Compiler {
   }
 
   static new(options: CompilerOptions) {
-    const parser = new Parser()
-    const generator = new Generator()
+    const parser = Parser.new()
+    const generator = Generator.new()
 
     return new Compiler({
       options,

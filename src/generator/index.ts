@@ -6,6 +6,10 @@ export interface GeneratorInput {
 }
 
 export class Generator {
+  static new() {
+    return new Generator()
+  }
+
   generate({ ast }: GeneratorInput) {
     return this.generateHtml(ast)
   }
