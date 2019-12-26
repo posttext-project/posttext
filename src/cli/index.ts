@@ -1,18 +1,16 @@
-import Koa from 'koa'
-import fs from 'fs-extra'
 import meow from 'meow'
-import path from 'path'
-import boxen from 'boxen'
-import chalk from 'chalk'
+import { CompileCommand } from './compile'
+import { ServeCommand } from './serve'
 
-import { Compiler } from '../compiler'
-import { Context } from 'koa'
+export class CLI {
+  private cli: meow.Result<any>
 
-export class Cli {
-  cli: meow.Result<any>
+  constructor({ cli }: { cli: meow.Result<any> }) {
+    this.cli = cli
+  }
 
-  init() {
-    this.cli = meow(
+  static new() {
+    const cli = meow(
       `
         Usage
           $ pt [command] <input>
@@ -35,13 +33,24 @@ export class Cli {
       }
     )
 
-    switch (this.cli?.input?.[0]?.toLowerCase()) {
+    return new CLI({
+      cli
+    })
+  }
+
+  async run() {
+    const args = this.cli.input.slice(1)
+    const command = this.cli.input[0].toLowerCase()
+
+    switch (command) {
       case 'compile':
-        this.compile()
+        await this.compile(args)
+
         return
 
       case 'serve':
-        this.serve()
+        await this.serve(args)
+
         return
 
       default:
@@ -49,54 +58,27 @@ export class Cli {
     }
   }
 
-  async compile() {
-    try {
-      const compiler = new Compiler({
-        input: {
-          file: path.resolve(process.cwd(), this.cli.input[1])
-        }
-      })
-      compiler.init()
+  async compile(
+    args: string[],
+    flags: meow.Options<any> = {}
+  ): Promise<any> {
+    const command = CompileCommand.new({
+      args,
+      flags
+    })
 
-      const outputHtml = await compiler.compile()
-
-      const inputPath = path.parse(this.cli.input[1])
-      fs.outputFile(
-        path.resolve(inputPath.dir, inputPath.name + '.html'),
-        outputHtml
-      )
-    } catch (err) {
-      console.log(chalk.red('error') + '  ' + err)
-    }
+    command.run()
   }
 
-  serve() {
-    const app = new Koa()
-
-    app.use(async (ctx: Context) => {
-      const compiler = new Compiler({
-        input: {
-          file: path.resolve(process.cwd(), this.cli.input[1])
-        }
-      })
-      compiler.init()
-
-      ctx.body = await compiler.compile()
+  async serve(
+    args: string[],
+    flags: meow.Options<any> = {}
+  ): Promise<any> {
+    const command = ServeCommand.new({
+      args,
+      flags
     })
 
-    app.listen(8080, () => {
-      console.log(
-        boxen(
-          chalk.yellow('serve') +
-            '      ' +
-            'http://localhost:8080',
-          {
-            borderColor: 'yellow',
-            margin: 1,
-            padding: 1
-          }
-        )
-      )
-    })
+    command.run()
   }
 }

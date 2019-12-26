@@ -1,4 +1,3 @@
-import path from 'path'
 import fs from 'fs-extra'
 
 import { Parser } from '../parser'
@@ -13,16 +12,32 @@ export interface CompilerOptions {
 export class Compiler {
   options: CompilerOptions
 
-  parser?: Parser
-  generator?: Generator
+  parser: Parser
+  generator: Generator
 
-  constructor(options: CompilerOptions) {
+  constructor({
+    options,
+    parser,
+    generator
+  }: {
+    options: CompilerOptions
+    parser: Parser
+    generator: Generator
+  }) {
     this.options = options
+    this.parser = parser
+    this.generator = generator
   }
 
-  init() {
-    this.parser = new Parser()
-    this.generator = new Generator()
+  static new(options: CompilerOptions) {
+    const parser = Parser.new()
+    const generator = Generator.new()
+
+    return new Compiler({
+      options,
+      parser,
+      generator
+    })
   }
 
   async compile(): Promise<string> {

@@ -8,6 +8,10 @@ import {
 } from '../ast'
 
 export class Parser {
+  static new() {
+    return new Parser()
+  }
+
   parse(input: string) {
     const cursor = Cursor.from(input)
 
