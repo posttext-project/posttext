@@ -1,3 +1,5 @@
+import 'prismjs/themes/prism.css'
+
 const socket = new WebSocket('ws://localhost:8080')
 
 async function loadDoc() {
