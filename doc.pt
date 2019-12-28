@@ -4,4 +4,12 @@
   \paragraph {
     This is an example document in \bold {PostText};!
   };
+
+  \code =={
+    var a = 5;
+
+    function print() {
+      console.log(a);
+    }
+  }==;
 };

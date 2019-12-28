@@ -11,11 +11,22 @@ export default {
   devtool: false,
   target: 'web',
   module: {
-    rules: [{ test: /\.ts$/, use: 'ts-loader' }]
+    rules: [
+      { test: /\.ts$/i, use: 'ts-loader' },
+      {
+        test: /\.css$/i,
+        use: [
+          'style-loader',
+          {
+            loader: 'css-loader'
+          }
+        ]
+      }
+    ]
   },
   resolve: {
     modules: ['node_modules', path.resolve(__dirname, 'src')],
-    extensions: ['.ts']
+    extensions: ['.ts', '.js', '.css']
   },
   plugins: [
     new webpack.SourceMapDevToolPlugin({

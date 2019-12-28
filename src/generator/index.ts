@@ -1,4 +1,6 @@
-import { DocumentNode, TagNode, TextNode, Node } from '../ast'
+import Prism from 'prismjs'
+
+import { DocumentNode, TagNode, Node } from '../ast'
 
 export interface GeneratorInput {
   ast: DocumentNode
@@ -46,7 +48,9 @@ export class Generator {
   }
 
   generateTag(node: TagNode): string {
-    switch (node.id.name.toLocaleLowerCase()) {
+    switch (
+      node.id.name.toLocaleLowerCase().replace(/\-+/, '')
+    ) {
       case 'section':
         return this.generateSection(node)
 
@@ -61,6 +65,9 @@ export class Generator {
 
       case 'paragraph':
         return this.generateParagraph(node)
+
+      case 'code':
+        return this.generateCodeBlock(node)
     }
 
     return ''
@@ -106,6 +113,16 @@ export class Generator {
     return ''
   }
 
+  generateCodeBlock(node: Node): string {
+    const code = this.inlineContent(node)
+
+    return `<pre class="language-javascript"><code class="language-javascript">${Prism.highlight(
+      this.normalizeTextContent(code),
+      Prism.languages.javascript,
+      'javascript'
+    )}</code></pre>`
+  }
+
   htmlContent(node: Node): string {
     switch (node.type) {
       case 'Document':
@@ -123,6 +140,36 @@ export class Generator {
     }
 
     throw new Error('Unsupported node type')
+  }
+
+  normalizeTextContent(input: string): string {
+    return this.normalizeIndents(
+      this.trimFirstAndLastLine(input)
+    )
+  }
+
+  trimFirstAndLastLine(input: string): string {
+    return input
+      .replace(/^[ \t]*\r?\n/, '')
+      .replace(/\r?\n[ \t]*$/, '')
+  }
+
+  normalizeIndents(input: string): string {
+    const doc = input.replace(/\t/g, '    ')
+
+    const indents = doc
+      .replace(/^\n|\n$/gm, '')
+      .matchAll(/^[ ]*/gm)
+
+    const indentSize = Array.from(indents)
+      .map(chunk => chunk[0].length)
+      .reduce((prev, next) => Math.min(prev, next))
+
+    return indentSize > 0
+      ? doc.replace(/^[ ]+/gm, indent =>
+          indent.substring(indentSize)
+        )
+      : doc
   }
 
   inlineContent(node: Node): string {
