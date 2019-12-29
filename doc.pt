@@ -5,7 +5,7 @@
     This is an example document in \bold {PostText};!
   };
 
-  \code =={
+  \code(javascript) =={
     var a = 5;
 
     function print() {
