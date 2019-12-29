@@ -1,6 +1,8 @@
 import Prism from 'prismjs'
+import loadLanguages from 'prismjs/components/'
 
-import { DocumentNode, TagNode, Node } from '../ast'
+import { DocumentNode, TagNode, Node, TextNode } from '../ast'
+import { supportedLanguages } from './prism'
 
 export interface GeneratorInput {
   ast: DocumentNode
@@ -9,36 +11,47 @@ export interface GeneratorInput {
 
 export class Generator {
   static new() {
+    loadLanguages(supportedLanguages)
+
     return new Generator()
   }
 
   generate({ ast }: GeneratorInput) {
-    return this.generateHtml(ast)
+    return this.generateNode(ast)
   }
 
-  generateHtml(node: Node): string {
+  generateNode(node: Node): string {
     switch (node.type) {
       case 'Document':
-        return (
-          node.body
-            .map(node => this.generateRootNode(node))
-            .join('') + '\n'
-        )
+        return this.generateDocument(node)
 
       case 'Tag':
         return this.generateTag(node)
 
       case 'Text':
         return this.generateText(node)
+
+      case 'Block':
+        return node.body
+          .map(innerNode => this.htmlContent(innerNode))
+          .join('')
     }
 
     throw new Error('Unsupported node type')
   }
 
-  generateRootNode(node: Node): string {
+  generateDocument(node: DocumentNode): string {
+    return (
+      node.body
+        .map(innerNode => this.generateRootNode(innerNode))
+        .join('') + '\n'
+    )
+  }
+
+  generateRootNode(node: TextNode | TagNode): string {
     switch (node.type) {
       case 'Text':
-        return this.generateParagraph(node)
+        return '<p>' + node.value + '</p>'
 
       case 'Tag':
         return this.generateTag(node)
@@ -52,74 +65,67 @@ export class Generator {
       node.id.name.toLocaleLowerCase().replace(/\-+/, '')
     ) {
       case 'section':
-        return this.generateSection(node)
+        return this.generateSectionTag(node)
 
       case 'title':
-        return this.generateTitle(node)
+        return this.generateTitleTag(node)
 
       case 'bold':
-        return this.generateBold(node)
+        return this.generateBoldTag(node)
 
       case 'italic':
-        return this.generateItalic(node)
+        return this.generateItalicTag(node)
 
       case 'paragraph':
-        return this.generateParagraph(node)
+        return this.generateParagraphTag(node)
 
       case 'code':
-        return this.generateCodeBlock(node)
+        return this.generateCodeTag(node)
     }
 
     return ''
   }
 
-  isInlineNode(node: Node): boolean {
-    if (node.type === 'Tag') {
-      return (
-        ['title', 'bold', 'italic', 'paragraph'].findIndex(
-          name => node.id.name === name
-        ) !== -1
-      )
-    }
-
-    return false
-  }
-
-  generateSection(node: Node): string {
+  generateSectionTag(node: TagNode): string {
     return '<section>' + this.htmlContent(node) + '</section>'
   }
 
-  generateText(node: Node): string {
+  generateText(node: TextNode): string {
     return this.textContent(node)
   }
 
-  generateTitle(node: Node): string {
-    return '<h1>' + this.inlineContent(node) + '</h1>'
+  generateTitleTag(node: TagNode): string {
+    return '<h1>' + this.htmlContent(node) + '</h1>'
   }
 
-  generateBold(node: Node): string {
-    return '<b>' + this.inlineContent(node) + '</b>'
+  generateBoldTag(node: TagNode): string {
+    return '<b>' + this.htmlContent(node) + '</b>'
   }
 
-  generateItalic(node: Node): string {
-    return '<i>' + this.inlineContent(node) + '</i>'
+  generateItalicTag(node: TagNode): string {
+    return '<i>' + this.htmlContent(node) + '</i>'
   }
 
-  generateParagraph(node: Node): string {
-    if (this.textContent(node).match(/[^ \t\r\n]+/)) {
-      return '<p>' + this.inlineContent(node) + '</p>'
-    }
-
-    return ''
+  generateParagraphTag(node: TagNode): string {
+    return '<p>' + this.htmlContent(node) + '</p>'
   }
 
-  generateCodeBlock(node: Node): string {
-    const code = this.inlineContent(node)
+  generateCodeTag(node: TagNode): string {
+    const code =
+      node.blocks.length > 0
+        ? this.textContent(node.blocks[0])
+        : ''
 
-    return `<pre class="language-javascript"><code class="language-javascript">${Prism.highlight(
+    const language =
+      node.params.length > 0 &&
+      supportedLanguages.indexOf(node.params[0].value) !== -1
+        ? node.params[0].value
+        : 'markdown'
+
+    return `<pre class="language-${language}"><code class="language-${language}">${Prism.highlight(
       this.normalizeTextContent(code),
-      Prism.languages.javascript,
-      'javascript'
+      Prism.languages[language],
+      language
     )}</code></pre>`
   }
 
@@ -127,16 +133,21 @@ export class Generator {
     switch (node.type) {
       case 'Document':
         return node.body
-          .map(node => this.inlineContent(node))
+          .map(innerNode => this.generateNode(innerNode))
           .join('')
 
       case 'Tag':
-        return node.children
-          .map(node => this.generateHtml(node))
+        return (node.blocks[0]?.body ?? [])
+          .map(block => this.generateNode(block))
           .join('')
 
       case 'Text':
         return node.value
+
+      case 'Block':
+        return node.body
+          .map(innerNode => this.generateNode(innerNode))
+          .join('')
     }
 
     throw new Error('Unsupported node type')
@@ -144,11 +155,11 @@ export class Generator {
 
   normalizeTextContent(input: string): string {
     return this.normalizeIndents(
-      this.trimFirstAndLastLine(input)
+      this.trimFirstAndLastLines(input)
     )
   }
 
-  trimFirstAndLastLine(input: string): string {
+  trimFirstAndLastLines(input: string): string {
     return input
       .replace(/^[ \t]*\r?\n/, '')
       .replace(/\r?\n[ \t]*$/, '')
@@ -172,45 +183,23 @@ export class Generator {
       : doc
   }
 
-  inlineContent(node: Node): string {
-    switch (node.type) {
-      case 'Document':
-        return node.body
-          .map(node => this.inlineContent(node))
-          .join('')
-
-      case 'Tag':
-        return node.children
-          .map(node => {
-            if (this.isInlineNode(node)) {
-              return this.generateTag(<TagNode>node)
-            }
-
-            return this.textContent(node)
-          })
-          .join('')
-
-      case 'Text':
-        return node.value
-    }
-
-    throw new Error('Unsupported node type')
-  }
-
   textContent(node: Node): string {
     switch (node.type) {
       case 'Document':
         return node.body
-          .map(node => this.textContent(node))
+          .map(innerNode => this.textContent(innerNode))
           .join('')
 
       case 'Tag':
-        return node.children
-          .map(node => this.textContent(node))
-          .join('')
+        return ''
 
       case 'Text':
         return node.value
+
+      case 'Block':
+        return node.body
+          .map(innerNode => this.textContent(innerNode))
+          .join('')
     }
 
     throw new Error('Unsupported node type')
