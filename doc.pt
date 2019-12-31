@@ -12,4 +12,14 @@
       console.log(a);
     }
   }==;
+
+  \paragraph {
+    This is a list of items:
+
+    \list {
+      \item {First item};
+      \item {Second item};
+      \item {Third item};
+    };
+  };
 };

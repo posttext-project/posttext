@@ -76,8 +76,17 @@ export class Generator {
       case 'italic':
         return this.generateItalicTag(node)
 
+      case 'underline':
+        return this.generateUnderline(node)
+
       case 'paragraph':
         return this.generateParagraphTag(node)
+
+      case 'list':
+        return this.generateListTag(node)
+
+      case 'item':
+        return this.generateItemTag(node)
 
       case 'code':
         return this.generateCodeTag(node)
@@ -106,8 +115,20 @@ export class Generator {
     return '<i>' + this.htmlContent(node) + '</i>'
   }
 
+  generateUnderline(node: TagNode): string {
+    return '<u>' + this.htmlContent(node) + '</u>'
+  }
+
   generateParagraphTag(node: TagNode): string {
     return '<p>' + this.htmlContent(node) + '</p>'
+  }
+
+  generateListTag(node: TagNode): string {
+    return '<ul>' + this.htmlContent(node) + '</ul>'
+  }
+
+  generateItemTag(node: TagNode): string {
+    return '<li>' + this.htmlContent(node) + '</li>'
   }
 
   generateCodeTag(node: TagNode): string {
