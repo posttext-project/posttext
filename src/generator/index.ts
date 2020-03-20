@@ -70,6 +70,12 @@ export class Generator {
       case 'title':
         return this.generateTitleTag(node)
 
+      case 'subtitle':
+        return this.generateSubtitleTag(node)
+
+      case 'subsubtitle':
+        return this.generateSubsubtitleTag(node)
+
       case 'bold':
         return this.generateBoldTag(node)
 
@@ -105,6 +111,14 @@ export class Generator {
 
   generateTitleTag(node: TagNode): string {
     return '<h1>' + this.htmlContent(node) + '</h1>'
+  }
+
+  generateSubtitleTag(node: TagNode): string {
+    return '<h2>' + this.htmlContent(node) + '</h2>'
+  }
+
+  generateSubsubtitleTag(node: TagNode): string {
+    return '<h3>' + this.htmlContent(node) + '</h3>'
   }
 
   generateBoldTag(node: TagNode): string {
