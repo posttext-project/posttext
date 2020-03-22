@@ -12,6 +12,7 @@ export interface TagNode extends BaseNode {
   id: IdentifierNode
   params: ParameterNode[]
   blocks: BlockNode[]
+  attrs: AttributeNode[]
 }
 
 export interface IdentifierNode extends BaseNode {
@@ -21,6 +22,12 @@ export interface IdentifierNode extends BaseNode {
 
 export interface ParameterNode extends BaseNode {
   type: 'Parameter'
+  value: string
+}
+
+export interface AttributeNode extends BaseNode {
+  type: 'Attribute'
+  id: IdentifierNode
   value: string
 }
 

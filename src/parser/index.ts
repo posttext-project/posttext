@@ -5,7 +5,8 @@ import {
   DocumentNode,
   IdentifierNode,
   ParameterNode,
-  BlockNode
+  BlockNode,
+  AttributeNode
 } from '../ast'
 
 export class Parser {
@@ -68,6 +69,13 @@ export class Parser {
 
     this.skip(cursor)
 
+    const attrs: AttributeNode[] = []
+    if (!attrs) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
     const blocks: BlockNode[] = []
 
     while (!cursor.isEof()) {
@@ -96,6 +104,7 @@ export class Parser {
       type: 'Tag',
       id,
       params,
+      attrs,
       blocks
     }
   }
@@ -121,32 +130,52 @@ export class Parser {
     if (cursor.startsWith('(')) {
       cursor.next(1)
     } else {
-      return []
+      return null
     }
 
     const marker = cursor.clone()
     const params: ParameterNode[] = []
 
+    if (cursor.startsWith(')')) {
+      cursor.next(1)
+
+      return params
+    }
+
+    const param = this.parseParameter(cursor)
+    if (param) {
+      params.push(param)
+    } else {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
     while (!cursor.startsWith(')') && !cursor.isEof()) {
-      const param = this.parseParameter(cursor)
-
-      if (param) {
-        params.push(param)
-      } else {
-        break
-      }
-
       if (cursor.startsWith(',')) {
         cursor.next(1)
-      } else if (cursor.startsWith(')')) {
-        cursor.next(1)
-
-        break
       } else {
         cursor.moveTo(marker)
 
         return null
       }
+
+      const param = this.parseParameter(cursor)
+      if (param) {
+        params.push(param)
+      } else {
+        cursor.moveTo(marker)
+
+        return null
+      }
+    }
+
+    if (cursor.startsWith(')')) {
+      cursor.next(1)
+    } else {
+      cursor.moveTo(marker)
+
+      return null
     }
 
     return params
@@ -195,11 +224,294 @@ export class Parser {
 
     return {
       type: 'Parameter',
-      value: chunks.join('')
+      value: chunks.join('').trim()
     }
   }
 
-  parseBlock(cursor: Cursor): BlockNode {
+  parseAttributes(cursor: Cursor): AttributeNode[] | null {
+    const marker = cursor.clone()
+
+    if (cursor.startsWith('[')) {
+      cursor.next(1)
+    } else {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    this.skip(cursor)
+
+    const attrs: AttributeNode[] = []
+    if (cursor.startsWith(']')) {
+      cursor.next(1)
+
+      return attrs
+    }
+
+    const attr = this.parseAttribute(cursor)
+    if (!attr) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    attrs.push(attr)
+
+    this.skip(cursor)
+
+    while (!cursor.startsWith(']') && !cursor.isEof()) {
+      if (!cursor.startsWith(';')) {
+        cursor.moveTo(marker)
+
+        return null
+      }
+
+      cursor.next(1)
+
+      this.skip(cursor)
+
+      if (cursor.startsWith(']')) {
+        break
+      }
+
+      const attr = this.parseAttribute(cursor)
+      if (!attr) {
+        cursor.moveTo(marker)
+
+        return null
+      }
+
+      attrs.push(attr)
+
+      this.skip(cursor)
+    }
+
+    if (cursor.startsWith(']')) {
+      cursor.next(1)
+    } else {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    return attrs
+  }
+
+  parseAttribute(cursor: Cursor): AttributeNode | null {
+    const marker = cursor.clone()
+
+    this.skip(cursor)
+
+    const id = this.parseIdentifier(cursor)
+    if (!id) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    this.skip(cursor)
+
+    if (cursor.startsWith('=')) {
+      cursor.next(1)
+    } else {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    this.skip(cursor)
+
+    const value = this.parseAttributeValue(cursor)
+    if (!value) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    return {
+      type: 'Attribute',
+      id,
+      value
+    }
+  }
+
+  parseAttributeValue(cursor: Cursor): string | null {
+    const value =
+      this.parseSingleQuoteAttributeValue(cursor) ||
+      this.parseDoubleQuoteAttributeValue(cursor) ||
+      this.parseBareAttributeValue(cursor)
+
+    return value ? value.trim() : null
+  }
+
+  parseSingleQuoteAttributeValue(
+    cursor: Cursor
+  ): string | null {
+    if (cursor.startsWith("'")) {
+      cursor.next(1)
+    } else {
+      return null
+    }
+
+    const marker = cursor.clone()
+
+    const chunks = []
+    const tempMarker = cursor.clone()
+    while (!cursor.startsWith("'") && !cursor.isEof()) {
+      if (cursor.startsWith('\\')) {
+        chunks.push(tempMarker.takeUntil(cursor))
+
+        cursor.next(1)
+
+        if (cursor.startsWith("'")) {
+          chunks.push("'")
+        } else if (cursor.startsWith('"')) {
+          chunks.push('"')
+        } else if (cursor.startsWith('\\')) {
+          chunks.push('\\')
+        } else if (cursor.startsWith('t')) {
+          chunks.push('\t')
+        } else if (cursor.startsWith('n')) {
+          chunks.push('\n')
+        } else if (cursor.startsWith('s')) {
+          chunks.push(' ')
+        } else {
+          cursor.moveTo(marker)
+
+          return null
+        }
+
+        cursor.next(1)
+
+        tempMarker.moveTo(cursor)
+      } else {
+        cursor.next(1)
+      }
+    }
+
+    if (!cursor.startsWith("'")) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    chunks.push(tempMarker.takeUntil(cursor))
+
+    cursor.next(1)
+
+    return chunks.join('')
+  }
+
+  parseDoubleQuoteAttributeValue(
+    cursor: Cursor
+  ): string | null {
+    if (cursor.startsWith('"')) {
+      cursor.next(1)
+    } else {
+      return null
+    }
+
+    const marker = cursor.clone()
+
+    const chunks = []
+    const tempMarker = cursor.clone()
+    while (!cursor.startsWith('"') && !cursor.isEof()) {
+      if (cursor.startsWith('\\')) {
+        chunks.push(tempMarker.takeUntil(cursor))
+
+        cursor.next(1)
+
+        if (cursor.startsWith("'")) {
+          chunks.push("'")
+        } else if (cursor.startsWith('"')) {
+          chunks.push('"')
+        } else if (cursor.startsWith('\\')) {
+          chunks.push('\\')
+        } else if (cursor.startsWith('t')) {
+          chunks.push('\t')
+        } else if (cursor.startsWith('n')) {
+          chunks.push('\n')
+        } else if (cursor.startsWith('s')) {
+          chunks.push(' ')
+        } else {
+          cursor.moveTo(marker)
+
+          return null
+        }
+
+        cursor.next(1)
+
+        tempMarker.moveTo(cursor)
+      } else {
+        cursor.next(1)
+      }
+    }
+
+    if (!cursor.startsWith('"')) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    chunks.push(tempMarker.takeUntil(cursor))
+
+    cursor.next(1)
+
+    return chunks.join('')
+  }
+
+  parseBareAttributeValue(cursor: Cursor): string | null {
+    const marker = cursor.clone()
+
+    const chunks = []
+    const tempMarker = cursor.clone()
+    while (
+      !cursor.startsWith(';') &&
+      !cursor.startsWith(']') &&
+      !cursor.startsWith('[') &&
+      !cursor.isEof()
+    ) {
+      if (cursor.startsWith('\\')) {
+        chunks.push(tempMarker.takeUntil(cursor))
+
+        cursor.next(1)
+
+        if (cursor.startsWith('\\')) {
+          chunks.push('\\')
+        } else if (cursor.startsWith(';')) {
+          chunks.push(';')
+        } else if (cursor.startsWith('=')) {
+          chunks.push('=')
+        } else if (cursor.startsWith('[')) {
+          chunks.push('[')
+        } else if (cursor.startsWith(']')) {
+          chunks.push(']')
+        } else {
+          cursor.moveTo(marker)
+
+          return null
+        }
+
+        chunks.push(tempMarker.takeUntil(cursor))
+
+        cursor.next(1)
+      } else {
+        cursor.next(1)
+      }
+    }
+
+    if (!cursor.startsWith(';') && !cursor.startsWith(']')) {
+      cursor.moveTo(marker)
+
+      return null
+    }
+
+    chunks.push(tempMarker.takeUntil(cursor))
+
+    return chunks.join('')
+  }
+
+  parseBlock(cursor: Cursor): BlockNode | null {
     const marker = cursor.clone()
 
     if (cursor.startsWith('{')) {
