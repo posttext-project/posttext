@@ -41,4 +41,11 @@ export interface BlockNode extends BaseNode {
   body: (TagNode | TextNode)[]
 }
 
-export type Node = DocumentNode | TagNode | TextNode | BlockNode
+export type Node =
+  | DocumentNode
+  | TagNode
+  | TextNode
+  | BlockNode
+  | ParameterNode
+  | AttributeNode
+  | IdentifierNode

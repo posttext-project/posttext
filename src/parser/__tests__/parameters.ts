@@ -8,7 +8,7 @@ describe('Parser', () => {
     let parser: Parser
 
     beforeAll(() => {
-      parser = new Parser()
+      parser = Parser.new()
     })
 
     test('parse an parameter', () => {

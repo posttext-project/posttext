@@ -130,7 +130,7 @@ export class Parser {
     if (cursor.startsWith('(')) {
       cursor.next(1)
     } else {
-      return null
+      return []
     }
 
     const marker = cursor.clone()
@@ -229,15 +229,13 @@ export class Parser {
   }
 
   parseAttributes(cursor: Cursor): AttributeNode[] | null {
-    const marker = cursor.clone()
-
     if (cursor.startsWith('[')) {
       cursor.next(1)
     } else {
-      cursor.moveTo(marker)
-
-      return null
+      return []
     }
+
+    const marker = cursor.clone()
 
     this.skip(cursor)
 
@@ -336,131 +334,6 @@ export class Parser {
   }
 
   parseAttributeValue(cursor: Cursor): string | null {
-    const value =
-      this.parseSingleQuoteAttributeValue(cursor) ||
-      this.parseDoubleQuoteAttributeValue(cursor) ||
-      this.parseBareAttributeValue(cursor)
-
-    return value ? value.trim() : null
-  }
-
-  parseSingleQuoteAttributeValue(
-    cursor: Cursor
-  ): string | null {
-    if (cursor.startsWith("'")) {
-      cursor.next(1)
-    } else {
-      return null
-    }
-
-    const marker = cursor.clone()
-
-    const chunks = []
-    const tempMarker = cursor.clone()
-    while (!cursor.startsWith("'") && !cursor.isEof()) {
-      if (cursor.startsWith('\\')) {
-        chunks.push(tempMarker.takeUntil(cursor))
-
-        cursor.next(1)
-
-        if (cursor.startsWith("'")) {
-          chunks.push("'")
-        } else if (cursor.startsWith('"')) {
-          chunks.push('"')
-        } else if (cursor.startsWith('\\')) {
-          chunks.push('\\')
-        } else if (cursor.startsWith('t')) {
-          chunks.push('\t')
-        } else if (cursor.startsWith('n')) {
-          chunks.push('\n')
-        } else if (cursor.startsWith('s')) {
-          chunks.push(' ')
-        } else {
-          cursor.moveTo(marker)
-
-          return null
-        }
-
-        cursor.next(1)
-
-        tempMarker.moveTo(cursor)
-      } else {
-        cursor.next(1)
-      }
-    }
-
-    if (!cursor.startsWith("'")) {
-      cursor.moveTo(marker)
-
-      return null
-    }
-
-    chunks.push(tempMarker.takeUntil(cursor))
-
-    cursor.next(1)
-
-    return chunks.join('')
-  }
-
-  parseDoubleQuoteAttributeValue(
-    cursor: Cursor
-  ): string | null {
-    if (cursor.startsWith('"')) {
-      cursor.next(1)
-    } else {
-      return null
-    }
-
-    const marker = cursor.clone()
-
-    const chunks = []
-    const tempMarker = cursor.clone()
-    while (!cursor.startsWith('"') && !cursor.isEof()) {
-      if (cursor.startsWith('\\')) {
-        chunks.push(tempMarker.takeUntil(cursor))
-
-        cursor.next(1)
-
-        if (cursor.startsWith("'")) {
-          chunks.push("'")
-        } else if (cursor.startsWith('"')) {
-          chunks.push('"')
-        } else if (cursor.startsWith('\\')) {
-          chunks.push('\\')
-        } else if (cursor.startsWith('t')) {
-          chunks.push('\t')
-        } else if (cursor.startsWith('n')) {
-          chunks.push('\n')
-        } else if (cursor.startsWith('s')) {
-          chunks.push(' ')
-        } else {
-          cursor.moveTo(marker)
-
-          return null
-        }
-
-        cursor.next(1)
-
-        tempMarker.moveTo(cursor)
-      } else {
-        cursor.next(1)
-      }
-    }
-
-    if (!cursor.startsWith('"')) {
-      cursor.moveTo(marker)
-
-      return null
-    }
-
-    chunks.push(tempMarker.takeUntil(cursor))
-
-    cursor.next(1)
-
-    return chunks.join('')
-  }
-
-  parseBareAttributeValue(cursor: Cursor): string | null {
     const marker = cursor.clone()
 
     const chunks = []

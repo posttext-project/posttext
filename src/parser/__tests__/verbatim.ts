@@ -8,10 +8,10 @@ describe('Parser', () => {
     let parser: Parser
 
     beforeAll(() => {
-      parser = new Parser()
+      parser = Parser.new()
     })
 
-    test('parse verbatim should work correctly', () => {
+    test('verbatim should be parsed correctly', () => {
       runParse(
         `
           🌵\\code(javascript) ==={
@@ -36,13 +36,11 @@ describe('Parser', () => {
               body:
                 - type: Text
                   value: |-2
+                    function sum(a, b) {
+                      return a + b;
+                    }
 
-                                function sum(a, b) {
-                                  return a + b;
-                                }
-
-                                console.log(sum(1, 2))
-                              
+                    console.log(sum(1, 2))
         `,
         (cursor: Cursor) => parser.parseTag(cursor)
       )
