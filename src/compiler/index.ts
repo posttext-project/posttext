@@ -1,4 +1,5 @@
 import fs from 'fs-extra'
+import yaml from 'js-yaml'
 
 import { Parser } from '../parser'
 import { Generator } from '../generator'
@@ -46,8 +47,11 @@ export class Compiler {
     const input = await fs.readFile(file, 'utf8')
     const ast = this.parser.parse(input)
 
-    const outputHtml = this.generator.generate({ ast, input })
+    const outputHtml = this.generator.generate({
+      ast,
+      target: 'html'
+    })
 
-    return outputHtml
+    return yaml.dump(outputHtml)
   }
 }

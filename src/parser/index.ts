@@ -60,7 +60,9 @@ export class Parser {
 
     this.skip(cursor)
 
-    const params: ParameterNode[] = this.parseParameters(cursor)
+    const params: ParameterNode[] | null = this.parseParameters(
+      cursor
+    )
     if (!params) {
       cursor.moveTo(marker)
 
@@ -336,7 +338,7 @@ export class Parser {
   parseAttributeValue(cursor: Cursor): string | null {
     const marker = cursor.clone()
 
-    const chunks = []
+    const chunks: string[] = []
     const tempMarker = cursor.clone()
     while (
       !cursor.startsWith(';') &&
@@ -427,7 +429,7 @@ export class Parser {
 
   parseVerbatimBlock(cursor: Cursor): BlockNode | null {
     const marker = cursor.clone()
-    const verbatimDecorator = cursor.exec(/=*/gy)[0]
+    const verbatimDecorator = cursor.exec(/=*/gy)?.[0] ?? []
 
     if (verbatimDecorator.length === 0) {
       return null
@@ -453,8 +455,8 @@ export class Parser {
         cursor.next(1)
 
         const execArr = cursor.exec(/=*/gy)
-        if (execArr[0].length === verbatimDecorator.length) {
-          cursor.next(execArr[0].length)
+        if (execArr![0].length === verbatimDecorator.length) {
+          cursor.next(execArr![0].length)
 
           body.push({
             type: 'Text',
