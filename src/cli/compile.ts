@@ -21,7 +21,8 @@ export class CompileCommand implements Command {
       const compiler = Compiler.new({
         input: {
           file: path.resolve(process.cwd(), this.args[0])
-        }
+        },
+        target: 'html'
       })
 
       const outputHtml = await compiler.compile()

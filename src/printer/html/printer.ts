@@ -3,8 +3,8 @@ import { HtmlInterpreter } from '../interpreters/html'
 import { TreeInterpreter } from '../interpreters/tree'
 import { Command } from '../command'
 
-export class EpubPrinter extends Printer<null> {
-  static new(): EpubPrinter {
+export class HtmlPrinter extends Printer<Command[]> {
+  static new(): HtmlPrinter {
     const rootInterpreter = RootInterpreter.new()
 
     rootInterpreter.registerInterpreters({
@@ -12,10 +12,12 @@ export class EpubPrinter extends Printer<null> {
       html: new HtmlInterpreter()
     })
 
-    return new EpubPrinter({ rootInterpreter })
+    return new HtmlPrinter({ rootInterpreter })
   }
 
-  protected async run(application: Command[]): Promise<null> {
-    return null
+  protected async run(
+    application: Command[]
+  ): Promise<Command[] | null> {
+    return application
   }
 }

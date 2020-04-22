@@ -13,7 +13,7 @@ import {
 export function runParse(
   input: string,
   expected: string,
-  callback: (cursor: Cursor) => Node | Node[]
+  callback: (cursor: Cursor) => Node | Node[] | null
 ) {
   const iter = t
     .capture(input, {

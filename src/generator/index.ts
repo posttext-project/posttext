@@ -8,9 +8,20 @@ import { Module } from './module'
 import { Resolver } from './resolver'
 import { Command } from '../printer'
 
-export type GeneratorInput<T = { ast: DocumentNode }> = {
+export type GeneratorInput = {
+  ast: DocumentNode
   target: string
-} & T
+}
+
+export type TagGeneratorInput = {
+  tagNode: TagNode
+  target: string
+}
+
+export type TextGeneratorInput = {
+  textNode: TextNode
+  target: string
+}
 
 export interface GeneratorStruct {
   resolvers: Map<string, Resolver>
@@ -42,17 +53,7 @@ export class Generator {
       current: {
         name: 'html',
         template: `
-          <!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <meta charset="UTF-8" />
-              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>{{ title }}</title>
-            </head>
-            <body>
-              {{ content }}
-            </body>
-          </html>
+          {{ content }}
         `,
         data: {
           name: 'compose',
@@ -61,12 +62,6 @@ export class Generator {
               name: 'getBlock',
               offset: 0,
               transform: (content: string) => ({ content })
-            },
-            {
-              name: 'getTitle',
-              transform: (title: string = 'Document') => ({
-                title
-              })
             }
           ]
         }
@@ -87,12 +82,7 @@ export class Generator {
   generateTag({
     tagNode,
     ...input
-  }: GeneratorInput<{ tagNode: TagNode }>): Command {
-    console.log(
-      tagNode.id.name,
-      this.resolvers.get(tagNode.id.name)
-    )
-
+  }: TagGeneratorInput): Command {
     return {
       name: 'tree',
       data: {
@@ -129,11 +119,7 @@ export class Generator {
     }
   }
 
-  generateText({
-    textNode
-  }: GeneratorInput<{
-    textNode: TextNode
-  }>): Command {
+  generateText({ textNode }: TextGeneratorInput): Command {
     return {
       name: 'text',
       textContent: textNode.value

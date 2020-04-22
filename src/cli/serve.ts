@@ -10,6 +10,7 @@ import chokidar from 'chokidar'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
+import { EpubPrinter } from '../printer'
 
 export class ServeCommand implements Command {
   private args: string[]
@@ -34,10 +35,13 @@ export class ServeCommand implements Command {
       const compiler = Compiler.new({
         input: {
           file: inputPath
-        }
+        },
+        target: 'html'
       })
 
-      ctx.body = await compiler.compile()
+      const outputHtml = await compiler.compile<string>()
+
+      ctx.body = outputHtml
     })
 
     app

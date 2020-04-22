@@ -6,15 +6,15 @@ export interface PrinterInput {
   rootCommand: Command
 }
 
-export interface Printer {
-  print(input: PrinterInput): any
+export interface Printer<T> {
+  print(input: PrinterInput): Promise<T | null>
 }
 
 export interface PrinterStruct {
   rootInterpreter: RootInterpreter
 }
 
-export class Printer {
+export class Printer<T> {
   rootInterpreter: RootInterpreter
 
   static new() {
@@ -27,7 +27,7 @@ export class Printer {
     this.rootInterpreter = rootInterpreter
   }
 
-  print(input: PrinterInput) {
+  print(input: PrinterInput): Promise<T | null> {
     const { rootCommand } = input
 
     const dispatcher = new RootDispatcher({
@@ -42,7 +42,11 @@ export class Printer {
     return this.run(application)
   }
 
-  protected run(application: Command) {}
+  protected async run(
+    application: Command[]
+  ): Promise<T | null> {
+    return null
+  }
 }
 
 export interface RootInterpreterStruct {
@@ -76,20 +80,19 @@ export class RootInterpreter implements Interpreter {
     this.interpreters.set(name, interpreter)
   }
 
-  interpret(command: Command, dispatcher: Dispatcher): Command {
+  interpret(
+    command: Command,
+    dispatcher: Dispatcher
+  ): Command[] {
     if (this.interpreters.has(command.name)) {
       return (
         this.interpreters
           .get(command.name)
-          ?.interpret(command, dispatcher) ?? {
-          name: '#undefined'
-        }
+          ?.interpret(command, dispatcher) ?? []
       )
     }
 
-    return {
-      name: '#undefined'
-    }
+    return []
   }
 }
 
@@ -104,7 +107,10 @@ export class RootDispatcher implements Dispatcher {
     this.rootInterpreter = rootInterpreter
   }
 
-  dispatch(command: Command, dispatcher: Dispatcher): Command {
+  dispatch(
+    command: Command,
+    dispatcher: Dispatcher
+  ): Command[] {
     return this.rootInterpreter.interpret(command, dispatcher)
   }
 }
