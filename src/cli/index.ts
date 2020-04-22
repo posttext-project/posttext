@@ -31,12 +31,12 @@ export class CLI {
       {
         description: false,
         hardRejection: false,
-        autoHelp: false
+        autoHelp: false,
       }
     )
 
     return new CLI({
-      cli
+      cli,
     })
   }
 
@@ -71,7 +71,7 @@ export class CLI {
   ): Promise<any> {
     const command = CompileCommand.new({
       args,
-      flags
+      flags,
     })
 
     command.run()
@@ -83,7 +83,7 @@ export class CLI {
   ): Promise<any> {
     const command = ServeCommand.new({
       args,
-      flags
+      flags,
     })
 
     command.run()
@@ -95,7 +95,7 @@ export class CLI {
   ): Promise<any> {
     const command = PrintCommand.new({
       args,
-      flags
+      flags,
     })
 
     command.run()

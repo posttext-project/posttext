@@ -11,7 +11,7 @@ export class EpubPrinter extends Printer<null> {
     rootInterpreter.registerInterpreters({
       tree: new TreeInterpreter(),
       html: new HtmlInterpreter(),
-      text: new TextInterpreter()
+      text: new TextInterpreter(),
     })
 
     return new EpubPrinter({ rootInterpreter })

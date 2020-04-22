@@ -2,7 +2,7 @@ import {
   DocumentNode,
   TagNode,
   TextNode,
-  BlockNode
+  BlockNode,
 } from '../ast'
 import { Module } from './module'
 import { Resolver } from './resolver'
@@ -61,28 +61,28 @@ export class Generator {
             {
               name: 'getBlock',
               offset: 0,
-              transform: (content: string) => ({ content })
-            }
-          ]
-        }
+              transform: (content: string) => ({ content }),
+            },
+          ],
+        },
       },
       children: [
         ast.body
-          .map(node =>
+          .map((node) =>
             node.type === 'Tag'
               ? this.generateTag({ tagNode: node, ...input })
               : node.type === 'Text'
               ? this.generateText({
                   textNode: node,
-                  ...input
+                  ...input,
                 })
               : []
           )
           .reduce(
             (accum, subcommands) => [...accum, ...subcommands],
             []
-          )
-      ]
+          ),
+      ],
     }
   }
 
@@ -96,39 +96,39 @@ export class Generator {
         data: {
           attrs: tagNode.attrs.reduce(
             (target, attr) => ({
-              [attr.id.name]: attr.value
+              [attr.id.name]: attr.value,
             }),
             {}
           ),
-          params: tagNode.params.map(param => param.value)
+          params: tagNode.params.map((param) => param.value),
         },
         current:
           this.resolvers.get(tagNode.id.name)?.resolve(input) ??
           undefined,
-        children: tagNode.blocks.map(blockNode =>
+        children: tagNode.blocks.map((blockNode) =>
           blockNode.body
-            .map(node =>
+            .map((node) =>
               node.type === 'Text'
                 ? this.generateText({
                     textNode: node,
-                    ...input
+                    ...input,
                   })
                 : node.type === 'Tag'
                 ? this.generateTag({
                     tagNode: node,
-                    ...input
+                    ...input,
                   })
                 : []
             )
             .reduce(
               (accum, subcommands) => [
                 ...accum,
-                ...subcommands
+                ...subcommands,
               ],
               []
             )
-        )
-      }
+        ),
+      },
     ]
   }
 
@@ -136,8 +136,8 @@ export class Generator {
     return [
       {
         name: 'text',
-        content: textNode.value
-      }
+        content: textNode.value,
+      },
     ]
   }
 }

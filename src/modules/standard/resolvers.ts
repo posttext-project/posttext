@@ -14,10 +14,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   title: {
@@ -28,10 +28,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   subtitle: {
@@ -42,10 +42,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   subsubtitle: {
@@ -56,10 +56,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   bold: {
@@ -70,10 +70,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   italic: {
@@ -84,10 +84,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   underline: {
@@ -98,10 +98,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   paragraph: {
@@ -112,10 +112,10 @@ export const tagResolvers: Record<string, Resolver> = {
         name: 'getBlock',
         offset: 0,
         transform: (content: string) => ({
-          content
-        })
-      }
-    })
+          content,
+        }),
+      },
+    }),
   },
 
   list: {
@@ -125,9 +125,9 @@ export const tagResolvers: Record<string, Resolver> = {
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({ content })
-      }
-    })
+        transform: (content: string) => ({ content }),
+      },
+    }),
   },
 
   item: {
@@ -137,9 +137,9 @@ export const tagResolvers: Record<string, Resolver> = {
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({ content })
-      }
-    })
+        transform: (content: string) => ({ content }),
+      },
+    }),
   },
 
   code: {
@@ -161,16 +161,16 @@ export const tagResolvers: Record<string, Resolver> = {
                 params[0] &&
                 supportedLanguages.indexOf(params[0]) !== -1
                   ? params[0]
-                  : 'markdown'
-            })
+                  : 'markdown',
+            }),
           },
           {
             name: 'textContent',
             offset: 0,
             transform: (textContent: string) => ({
-              textContent
-            })
-          }
+              textContent,
+            }),
+          },
         ],
         transform: ({ language, textContent }: any) => {
           return {
@@ -180,10 +180,10 @@ export const tagResolvers: Record<string, Resolver> = {
                 .replace(/\r?\n[\t ]+$/, ''),
               Prism.languages[language],
               language
-            )
+            ),
           }
-        }
-      }
-    })
-  }
+        },
+      },
+    }),
+  },
 }

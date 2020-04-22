@@ -6,7 +6,7 @@ import {
   IdentifierNode,
   ParameterNode,
   BlockNode,
-  AttributeNode
+  AttributeNode,
 } from '../ast'
 
 export class Parser {
@@ -36,7 +36,7 @@ export class Parser {
 
     return {
       type: 'Document',
-      body
+      body,
     }
   }
 
@@ -107,7 +107,7 @@ export class Parser {
       id,
       params,
       attrs,
-      blocks
+      blocks,
     }
   }
 
@@ -121,7 +121,7 @@ export class Parser {
 
       return {
         type: 'Identifier',
-        name
+        name,
       }
     }
 
@@ -226,7 +226,7 @@ export class Parser {
 
     return {
       type: 'Parameter',
-      value: chunks.join('').trim()
+      value: chunks.join('').trim(),
     }
   }
 
@@ -331,7 +331,7 @@ export class Parser {
     return {
       type: 'Attribute',
       id,
-      value
+      value,
     }
   }
 
@@ -423,7 +423,7 @@ export class Parser {
 
     return {
       type: 'Block',
-      body
+      body,
     }
   }
 
@@ -460,7 +460,7 @@ export class Parser {
 
           body.push({
             type: 'Text',
-            value: startMarker.takeUntil(endMarker)
+            value: startMarker.takeUntil(endMarker),
           })
 
           break
@@ -480,7 +480,7 @@ export class Parser {
 
     return {
       type: 'Block',
-      body
+      body,
     }
   }
 
@@ -494,7 +494,7 @@ export class Parser {
 
       return {
         type: 'Text',
-        value
+        value,
       }
     }
 

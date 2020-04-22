@@ -13,8 +13,8 @@ export class TextInterpreter implements Interpreter {
     return [
       {
         name: 'setData',
-        data: command.content ?? ''
-      }
+        data: command.content ?? '',
+      },
     ]
   }
 }

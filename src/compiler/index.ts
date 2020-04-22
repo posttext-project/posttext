@@ -41,7 +41,7 @@ export class Compiler {
     return new Compiler({
       options,
       parser,
-      generator
+      generator,
     })
   }
 
@@ -55,7 +55,7 @@ export class Compiler {
   async compile<T>(): Promise<T | null> {
     const {
       input: { file },
-      target
+      target,
     } = this.options
 
     const printerLoader:
@@ -72,11 +72,11 @@ export class Compiler {
 
     const command = this.generator.generate({
       ast,
-      target: 'html'
+      target: 'html',
     })
 
     return printer.print({
-      rootCommand: command
+      rootCommand: command,
     })
   }
 }

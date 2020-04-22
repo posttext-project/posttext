@@ -50,7 +50,7 @@ export class TreeInterpreter implements Interpreter {
           command.current,
           new TreeDispatcher({
             parent: dispatcher,
-            command: <TreeCommand>command
+            command: <TreeCommand>command,
           })
         )
       : []
@@ -81,35 +81,35 @@ export class TreeDispatcher implements Dispatcher {
       }
 
       const result = command.reduce
-        .map(subcommand => this.dispatch(subcommand, this))
+        .map((subcommand) => this.dispatch(subcommand, this))
         .reduce(
           (accum, returnedCommands) => [
             ...accum,
-            ...returnedCommands
+            ...returnedCommands,
           ],
           []
         )
 
       const data = result
-        .filter(subcommand => subcommand.name === 'setData')
+        .filter((subcommand) => subcommand.name === 'setData')
         .reduce(
           (accum, subcommand) => ({
             ...accum,
-            ...(subcommand.data ?? {})
+            ...(subcommand.data ?? {}),
           }),
           {}
         )
 
       const others = result.filter(
-        subcommand => subcommand.name !== 'setData'
+        (subcommand) => subcommand.name !== 'setData'
       )
 
       return [
         {
           name: 'setData',
-          data: command.transform?.(data) ?? data
+          data: command.transform?.(data) ?? data,
         },
-        ...others
+        ...others,
       ]
     }
 
@@ -117,8 +117,8 @@ export class TreeDispatcher implements Dispatcher {
       return [
         {
           name: 'setData',
-          data: command.transform?.(this.command.data) ?? {}
-        }
+          data: command.transform?.(this.command.data) ?? {},
+        },
       ]
     }
 
@@ -128,34 +128,36 @@ export class TreeDispatcher implements Dispatcher {
         command.offset !== undefined &&
         this.command.children[command.offset]
           ? this.command.children[command.offset]
-              .filter(subcommand => subcommand.name === 'text')
-              .map(subcommand =>
+              .filter(
+                (subcommand) => subcommand.name === 'text'
+              )
+              .map((subcommand) =>
                 this.parent.dispatch(subcommand, dispatcher)
               )
               .reduce(
                 (accum, subcommands) => [
                   ...accum,
-                  ...subcommands
+                  ...subcommands,
                 ],
                 []
               )
           : []
 
       const data = result
-        .filter(subcommand => subcommand.name === 'setData')
-        .map(subcommand => subcommand.data ?? '')
+        .filter((subcommand) => subcommand.name === 'setData')
+        .map((subcommand) => subcommand.data ?? '')
         .join('')
 
       const others = result.filter(
-        subcommand => subcommand.name !== 'setData'
+        (subcommand) => subcommand.name !== 'setData'
       )
 
       return [
         {
           name: 'setData',
-          data: command.transform?.(data) ?? data
+          data: command.transform?.(data) ?? data,
         },
-        ...others
+        ...others,
       ]
     }
 
@@ -165,33 +167,33 @@ export class TreeDispatcher implements Dispatcher {
         command.offset !== undefined &&
         this.command.children[command.offset]
           ? this.command.children[command.offset]
-              .map(subcommand =>
+              .map((subcommand) =>
                 this.parent.dispatch(subcommand, dispatcher)
               )
               .reduce(
                 (accum, subcommands) => [
                   ...accum,
-                  ...subcommands
+                  ...subcommands,
                 ],
                 []
               )
           : []
 
       const data = result
-        .filter(subcommand => subcommand.name === 'setData')
-        .map(subcommand => subcommand.data ?? '')
+        .filter((subcommand) => subcommand.name === 'setData')
+        .map((subcommand) => subcommand.data ?? '')
         .join('')
 
       const others = result.filter(
-        subcommand => subcommand.name !== 'setData'
+        (subcommand) => subcommand.name !== 'setData'
       )
 
       return [
         {
           name: 'setData',
-          data: command.transform?.(data) ?? data
+          data: command.transform?.(data) ?? data,
         },
-        ...others
+        ...others,
       ]
     }
 

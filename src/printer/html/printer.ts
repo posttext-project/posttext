@@ -13,7 +13,7 @@ export class HtmlPrinter extends Printer<string> {
     rootInterpreter.registerInterpreters({
       tree: new TreeInterpreter(),
       html: new HtmlInterpreter(),
-      text: new TextInterpreter()
+      text: new TextInterpreter(),
     })
 
     return new HtmlPrinter({ rootInterpreter })
@@ -28,9 +28,9 @@ export class HtmlPrinter extends Printer<string> {
 
     return template({
       body: application
-        .filter(command => command.name === 'setData')
-        .map(command => command.data ?? '')
-        .join('')
+        .filter((command) => command.name === 'setData')
+        .map((command) => command.data ?? '')
+        .join(''),
     })
   }
 }

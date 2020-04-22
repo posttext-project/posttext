@@ -7,11 +7,11 @@ import StandardModule from '../modules/standard'
 import {
   EpubPrinter,
   Printer,
-  RootInterpreter
+  RootInterpreter,
 } from '../printer'
 import {
   TreeInterpreter,
-  TreeDispatcher
+  TreeDispatcher,
 } from '../printer/interpreters/tree'
 import { HtmlInterpreter } from '../printer/interpreters/html'
 import { HtmlPrinter } from '../printer/html'
@@ -31,9 +31,9 @@ export class PrintCommand implements Command {
     try {
       const compiler = Compiler.new({
         input: {
-          file: path.resolve(process.cwd(), this.args[0])
+          file: path.resolve(process.cwd(), this.args[0]),
         },
-        target: 'html'
+        target: 'html',
       })
 
       compiler.generator.registerRootModule(

@@ -47,5 +47,5 @@ export const supportedLanguages = [
   'yaml',
   'toml',
   'tsx',
-  'typescript'
+  'typescript',
 ]

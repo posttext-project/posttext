@@ -57,7 +57,7 @@ module.exports = {
   // setupFiles: [],
   // setupFilesAfterEnv: [],
   // snapshotSerializers: [],
-  testEnvironment: 'node'
+  testEnvironment: 'node',
   // testEnvironmentOptions: {},
   // testLocationInResults: false,
   // testMatch: [

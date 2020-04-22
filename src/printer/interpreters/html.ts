@@ -22,17 +22,17 @@ export class HtmlInterpreter implements Interpreter {
         : []
 
       const data = result
-        .filter(command => command.name === 'setData')
+        .filter((command) => command.name === 'setData')
         .reduce(
           (accum, command) => ({
             ...accum,
-            ...(command.data ?? {})
+            ...(command.data ?? {}),
           }),
           {}
         )
 
       const others = result.filter(
-        command => command.name !== 'setData'
+        (command) => command.name !== 'setData'
       )
 
       const template = Handlebars.compile(
@@ -44,9 +44,9 @@ export class HtmlInterpreter implements Interpreter {
       return [
         {
           name: 'setData',
-          data: body
+          data: body,
         },
-        ...others
+        ...others,
       ]
     }
 

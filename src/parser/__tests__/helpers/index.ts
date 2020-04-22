@@ -7,7 +7,7 @@ import {
   BlockNode,
   TextNode,
   TagNode,
-  DocumentNode
+  DocumentNode,
 } from '../../../ast'
 
 export function runParse(
@@ -17,7 +17,7 @@ export function runParse(
 ) {
   const iter = t
     .capture(input, {
-      noLabel: true
+      noLabel: true,
     })
     .toIter()
 
@@ -34,7 +34,7 @@ function normalize<T>(ast: T): T
 
 function normalize(ast: Node | Node[]): Node | Node[] {
   if (Array.isArray(ast)) {
-    return ast.map(ast => normalize(ast))
+    return ast.map((ast) => normalize(ast))
   }
 
   switch (ast.type) {
@@ -42,28 +42,32 @@ function normalize(ast: Node | Node[]): Node | Node[] {
       return {
         ...ast,
         body: <(TextNode | TagNode)[]>(
-          (<DocumentNode>ast).body.map(node => normalize(node))
-        )
+          (<DocumentNode>ast).body.map((node) =>
+            normalize(node)
+          )
+        ),
       }
 
     case 'Tag':
       return <TagNode>{
         ...ast,
-        blocks: (<TagNode>ast).blocks.map(block =>
+        blocks: (<TagNode>ast).blocks.map((block) =>
           normalize(block)
-        )
+        ),
       }
 
     case 'Block':
       return <BlockNode>{
         ...ast,
-        body: (<BlockNode>ast).body.map(node => normalize(node))
+        body: (<BlockNode>ast).body.map((node) =>
+          normalize(node)
+        ),
       }
 
     case 'Text':
       return {
         ...ast,
-        value: stripIndent((<TextNode>ast).value).trim()
+        value: stripIndent((<TextNode>ast).value).trim(),
       }
 
     default:

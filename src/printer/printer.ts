@@ -19,7 +19,7 @@ export class Printer<T> {
 
   static new() {
     return new Printer({
-      rootInterpreter: RootInterpreter.new()
+      rootInterpreter: RootInterpreter.new(),
     })
   }
 
@@ -31,7 +31,7 @@ export class Printer<T> {
     const { rootCommand } = input
 
     const dispatcher = new RootDispatcher({
-      rootInterpreter: this.rootInterpreter
+      rootInterpreter: this.rootInterpreter,
     })
 
     const application = this.rootInterpreter.interpret(
@@ -61,7 +61,7 @@ export class RootInterpreter implements Interpreter {
   }
 
   constructor({
-    interpreters
+    interpreters,
   }: Partial<RootInterpreterStruct> = {}) {
     this.interpreters = interpreters ?? new Map()
   }
