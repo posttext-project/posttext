@@ -11,6 +11,8 @@ import chokidar from 'chokidar'
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
 import { EpubPrinter } from '../printer'
+import StandardModule from '../modules/standard'
+import { HtmlPrinter } from '../printer/html'
 
 export class ServeCommand implements Command {
   private args: string[]
@@ -34,12 +36,20 @@ export class ServeCommand implements Command {
     router.get('/doc.html', async ctx => {
       const compiler = Compiler.new({
         input: {
-          file: inputPath
+          file: path.resolve(process.cwd(), this.args[0])
         },
         target: 'html'
       })
 
-      const outputHtml = await compiler.compile<string>()
+      compiler.generator.registerRootModule(
+        new StandardModule()
+      )
+
+      compiler.registerPrinter('html', async () =>
+        HtmlPrinter.new()
+      )
+
+      const outputHtml = await compiler.compile()
 
       ctx.body = outputHtml
     })

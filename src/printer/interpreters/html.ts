@@ -31,6 +31,10 @@ export class HtmlInterpreter implements Interpreter {
           {}
         )
 
+      const others = result.filter(
+        command => command.name !== 'setData'
+      )
+
       const template = Handlebars.compile(
         command?.template ?? ''
       )
@@ -41,7 +45,8 @@ export class HtmlInterpreter implements Interpreter {
         {
           name: 'setData',
           data: body
-        }
+        },
+        ...others
       ]
     }
 

@@ -1,15 +1,19 @@
+import Handlebars from 'handlebars'
+
 import { Printer, RootInterpreter } from '../printer'
 import { HtmlInterpreter } from '../interpreters/html'
 import { TreeInterpreter } from '../interpreters/tree'
 import { Command } from '../command'
+import { TextInterpreter } from '../interpreters/text'
 
-export class HtmlPrinter extends Printer<Command[]> {
+export class HtmlPrinter extends Printer<string> {
   static new(): HtmlPrinter {
     const rootInterpreter = RootInterpreter.new()
 
     rootInterpreter.registerInterpreters({
       tree: new TreeInterpreter(),
-      html: new HtmlInterpreter()
+      html: new HtmlInterpreter(),
+      text: new TextInterpreter()
     })
 
     return new HtmlPrinter({ rootInterpreter })
@@ -17,7 +21,16 @@ export class HtmlPrinter extends Printer<Command[]> {
 
   protected async run(
     application: Command[]
-  ): Promise<Command[] | null> {
-    return application
+  ): Promise<string | null> {
+    const template = Handlebars.compile(`
+      {{{ body }}}
+    `)
+
+    return template({
+      body: application
+        .filter(command => command.name === 'setData')
+        .map(command => command.data ?? '')
+        .join('')
+    })
   }
 }

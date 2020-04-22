@@ -1,19 +1,20 @@
 import Prism from 'prismjs'
 import loadLanguages from 'prismjs/components'
+import stripIndent from 'strip-indent'
 
 import { Resolver, TagInput } from '../../generator/resolver'
-import { supportedLanguages } from '../../generator/prism'
+import { supportedLanguages } from './prism'
 
 export const tagResolvers: Record<string, Resolver> = {
   section: {
     resolve: () => ({
       name: 'html',
-      template: '<section>{{ textContent }}</section>',
+      template: '<section>{{{ content }}}</section>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -22,12 +23,12 @@ export const tagResolvers: Record<string, Resolver> = {
   title: {
     resolve: () => ({
       name: 'html',
-      template: '<h1>{{ textContent }}</h1>',
+      template: '<h1>{{{ content }}}</h1>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -36,12 +37,12 @@ export const tagResolvers: Record<string, Resolver> = {
   subtitle: {
     resolve: () => ({
       name: 'html',
-      template: '<h2>{{ textContent }}</h2>',
+      template: '<h2>{{{ content }}}</h2>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -50,12 +51,12 @@ export const tagResolvers: Record<string, Resolver> = {
   subsubtitle: {
     resolve: () => ({
       name: 'html',
-      template: '<h3>{{ textContent }}</h3>',
+      template: '<h3>{{{ content }}}</h3>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -64,12 +65,12 @@ export const tagResolvers: Record<string, Resolver> = {
   bold: {
     resolve: () => ({
       name: 'html',
-      template: '<b>{{ textContent }}</b>',
+      template: '<b>{{{ content }}}</b>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -78,12 +79,12 @@ export const tagResolvers: Record<string, Resolver> = {
   italic: {
     resolve: () => ({
       name: 'html',
-      template: '<i>{{ textContent }}</i>',
+      template: '<i>{{{ content }}}</i>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -92,12 +93,12 @@ export const tagResolvers: Record<string, Resolver> = {
   underline: {
     resolve: () => ({
       name: 'html',
-      template: '<u>{{ textContent }}</u>',
+      template: '<u>{{{ content }}}</u>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -106,12 +107,12 @@ export const tagResolvers: Record<string, Resolver> = {
   paragraph: {
     resolve: () => ({
       name: 'html',
-      template: '<p>{{ textContent }}</p>',
+      template: '<p>{{{ content }}}</p>',
       data: {
-        name: 'textContent',
+        name: 'getBlock',
         offset: 0,
-        transform: (textContent: string) => ({
-          textContent
+        transform: (content: string) => ({
+          content
         })
       }
     })
@@ -120,7 +121,7 @@ export const tagResolvers: Record<string, Resolver> = {
   list: {
     resolve: () => ({
       name: 'html',
-      template: '<ul>{{ content }}</ul>',
+      template: '<ul>{{{ content }}}</ul>',
       data: {
         name: 'getBlock',
         offset: 0,
@@ -132,7 +133,7 @@ export const tagResolvers: Record<string, Resolver> = {
   item: {
     resolve: () => ({
       name: 'html',
-      template: '<li>{{ content }}</li>',
+      template: '<li>{{{ content }}}</li>',
       data: {
         name: 'getBlock',
         offset: 0,
@@ -148,11 +149,8 @@ export const tagResolvers: Record<string, Resolver> = {
 
     resolve: () => ({
       name: 'html',
-      template: `
-          <pre class="language-{{ language }}">
-            <code>{{ code }}</code>
-          </pre>
-        `,
+      template:
+        '<pre class="language-{{ language }}"><code>{{{ code }}}</code></pre>',
       data: {
         name: 'compose',
         reduce: [
@@ -163,7 +161,7 @@ export const tagResolvers: Record<string, Resolver> = {
                 params[0] &&
                 supportedLanguages.indexOf(params[0]) !== -1
                   ? params[0]
-                  : 'text'
+                  : 'markdown'
             })
           },
           {
@@ -174,13 +172,17 @@ export const tagResolvers: Record<string, Resolver> = {
             })
           }
         ],
-        transform: ({ language, textContent }: any) => ({
-          code: Prism.highlight(
-            textContent,
-            Prism.languages[language],
-            language
-          )
-        })
+        transform: ({ language, textContent }: any) => {
+          return {
+            code: Prism.highlight(
+              stripIndent(textContent)
+                .replace(/^\r?\n/, '')
+                .replace(/\r?\n[\t ]+$/, ''),
+              Prism.languages[language],
+              language
+            )
+          }
+        }
       }
     })
   }

@@ -30,7 +30,8 @@
     "pt": "./index.js"
   },
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node lib/index.js",
+    "dev": "ts-node src/index.ts",
     "build": "gulp clean && yarn format && gulp build",
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
     "test": "jest",

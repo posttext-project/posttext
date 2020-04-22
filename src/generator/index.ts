@@ -53,7 +53,7 @@ export class Generator {
       current: {
         name: 'html',
         template: `
-          {{ content }}
+          {{{ content }}}
         `,
         data: {
           name: 'compose',
@@ -67,14 +67,21 @@ export class Generator {
         }
       },
       children: [
-        ast.body.map(node =>
-          node.type === 'Tag'
-            ? this.generateTag({ tagNode: node, ...input })
-            : this.generateText({
-                textNode: node,
-                ...input
-              })
-        )
+        ast.body
+          .map(node =>
+            node.type === 'Tag'
+              ? this.generateTag({ tagNode: node, ...input })
+              : node.type === 'Text'
+              ? this.generateText({
+                  textNode: node,
+                  ...input
+                })
+              : []
+          )
+          .reduce(
+            (accum, subcommands) => [...accum, ...subcommands],
+            []
+          )
       ]
     }
   }
@@ -82,48 +89,56 @@ export class Generator {
   generateTag({
     tagNode,
     ...input
-  }: TagGeneratorInput): Command {
-    return {
-      name: 'tree',
-      data: {
-        attrs: tagNode.attrs.reduce(
-          (target, attr) => ({
-            [attr.id.name]: attr.value
-          }),
-          {}
-        ),
-        params: tagNode.params.map(param => param.value)
-      },
-      current: this.resolvers
-        .get(tagNode.id.name)
-        ?.resolve(input) ?? {
-        name: '#undefined'
-      },
-      children: tagNode.blocks.map(blockNode =>
-        blockNode.body.map(node =>
-          node.type === 'Text'
-            ? this.generateText({
-                textNode: node,
-                ...input
-              })
-            : node.type === 'Tag'
-            ? this.generateTag({
-                tagNode: node,
-                ...input
-              })
-            : {
-                name: '#undefined'
-              }
+  }: TagGeneratorInput): Command[] {
+    return [
+      {
+        name: 'tree',
+        data: {
+          attrs: tagNode.attrs.reduce(
+            (target, attr) => ({
+              [attr.id.name]: attr.value
+            }),
+            {}
+          ),
+          params: tagNode.params.map(param => param.value)
+        },
+        current:
+          this.resolvers.get(tagNode.id.name)?.resolve(input) ??
+          undefined,
+        children: tagNode.blocks.map(blockNode =>
+          blockNode.body
+            .map(node =>
+              node.type === 'Text'
+                ? this.generateText({
+                    textNode: node,
+                    ...input
+                  })
+                : node.type === 'Tag'
+                ? this.generateTag({
+                    tagNode: node,
+                    ...input
+                  })
+                : []
+            )
+            .reduce(
+              (accum, subcommands) => [
+                ...accum,
+                ...subcommands
+              ],
+              []
+            )
         )
-      )
-    }
+      }
+    ]
   }
 
-  generateText({ textNode }: TextGeneratorInput): Command {
-    return {
-      name: 'text',
-      textContent: textNode.value
-    }
+  generateText({ textNode }: TextGeneratorInput): Command[] {
+    return [
+      {
+        name: 'text',
+        content: textNode.value
+      }
+    ]
   }
 }
 

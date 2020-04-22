@@ -6,7 +6,7 @@ import { TagInput } from '../../generator/resolver'
 export interface TreeCommand extends Command {
   name: 'tree'
   data: TagInput
-  current: Command
+  current?: Command
   children: Command[][]
 }
 
@@ -44,13 +44,16 @@ export class TreeInterpreter implements Interpreter {
     command: Command,
     dispatcher: Dispatcher
   ): Command[] {
-    return dispatcher.dispatch(
-      command.current,
-      new TreeDispatcher({
-        parent: dispatcher,
-        command: <TreeCommand>command
-      })
-    )
+    return command.current !== undefined &&
+      command.current !== null
+      ? dispatcher.dispatch(
+          command.current,
+          new TreeDispatcher({
+            parent: dispatcher,
+            command: <TreeCommand>command
+          })
+        )
+      : []
   }
 }
 
@@ -77,24 +80,36 @@ export class TreeDispatcher implements Dispatcher {
         return []
       }
 
-      const data = command.reduce
+      const result = command.reduce
+        .map(subcommand => this.dispatch(subcommand, this))
+        .reduce(
+          (accum, returnedCommands) => [
+            ...accum,
+            ...returnedCommands
+          ],
+          []
+        )
+
+      const data = result
         .filter(subcommand => subcommand.name === 'setData')
         .reduce(
           (accum, subcommand) => ({
             ...accum,
-            subcommand
+            ...(subcommand.data ?? {})
           }),
           {}
         )
+
+      const others = result.filter(
+        subcommand => subcommand.name !== 'setData'
+      )
 
       return [
         {
           name: 'setData',
           data: command.transform?.(data) ?? data
         },
-        ...command.reduce.filter(
-          subcommand => subcommand.name !== 'setData'
-        )
+        ...others
       ]
     }
 
@@ -108,20 +123,75 @@ export class TreeDispatcher implements Dispatcher {
     }
 
     if (command.name === 'textContent') {
+      const result =
+        command.offset !== null &&
+        command.offset !== undefined &&
+        this.command.children[command.offset]
+          ? this.command.children[command.offset]
+              .filter(subcommand => subcommand.name === 'text')
+              .map(subcommand =>
+                this.parent.dispatch(subcommand, dispatcher)
+              )
+              .reduce(
+                (accum, subcommands) => [
+                  ...accum,
+                  ...subcommands
+                ],
+                []
+              )
+          : []
+
+      const data = result
+        .filter(subcommand => subcommand.name === 'setData')
+        .map(subcommand => subcommand.data ?? '')
+        .join('')
+
+      const others = result.filter(
+        subcommand => subcommand.name !== 'setData'
+      )
+
       return [
         {
           name: 'setData',
-          data: 'Lorem ipsum'
-        }
+          data: command.transform?.(data) ?? data
+        },
+        ...others
       ]
     }
 
     if (command.name === 'getBlock') {
+      const result =
+        command.offset !== null &&
+        command.offset !== undefined &&
+        this.command.children[command.offset]
+          ? this.command.children[command.offset]
+              .map(subcommand =>
+                this.parent.dispatch(subcommand, dispatcher)
+              )
+              .reduce(
+                (accum, subcommands) => [
+                  ...accum,
+                  ...subcommands
+                ],
+                []
+              )
+          : []
+
+      const data = result
+        .filter(subcommand => subcommand.name === 'setData')
+        .map(subcommand => subcommand.data ?? '')
+        .join('')
+
+      const others = result.filter(
+        subcommand => subcommand.name !== 'setData'
+      )
+
       return [
         {
           name: 'setData',
-          data: 'Lorem ipsum'
-        }
+          data: command.transform?.(data) ?? data
+        },
+        ...others
       ]
     }
 
