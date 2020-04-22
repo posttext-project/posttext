@@ -4,4 +4,22 @@
   \paragraph {
     This is an example document in \bold {PostText};!
   };
+
+  \code(javascript) =={
+    var a = 5;
+
+    function print() {
+      console.log(a);
+    }
+  }==;
+
+  \paragraph {
+    This is a list of items:
+
+    \list {
+      \item {First item};
+      \item {Second item};
+      \item {Third item};
+    };
+  };
 };

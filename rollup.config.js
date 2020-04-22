@@ -9,7 +9,7 @@ export default {
     file: 'index.umd.js',
     name: 'posttext',
     format: 'umd',
-    sourcemap: true
+    sourcemap: true,
   },
-  plugins: [typescript(), terser(), visualizer()]
+  plugins: [typescript(), terser(), visualizer()],
 }

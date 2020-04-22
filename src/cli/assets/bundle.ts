@@ -1,3 +1,5 @@
+import 'prismjs/themes/prism.css'
+
 const socket = new WebSocket('ws://localhost:8080')
 
 async function loadDoc() {
@@ -8,7 +10,7 @@ async function loadDoc() {
   document.body.innerHTML = await response.text()
 }
 
-socket.addEventListener('message', event => {
+socket.addEventListener('message', (event) => {
   const payload = JSON.parse(event.data)
 
   switch (payload.type) {

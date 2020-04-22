@@ -10,6 +10,9 @@ import chokidar from 'chokidar'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
+import { EpubPrinter } from '../printer'
+import StandardModule from '../modules/standard'
+import { HtmlPrinter } from '../printer/html'
 
 export class ServeCommand implements Command {
   private args: string[]
@@ -30,14 +33,25 @@ export class ServeCommand implements Command {
 
     const inputPath = path.resolve(process.cwd(), this.args[0])
 
-    router.get('/doc.html', async ctx => {
+    router.get('/doc.html', async (ctx) => {
       const compiler = Compiler.new({
         input: {
-          file: inputPath
-        }
+          file: path.resolve(process.cwd(), this.args[0]),
+        },
+        target: 'html',
       })
 
-      ctx.body = await compiler.compile()
+      compiler.generator.registerRootModule(
+        new StandardModule()
+      )
+
+      compiler.registerPrinter('html', async () =>
+        HtmlPrinter.new()
+      )
+
+      const outputHtml = await compiler.compile()
+
+      ctx.body = outputHtml
     })
 
     app
@@ -45,7 +59,7 @@ export class ServeCommand implements Command {
       .use(router.allowedMethods())
       .use(serve(path.resolve(__dirname, 'assets')))
 
-    wss.on('connection', ws => {
+    wss.on('connection', (ws) => {
       chokidar.watch(inputPath).on('change', async () => {
         ws.send(JSON.stringify({ type: 'reload' }))
       })
@@ -60,7 +74,7 @@ export class ServeCommand implements Command {
           {
             borderColor: 'yellow',
             margin: 1,
-            padding: 1
+            padding: 1,
           }
         )
       )

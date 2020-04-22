@@ -1,171 +1,149 @@
-import { DocumentNode, TagNode, TextNode, Node } from '../ast'
+import {
+  DocumentNode,
+  TagNode,
+  TextNode,
+  BlockNode,
+} from '../ast'
+import { Module } from './module'
+import { Resolver } from './resolver'
+import { Command } from '../printer'
 
-export interface GeneratorInput {
+export type GeneratorInput = {
   ast: DocumentNode
-  input: string
+  target: string
+}
+
+export type TagGeneratorInput = {
+  tagNode: TagNode
+  target: string
+}
+
+export type TextGeneratorInput = {
+  textNode: TextNode
+  target: string
+}
+
+export interface GeneratorStruct {
+  resolvers: Map<string, Resolver>
 }
 
 export class Generator {
+  private resolvers: Map<string, Resolver>
+
   static new() {
     return new Generator()
   }
 
-  generate({ ast }: GeneratorInput) {
-    return this.generateHtml(ast)
+  constructor({ resolvers }: Partial<GeneratorStruct> = {}) {
+    this.resolvers = resolvers ?? new Map()
   }
 
-  generateHtml(node: Node): string {
-    switch (node.type) {
-      case 'Document':
-        return (
-          node.body
-            .map(node => this.generateRootNode(node))
-            .join('') + '\n'
-        )
+  registerRootModule(module: Module) {
+    const resolvers = new Map(
+      Object.entries(module.registerTagResolvers())
+    )
 
-      case 'Tag':
-        return this.generateTag(node)
+    this.resolvers = resolvers
+  }
 
-      case 'Text':
-        return this.generateText(node)
+  generate({ ast, ...input }: GeneratorInput): Command {
+    return {
+      name: 'tree',
+      data: {},
+      current: {
+        name: 'html',
+        template: `
+          {{{ content }}}
+        `,
+        data: {
+          name: 'compose',
+          reduce: [
+            {
+              name: 'getBlock',
+              offset: 0,
+              transform: (content: string) => ({ content }),
+            },
+          ],
+        },
+      },
+      children: [
+        ast.body
+          .map((node) =>
+            node.type === 'Tag'
+              ? this.generateTag({ tagNode: node, ...input })
+              : node.type === 'Text'
+              ? this.generateText({
+                  textNode: node,
+                  ...input,
+                })
+              : []
+          )
+          .reduce(
+            (accum, subcommands) => [...accum, ...subcommands],
+            []
+          ),
+      ],
     }
-
-    throw new Error('Unsupported node type')
   }
 
-  generateRootNode(node: Node): string {
-    switch (node.type) {
-      case 'Text':
-        return this.generateParagraph(node)
-
-      case 'Tag':
-        return this.generateTag(node)
-    }
-
-    return ''
+  generateTag({
+    tagNode,
+    ...input
+  }: TagGeneratorInput): Command[] {
+    return [
+      {
+        name: 'tree',
+        data: {
+          attrs: tagNode.attrs.reduce(
+            (target, attr) => ({
+              [attr.id.name]: attr.value,
+            }),
+            {}
+          ),
+          params: tagNode.params.map((param) => param.value),
+        },
+        current:
+          this.resolvers.get(tagNode.id.name)?.resolve(input) ??
+          undefined,
+        children: tagNode.blocks.map((blockNode) =>
+          blockNode.body
+            .map((node) =>
+              node.type === 'Text'
+                ? this.generateText({
+                    textNode: node,
+                    ...input,
+                  })
+                : node.type === 'Tag'
+                ? this.generateTag({
+                    tagNode: node,
+                    ...input,
+                  })
+                : []
+            )
+            .reduce(
+              (accum, subcommands) => [
+                ...accum,
+                ...subcommands,
+              ],
+              []
+            )
+        ),
+      },
+    ]
   }
 
-  generateTag(node: TagNode): string {
-    switch (node.id.name.toLocaleLowerCase()) {
-      case 'section':
-        return this.generateSection(node)
-
-      case 'title':
-        return this.generateTitle(node)
-
-      case 'bold':
-        return this.generateBold(node)
-
-      case 'italic':
-        return this.generateItalic(node)
-
-      case 'paragraph':
-        return this.generateParagraph(node)
-    }
-
-    return ''
+  generateText({ textNode }: TextGeneratorInput): Command[] {
+    return [
+      {
+        name: 'text',
+        content: textNode.value,
+      },
+    ]
   }
+}
 
-  isInlineNode(node: Node): boolean {
-    if (node.type === 'Tag') {
-      return (
-        ['title', 'bold', 'italic', 'paragraph'].findIndex(
-          name => node.id.name === name
-        ) !== -1
-      )
-    }
-
-    return false
-  }
-
-  generateSection(node: Node): string {
-    return '<section>' + this.htmlContent(node) + '</section>'
-  }
-
-  generateText(node: Node): string {
-    return this.textContent(node)
-  }
-
-  generateTitle(node: Node): string {
-    return '<h1>' + this.inlineContent(node) + '</h1>'
-  }
-
-  generateBold(node: Node): string {
-    return '<b>' + this.inlineContent(node) + '</b>'
-  }
-
-  generateItalic(node: Node): string {
-    return '<i>' + this.inlineContent(node) + '</i>'
-  }
-
-  generateParagraph(node: Node): string {
-    if (this.textContent(node).match(/[^ \t\r\n]+/)) {
-      return '<p>' + this.inlineContent(node) + '</p>'
-    }
-
-    return ''
-  }
-
-  htmlContent(node: Node): string {
-    switch (node.type) {
-      case 'Document':
-        return node.body
-          .map(node => this.inlineContent(node))
-          .join('')
-
-      case 'Tag':
-        return node.children
-          .map(node => this.generateHtml(node))
-          .join('')
-
-      case 'Text':
-        return node.value
-    }
-
-    throw new Error('Unsupported node type')
-  }
-
-  inlineContent(node: Node): string {
-    switch (node.type) {
-      case 'Document':
-        return node.body
-          .map(node => this.inlineContent(node))
-          .join('')
-
-      case 'Tag':
-        return node.children
-          .map(node => {
-            if (this.isInlineNode(node)) {
-              return this.generateTag(<TagNode>node)
-            }
-
-            return this.textContent(node)
-          })
-          .join('')
-
-      case 'Text':
-        return node.value
-    }
-
-    throw new Error('Unsupported node type')
-  }
-
-  textContent(node: Node): string {
-    switch (node.type) {
-      case 'Document':
-        return node.body
-          .map(node => this.textContent(node))
-          .join('')
-
-      case 'Tag':
-        return node.children
-          .map(node => this.textContent(node))
-          .join('')
-
-      case 'Text':
-        return node.value
-    }
-
-    throw new Error('Unsupported node type')
+export class DefaultModule implements Module {
+  registerTagResolvers() {
+    return {}
   }
 }

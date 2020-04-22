@@ -15,7 +15,7 @@ task('build:cjs', () => {
 
   return merge(
     src(['src/**/*.ts', '!src/cli/assets/**/*.ts'], {
-      base: path.resolve(__dirname, 'src')
+      base: path.resolve(__dirname, 'src'),
     })
       .pipe(sourcemaps.init())
       .pipe(tsProject(reporter))
@@ -28,7 +28,7 @@ task('build:assets', async () => {
   await buildWebpack(webpackConfig)
 
   return src(['src/cli/assets/*.html'], {
-    base: path.resolve(__dirname, 'src')
+    base: path.resolve(__dirname, 'src'),
   }).pipe(dest('lib'))
 })
 
@@ -47,7 +47,7 @@ export function buildWebpack(config) {
 
       console.log(
         stats.toString({
-          colors: true
+          colors: true,
         })
       )
 
