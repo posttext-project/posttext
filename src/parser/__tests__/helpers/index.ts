@@ -14,7 +14,7 @@ export function runParse(
   input: string,
   expected: string,
   callback: (cursor: Cursor) => Node | Node[] | null
-) {
+): void {
   const iter = t
     .capture(input, {
       noLabel: true,
@@ -41,33 +41,31 @@ function normalize(ast: Node | Node[]): Node | Node[] {
     case 'Document':
       return {
         ...ast,
-        body: <(TextNode | TagNode)[]>(
-          (<DocumentNode>ast).body.map((node) =>
-            normalize(node)
-          )
-        ),
+        body: (ast as DocumentNode).body.map((node) =>
+          normalize(node)
+        ) as (TextNode | TagNode)[],
       }
 
     case 'Tag':
-      return <TagNode>{
+      return {
         ...ast,
-        blocks: (<TagNode>ast).blocks.map((block) =>
+        blocks: (ast as TagNode).blocks.map((block) =>
           normalize(block)
         ),
-      }
+      } as TagNode
 
     case 'Block':
-      return <BlockNode>{
+      return {
         ...ast,
-        body: (<BlockNode>ast).body.map((node) =>
+        body: (ast as BlockNode).body.map((node) =>
           normalize(node)
         ),
-      }
+      } as BlockNode
 
     case 'Text':
       return {
         ...ast,
-        value: stripIndent((<TextNode>ast).value).trim(),
+        value: stripIndent((ast as TextNode).value).trim(),
       }
 
     default:

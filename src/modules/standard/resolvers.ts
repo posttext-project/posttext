@@ -4,16 +4,17 @@ import stripIndent from 'strip-indent'
 
 import { Resolver, TagInput } from '../../generator/resolver'
 import { supportedLanguages } from './prism'
+import { Command } from '../../printer'
 
 export const tagResolvers: Record<string, Resolver> = {
   section: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<section>{{{ content }}}</section>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -21,13 +22,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   title: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<h1>{{{ content }}}</h1>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -35,13 +36,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   subtitle: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<h2>{{{ content }}}</h2>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -49,13 +50,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   subsubtitle: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<h3>{{{ content }}}</h3>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -63,13 +64,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   bold: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<b>{{{ content }}}</b>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -77,13 +78,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   italic: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<i>{{{ content }}}</i>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -91,13 +92,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   underline: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<u>{{{ content }}}</u>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -105,13 +106,13 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   paragraph: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<p>{{{ content }}}</p>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({
+        transform: (content: string): Record<string, any> => ({
           content,
         }),
       },
@@ -119,35 +120,39 @@ export const tagResolvers: Record<string, Resolver> = {
   },
 
   list: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<ul>{{{ content }}}</ul>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({ content }),
+        transform: (content: string): Record<string, any> => ({
+          content,
+        }),
       },
     }),
   },
 
   item: {
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template: '<li>{{{ content }}}</li>',
       data: {
         name: 'getBlock',
         offset: 0,
-        transform: (content: string) => ({ content }),
+        transform: (content: string): Record<string, any> => ({
+          content,
+        }),
       },
     }),
   },
 
   code: {
-    load: () => {
+    load: (): void => {
       loadLanguages(supportedLanguages)
     },
 
-    resolve: () => ({
+    resolve: (): Command => ({
       name: 'html',
       template:
         '<pre class="language-{{ language }}"><code>{{{ code }}}</code></pre>',
@@ -156,7 +161,9 @@ export const tagResolvers: Record<string, Resolver> = {
         reduce: [
           {
             name: 'getAttrs',
-            transform: ({ params }: TagInput) => ({
+            transform: ({
+              params,
+            }: TagInput): Record<string, any> => ({
               language:
                 params[0] &&
                 supportedLanguages.indexOf(params[0]) !== -1
@@ -167,12 +174,17 @@ export const tagResolvers: Record<string, Resolver> = {
           {
             name: 'textContent',
             offset: 0,
-            transform: (textContent: string) => ({
+            transform: (
+              textContent: string
+            ): Record<string, any> => ({
               textContent,
             }),
           },
         ],
-        transform: ({ language, textContent }: any) => {
+        transform: ({
+          language,
+          textContent,
+        }: Record<string, any>): Record<string, any> => {
           return {
             code: Prism.highlight(
               stripIndent(textContent)

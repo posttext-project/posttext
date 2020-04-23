@@ -11,7 +11,7 @@ export class CLI {
     this.cli = cli
   }
 
-  static new() {
+  static new(): CLI {
     const cli = meow(
       `
         Usage
@@ -41,7 +41,7 @@ export class CLI {
     })
   }
 
-  async run() {
+  async run(): Promise<void> {
     try {
       const args = this.cli?.input?.slice(1) ?? []
       const command =

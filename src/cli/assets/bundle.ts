@@ -2,7 +2,7 @@ import 'prismjs/themes/prism.css'
 
 const socket = new WebSocket('ws://localhost:8080')
 
-async function loadDoc() {
+async function loadDoc(): Promise<void> {
   const response = await window.fetch(
     'http://localhost:8080/doc.html'
   )
