@@ -17,7 +17,7 @@ export interface PrinterStruct {
 export class Printer<T> {
   rootInterpreter: RootInterpreter
 
-  static new() {
+  static new(): Printer<any> {
     return new Printer({
       rootInterpreter: RootInterpreter.new(),
     })

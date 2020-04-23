@@ -74,6 +74,7 @@
     "gulp": "^4.0.2",
     "gulp-sourcemaps": "^2.6.4",
     "gulp-typescript": "^6.0.0-alpha.1",
+    "husky": "^4.2.5",
     "jest": "^25.1.0",
     "js-yaml": "^3.13.1",
     "merge-stream": "^2.0.0",
