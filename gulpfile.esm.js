@@ -35,7 +35,7 @@ task('build:assets', async () => {
 task('build', series(['build:cjs', 'build:assets']))
 
 task('clean', async () => {
-  await del('lib')
+  return await del('lib')
 })
 
 export function buildWebpack(config) {

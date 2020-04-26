@@ -9,6 +9,6 @@ export class StandardModule implements Module {
   }
 }
 
-const m = new StandardModule()
+export const m = new StandardModule()
 
 export default StandardModule

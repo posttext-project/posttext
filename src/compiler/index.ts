@@ -1,9 +1,8 @@
 import fs from 'fs-extra'
-import yaml from 'js-yaml'
 
 import { Parser } from '../parser'
 import { Generator } from '../generator'
-import { Printer, Command } from '../printer'
+import { Printer } from '../printer'
 
 export interface CompilerOptions {
   input: {
@@ -55,7 +54,6 @@ export class Compiler {
   async compile<T>(): Promise<T | null> {
     const {
       input: { file },
-      target,
     } = this.options
 
     const printerLoader:

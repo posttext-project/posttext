@@ -1,9 +1,4 @@
-import {
-  DocumentNode,
-  TagNode,
-  TextNode,
-  BlockNode,
-} from '../ast'
+import { DocumentNode, TagNode, TextNode } from '../ast'
 import { Module } from './module'
 import { Resolver } from './resolver'
 import { Command } from '../printer'

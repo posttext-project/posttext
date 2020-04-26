@@ -10,7 +10,6 @@ import chokidar from 'chokidar'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
-import { EpubPrinter } from '../printer'
 import StandardModule from '../modules/standard'
 import { HtmlPrinter } from '../printer/html'
 
@@ -49,9 +48,12 @@ export class ServeCommand implements Command {
         HtmlPrinter.new()
       )
 
-      const outputHtml = await compiler.compile()
+      const outputHtml = await compiler.compile<string>()
 
-      ctx.body = outputHtml
+      ctx.body =
+        outputHtml !== undefined && outputHtml !== null
+          ? outputHtml
+          : ''
     })
 
     app

@@ -2,6 +2,7 @@ import meow from 'meow'
 import { CompileCommand } from './compile'
 import { ServeCommand } from './serve'
 import { PrintCommand } from './print'
+import chalk from 'chalk'
 
 export class CLI {
   private cli: meow.Result<any>
@@ -41,27 +42,32 @@ export class CLI {
   }
 
   async run() {
-    const args = this.cli.input.slice(1)
-    const command = this.cli.input[0].toLowerCase()
+    try {
+      const args = this.cli?.input?.slice(1) ?? []
+      const command =
+        this.cli?.input?.[0]?.toLowerCase() ?? 'help'
 
-    switch (command) {
-      case 'compile':
-        await this.compile(args)
+      switch (command) {
+        case 'compile':
+          await this.compile(args)
 
-        return
+          return
 
-      case 'serve':
-        await this.serve(args)
+        case 'serve':
+          await this.serve(args)
 
-        return
+          return
 
-      case 'print':
-        await this.print(args)
+        case 'print':
+          await this.print(args)
 
-        return
+          return
 
-      default:
-        this.cli.showHelp()
+        default:
+          this.cli.showHelp()
+      }
+    } catch (error) {
+      console.log(chalk.bgRed(' ERROR '), error)
     }
   }
 
@@ -74,7 +80,7 @@ export class CLI {
       flags,
     })
 
-    command.run()
+    await command.run()
   }
 
   async serve(
@@ -86,7 +92,7 @@ export class CLI {
       flags,
     })
 
-    command.run()
+    await command.run()
   }
 
   async print(
@@ -98,6 +104,6 @@ export class CLI {
       flags,
     })
 
-    command.run()
+    await command.run()
   }
 }

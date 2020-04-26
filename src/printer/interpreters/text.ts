@@ -1,5 +1,3 @@
-import Handlebars from 'handlebars'
-
 import { Interpreter } from '../interpreter'
 import { Command } from '../command'
 
