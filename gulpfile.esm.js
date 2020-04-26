@@ -19,7 +19,12 @@ task('build:cjs', () => {
     })
       .pipe(sourcemaps.init())
       .pipe(tsProject(reporter))
-      .js.pipe(sourcemaps.write('.'))
+      .js.pipe(
+        sourcemaps.write('.', {
+          includeContent: false,
+          sourceRoot: '../src',
+        })
+      )
       .pipe(dest('lib'))
   )
 })
@@ -35,7 +40,7 @@ task('build:assets', async () => {
 task('build', series(['build:cjs', 'build:assets']))
 
 task('clean', async () => {
-  await del('lib')
+  return await del('lib')
 })
 
 export function buildWebpack(config) {

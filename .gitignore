@@ -3,5 +3,6 @@ stats.html
 lib/
 node_modules/
 
-.vscode/
+.vscode/*
+!.vscode/launch.example.json
 coverage/
