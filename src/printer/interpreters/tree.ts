@@ -50,7 +50,7 @@ export class TreeInterpreter implements Interpreter {
           command.current,
           new TreeDispatcher({
             parent: dispatcher,
-            command: <TreeCommand>command,
+            command: command as TreeCommand,
           })
         )
       : []

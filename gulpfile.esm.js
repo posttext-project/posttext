@@ -8,6 +8,34 @@ import webpackConfig from './webpack.config'
 
 import { src, task, series, dest } from 'gulp'
 
+export function buildWebpack(config) {
+  return new Promise((resolve, reject) => {
+    webpack(config, (err, stats) => {
+      if (err) {
+        return reject(err)
+      }
+
+      console.log(
+        stats.toString({
+          colors: true,
+        })
+      )
+
+      const info = stats.toJson()
+
+      if (stats.hasWarnings()) {
+        console.log(info.warnings)
+      }
+
+      if (stats.hasErrors()) {
+        return reject(info.errors)
+      }
+
+      resolve(true)
+    })
+  })
+}
+
 const reporter = ts.reporter.fullReporter(true)
 
 task('build:cjs', () => {
@@ -42,31 +70,3 @@ task('build', series(['build:cjs', 'build:assets']))
 task('clean', async () => {
   return await del('lib')
 })
-
-export function buildWebpack(config) {
-  return new Promise((resolve, reject) => {
-    webpack(config, (err, stats) => {
-      if (err) {
-        return reject(err)
-      }
-
-      console.log(
-        stats.toString({
-          colors: true,
-        })
-      )
-
-      const info = stats.toJson()
-
-      if (stats.hasWarnings()) {
-        console.log(info.warnings)
-      }
-
-      if (stats.hasErrors()) {
-        return reject(info.errors)
-      }
-
-      resolve(true)
-    })
-  })
-}

@@ -42,9 +42,9 @@ export class Printer<T> {
     return this.run(application)
   }
 
-  protected async run(
-    application: Command[]
-  ): Promise<T | null> {
+  protected async run(application: Command[]): Promise<T | null>
+
+  protected async run(): Promise<T | null> {
     return null
   }
 }
@@ -56,7 +56,7 @@ export interface RootInterpreterStruct {
 export class RootInterpreter implements Interpreter {
   interpreters: Map<string, Interpreter>
 
-  static new() {
+  static new(): RootInterpreter {
     return new RootInterpreter()
   }
 
@@ -68,7 +68,7 @@ export class RootInterpreter implements Interpreter {
 
   registerInterpreters(
     interpreters: Record<string, Interpreter>
-  ) {
+  ): void {
     for (const [name, interpreter] of Object.entries(
       interpreters
     )) {
@@ -76,7 +76,10 @@ export class RootInterpreter implements Interpreter {
     }
   }
 
-  registerInterpreter(name: string, interpreter: Interpreter) {
+  registerInterpreter(
+    name: string,
+    interpreter: Interpreter
+  ): void {
     this.interpreters.set(name, interpreter)
   }
 

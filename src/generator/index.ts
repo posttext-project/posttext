@@ -25,7 +25,7 @@ export interface GeneratorStruct {
 export class Generator {
   private resolvers: Map<string, Resolver>
 
-  static new() {
+  static new(): Generator {
     return new Generator()
   }
 
@@ -33,7 +33,7 @@ export class Generator {
     this.resolvers = resolvers ?? new Map()
   }
 
-  registerRootModule(module: Module) {
+  registerRootModule(module: Module): void {
     const resolvers = new Map(
       Object.entries(module.registerTagResolvers())
     )
@@ -56,7 +56,9 @@ export class Generator {
             {
               name: 'getBlock',
               offset: 0,
-              transform: (content: string) => ({ content }),
+              transform: (
+                content: string
+              ): Record<string, any> => ({ content }),
             },
           ],
         },
@@ -138,7 +140,7 @@ export class Generator {
 }
 
 export class DefaultModule implements Module {
-  registerTagResolvers() {
+  registerTagResolvers(): Record<string, Resolver> {
     return {}
   }
 }

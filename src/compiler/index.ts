@@ -33,7 +33,7 @@ export class Compiler {
     this.printers = new Map()
   }
 
-  static new(options: CompilerOptions) {
+  static new(options: CompilerOptions): Compiler {
     const parser = Parser.new()
     const generator = Generator.new()
 
@@ -47,7 +47,7 @@ export class Compiler {
   registerPrinter(
     target: string,
     printerLoader: () => Promise<Printer<any>>
-  ) {
+  ): void {
     this.printers.set(target, printerLoader)
   }
 

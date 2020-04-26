@@ -10,11 +10,11 @@ import {
 } from '../ast'
 
 export class Parser {
-  static new() {
+  static new(): Parser {
     return new Parser()
   }
 
-  parse(input: string) {
+  parse(input: string): DocumentNode {
     const cursor = Cursor.from(input)
 
     return this.parseDocument(cursor)
@@ -501,7 +501,7 @@ export class Parser {
     return null
   }
 
-  skip(cursor: Cursor) {
+  skip(cursor: Cursor): void {
     const execArr = cursor.exec(/[ \t\r\n]+/gy)
 
     if (execArr) {
