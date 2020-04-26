@@ -19,7 +19,12 @@ task('build:cjs', () => {
     })
       .pipe(sourcemaps.init())
       .pipe(tsProject(reporter))
-      .js.pipe(sourcemaps.write('.'))
+      .js.pipe(
+        sourcemaps.write('.', {
+          includeContent: false,
+          sourceRoot: '../src',
+        })
+      )
       .pipe(dest('lib'))
   )
 })
