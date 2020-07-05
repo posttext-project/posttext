@@ -72,7 +72,7 @@ export class TreeDispatcher implements Dispatcher {
   }
 
   dispatch(
-    command: TreeChildCommand,
+    command: Command,
     dispatcher: Dispatcher
   ): Command[] {
     if (command.name === 'compose') {
@@ -80,7 +80,7 @@ export class TreeDispatcher implements Dispatcher {
         return []
       }
 
-      const result = command.reduce
+      const result = (command as ComposeCommand).reduce
         .map((subcommand) => this.dispatch(subcommand, this))
         .reduce(
           (accum, returnedCommands) => [
@@ -91,7 +91,7 @@ export class TreeDispatcher implements Dispatcher {
         )
 
       const data = result
-        .filter((subcommand) => subcommand.name === 'setData')
+        .filter((subcommand: any) => subcommand.name === 'setData')
         .reduce(
           (accum, subcommand) => ({
             ...accum,

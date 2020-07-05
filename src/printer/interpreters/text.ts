@@ -7,7 +7,7 @@ export interface TextCommand {
 }
 
 export class TextInterpreter implements Interpreter {
-  interpret(command: Partial<TextCommand>): Command[] {
+  interpret(command: Command): Command[] {
     return [
       {
         name: 'setData',

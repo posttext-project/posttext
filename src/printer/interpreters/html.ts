@@ -13,7 +13,7 @@ export interface HtmlCommand {
 
 export class HtmlInterpreter implements Interpreter {
   interpret(
-    command: Partial<HtmlCommand>,
+    command: Command,
     dispatcher: Dispatcher
   ): Command[] {
     if (command.template) {
