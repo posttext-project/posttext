@@ -1,5 +1,5 @@
 import { Interpreter } from '../interpreter'
-import { Command } from '../command'
+import { Command } from '../ast'
 
 export interface TextCommand {
   name: 'text'

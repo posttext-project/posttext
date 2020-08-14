@@ -1,4 +1,4 @@
-import { Command } from '../printer/command'
+import { Command } from '../printer/ast'
 
 export interface ResolverInput {
   target: string

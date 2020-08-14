@@ -1,4 +1,4 @@
-import { Command } from './command'
+import { Command } from './ast'
 import { Dispatcher } from './dispatcher'
 
 export interface Interpreter {

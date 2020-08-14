@@ -1,5 +1,5 @@
 import { Interpreter } from '../interpreter'
-import { Command } from '../command'
+import { Command } from '../ast'
 import { Dispatcher } from '../dispatcher'
 import { TagInput } from '../../generator/resolver'
 

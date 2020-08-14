@@ -1,4 +1,4 @@
-import { Command } from './command'
+import { Command } from './ast'
 import { Interpreter } from './interpreter'
 import { Dispatcher } from './dispatcher'
 

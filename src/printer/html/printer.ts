@@ -3,7 +3,7 @@ import Handlebars from 'handlebars'
 import { Printer, RootInterpreter } from '../printer'
 import { HtmlInterpreter } from '../interpreters/html'
 import { TreeInterpreter } from '../interpreters/tree'
-import { Command } from '../command'
+import { Command } from '../ast'
 import { TextInterpreter } from '../interpreters/text'
 
 export class HtmlPrinter extends Printer<string> {

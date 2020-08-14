@@ -1,7 +1,7 @@
 import { DocumentNode, TagNode, TextNode } from '../ast'
 import { Module } from './module'
 import { Resolver } from './resolver'
-import { Command } from '../printer'
+import { PrinterNode, Command,  } from '../printer'
 
 export type GeneratorInput = {
   ast: DocumentNode
@@ -41,7 +41,7 @@ export class Generator {
     this.resolvers = resolvers
   }
 
-  generate({ ast, ...input }: GeneratorInput): Command {
+  generate({ ast, ...input }: GeneratorInput): PrinterNode {
     return {
       name: 'tree',
       data: {},
@@ -83,10 +83,22 @@ export class Generator {
     }
   }
 
+  generateBlock({
+
+  }: BlockGeneratorInput): PrinterNode)
+
   generateTag({
     tagNode,
     ...input
-  }: TagGeneratorInput): Command[] {
+  }: TagGeneratorInput): PrinterNode {
+    return {
+      target: tagNode,
+      commands: [],
+      childNodes: tagNode.blocks.map(block => this.generateBlock({
+
+      })),
+    }
+
     return [
       {
         name: 'tree',
@@ -129,13 +141,12 @@ export class Generator {
     ]
   }
 
-  generateText({ textNode }: TextGeneratorInput): Command[] {
-    return [
-      {
-        name: 'text',
-        content: textNode.value,
-      },
-    ]
+  generateText({ textNode }: TextGeneratorInput): TextNode {
+    return {
+      target: textNode,
+      commands: [],
+      childNodes: [],
+    }
   }
 }
 
