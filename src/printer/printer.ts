@@ -1,119 +1,132 @@
-import { Command } from './ast'
+import { DocumentNode, Node } from '../ast'
 import { Interpreter } from './interpreter'
-import { Dispatcher } from './dispatcher'
+import { Command } from './command'
+import { Generator } from '../registry'
+
+export interface PrinterComponents {
+  generator: Generator
+}
 
 export interface PrinterInput {
-  rootCommand: Command
+  ast: DocumentNode
 }
 
-export interface Printer<T> {
-  print(input: PrinterInput): Promise<T | null>
-}
+export interface PrinterResult {}
 
-export interface PrinterStruct {
-  rootInterpreter: RootInterpreter
-}
-
-export class Printer<T> {
-  rootInterpreter: RootInterpreter
-
-  static new(): Printer<any> {
-    return new Printer({
-      rootInterpreter: RootInterpreter.new(),
-    })
-  }
-
-  constructor({ rootInterpreter }: PrinterStruct) {
-    this.rootInterpreter = rootInterpreter
-  }
-
-  print(input: PrinterInput): Promise<T | null> {
-    const { rootCommand } = input
-
-    const dispatcher = new RootDispatcher({
-      rootInterpreter: this.rootInterpreter,
-    })
-
-    const application = this.rootInterpreter.interpret(
-      rootCommand,
-      dispatcher
-    )
-
-    return this.run(application)
-  }
-
-  protected async run(application: Command[]): Promise<T | null>
-
-  protected async run(): Promise<T | null> {
-    return null
-  }
-}
-
-export interface RootInterpreterStruct {
+export class Printer {
   interpreters: Map<string, Interpreter>
-}
+  generator: Generator
 
-export class RootInterpreter implements Interpreter {
-  interpreters: Map<string, Interpreter>
-
-  static new(): RootInterpreter {
-    return new RootInterpreter()
+  static new(components: PrinterComponents) {
+    return new Printer(components)
   }
 
-  constructor({
-    interpreters,
-  }: Partial<RootInterpreterStruct> = {}) {
-    this.interpreters = interpreters ?? new Map()
+  constructor({ generator }: PrinterComponents) {
+    this.interpreters = new Map()
+    this.generator = generator
   }
 
   registerInterpreters(
     interpreters: Record<string, Interpreter>
-  ): void {
+  ) {
     for (const [name, interpreter] of Object.entries(
       interpreters
     )) {
-      this.registerInterpreter(name, interpreter)
+      this.interpreters.set(name, interpreter)
     }
   }
 
-  registerInterpreter(
-    name: string,
-    interpreter: Interpreter
-  ): void {
-    this.interpreters.set(name, interpreter)
+  print(input: PrinterInput) {
+    const { ast } = input
+
+    this.interpret(ast, {
+      name: 'render',
+    })
   }
 
-  interpret(
-    command: Command,
-    dispatcher: Dispatcher
-  ): Command[] {
-    if (this.interpreters.has(command.name)) {
-      return (
-        this.interpreters
-          .get(command.name)
-          ?.interpret(command, dispatcher) ?? []
-      )
+  async *interpret(
+    node: Node,
+    command: Command
+  ): AsyncGenerator<Command, any, any> {
+    switch (node.type) {
+      case 'Tag':
+        if (command.name === 'render') {
+          const resolver = this.generator.getTagResolver(
+            node.id.name
+          )
+
+          if (!resolver) {
+            return
+          }
+
+          const iter = resolver.resolve()
+          let iterResult = await iter.next()
+          resolverLoop: while (!iterResult.done) {
+            const resolverCommand = iterResult.value
+
+            const interpreter = this.interpreters.get(
+              resolverCommand.name
+            )
+
+            if (
+              !interpreter ||
+              interpreter.modifier === 'private'
+            ) {
+              break
+            }
+
+            const commandIter = interpreter.interpret(
+              node,
+              resolverCommand,
+              this.interpret.bind(this)
+            )
+
+            let commandIterResult = await commandIter.next()
+            while (!commandIterResult.done) {
+              if (commandIterResult.value.name === 'error') {
+                break resolverLoop
+              }
+
+              yield commandIterResult.value
+            }
+
+            iterResult = await iter.next(
+              commandIterResult.value
+            )
+          }
+
+          return
+        } else {
+          const interpreter = this.interpreters.get(
+            command.name
+          )
+
+          if (!interpreter) {
+            return
+          }
+
+          yield* interpreter.interpret(
+            node,
+            command,
+            this.interpret.bind(this)
+          )
+        }
+
+        return
+
+      default:
+        const interpreter = this.interpreters.get(command.name)
+
+        // TODO: Handle invalid command.
+        if (!interpreter) {
+          return
+        }
+
+        yield* interpreter.interpret(
+          node,
+          command,
+          this.interpret.bind(this)
+        )
     }
-
-    return []
-  }
-}
-
-export interface RootDispatcherStruct {
-  rootInterpreter: RootInterpreter
-}
-
-export class RootDispatcher implements Dispatcher {
-  rootInterpreter: RootInterpreter
-
-  constructor({ rootInterpreter }: RootDispatcherStruct) {
-    this.rootInterpreter = rootInterpreter
-  }
-
-  dispatch(
-    command: Command,
-    dispatcher: Dispatcher
-  ): Command[] {
-    return this.rootInterpreter.interpret(command, dispatcher)
   }
 }

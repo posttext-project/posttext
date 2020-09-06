@@ -1,4 +1,4 @@
-import { Command } from '../printer/ast'
+import { Command } from '../printer/command'
 
 export interface ResolverInput {
   target: string
@@ -12,5 +12,5 @@ export interface TagInput {
 export interface Resolver {
   load?(): void
 
-  resolve(input: ResolverInput): Command
+  resolve(): AsyncGenerator<Command, void, any>
 }

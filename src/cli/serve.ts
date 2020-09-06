@@ -10,8 +10,10 @@ import chokidar from 'chokidar'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
-import StandardModule from '../modules/standard'
-import { HtmlPrinter } from '../printer/html'
+import { Printer } from '../printer'
+import { Generator } from '../registry'
+import StdModule from '../modules/std'
+import { Parser } from '../parser'
 
 export class ServeCommand implements Command {
   private args: string[]
@@ -34,21 +36,21 @@ export class ServeCommand implements Command {
 
     router.get('/doc.html', async (ctx) => {
       const compiler = Compiler.new({
+        parser: Parser.new(),
+        printer: Printer.new({
+          generator: Generator.new({
+            target: 'html',
+            rootModule: new StdModule(),
+          }),
+        }),
+      })
+
+      const outputHtml = await compiler.compile({
         input: {
           file: path.resolve(process.cwd(), this.args[0]),
         },
         target: 'html',
       })
-
-      compiler.generator.registerRootModule(
-        new StandardModule()
-      )
-
-      compiler.registerPrinter('html', async () =>
-        HtmlPrinter.new()
-      )
-
-      const outputHtml = await compiler.compile<string>()
 
       ctx.body =
         outputHtml !== undefined && outputHtml !== null

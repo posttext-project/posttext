@@ -3,7 +3,7 @@ import path from 'path'
 import { CommandOptions, Command } from './command'
 import { Compiler } from '../compiler'
 import StandardModule from '../modules/standard'
-import { HtmlPrinter } from '../printer/html'
+import { HtmlPrinter } from '../printer/common'
 
 export class PrintCommand implements Command {
   private args: string[]
