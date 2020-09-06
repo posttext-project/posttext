@@ -2,15 +2,12 @@ import Prism from 'prismjs'
 import loadLanguages from 'prismjs/components'
 import stripIndent from 'strip-indent'
 
-import {
-  Resolver,
-  ResolverInput,
-} from '../../registry/resolver'
+import { Resolver, RegistryOptions } from '../../registry'
 import { supportedLanguages } from './prism'
 import { Command } from '../../printer'
 
 export const tagResolvers = (
-  input: ResolverInput
+  _options: RegistryOptions
 ): Record<string, Resolver> => {
   return {
     section: {

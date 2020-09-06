@@ -1,16 +1,13 @@
 import { Module } from '../../registry/module'
-import {
-  Resolver,
-  ResolverInput,
-} from '../../registry/resolver'
+import { Resolver, RegistryOptions } from '../../registry'
 
 import { tagResolvers } from './resolvers'
 
 export class StdModule implements Module {
   getTagResolvers(
-    input: ResolverInput
+    options: RegistryOptions
   ): Record<string, Resolver> {
-    return tagResolvers(input)
+    return tagResolvers(options)
   }
 }
 

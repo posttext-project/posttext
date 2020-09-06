@@ -1,7 +1,8 @@
-import { Resolver, ResolverInput } from './resolver'
+import { Resolver } from './resolver'
+import { RegistryOptions } from './registry';
 
 export interface Module {
   getTagResolvers(
-    input: ResolverInput
+    options: RegistryOptions
   ): Record<string, Resolver>
 }

@@ -1,13 +1,7 @@
-import fs from 'fs-extra'
-
 import { Parser } from '../parser'
 import { Printer } from '../printer'
-
-export interface CompilerOptions {
-  input: {
-    file: string
-  }
-}
+import { Registry } from '../registry'
+import StdModule from '../modules/std'
 
 export interface CompilerComponents {
   parser: Parser
@@ -23,22 +17,23 @@ export class Compiler {
     this.printer = printer
   }
 
-  static new({
-    parser,
-    printer,
-  }: CompilerComponents): Compiler {
+  static create(): Compiler {
+    const parser = Parser.create()
+
+    const registry = Registry.create({
+      rootModule: new StdModule(),
+    })
+    const printer = Printer.create({
+      registry,
+    })
+
     return new Compiler({
       parser,
       printer,
     })
   }
 
-  async compile(options: CompilerOptions): Promise<any> {
-    const {
-      input: { file },
-    } = options
-
-    const input = await fs.readFile(file, 'utf8')
+  async compile(input: string): Promise<any> {
     const ast = this.parser.parse(input)
 
     return this.printer.print({

@@ -11,19 +11,18 @@ export class CompileCommand implements Command {
     this.args = args
   }
 
-  static new(options: CommandOptions): CompileCommand {
+  static create(options: CommandOptions): CompileCommand {
     return new CompileCommand(options)
   }
 
   async run(): Promise<void> {
-    const compiler = Compiler.new({
-      input: {
-        file: path.resolve(process.cwd(), this.args[0]),
-      },
-      target: 'html',
-    })
+    const filePath = path.resolve(process.cwd(), this.args[0])
+    const input = await fs.readFile(filePath, 'utf-8')
 
-    const outputHtml = await compiler.compile()
+    const compiler = Compiler.create()
+
+    const result = await compiler.compile(input)
+    const outputHtml = result?.content
 
     const inputPath = path.parse(this.args[0])
     const outputPath = path.resolve(

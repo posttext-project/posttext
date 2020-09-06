@@ -1,19 +1,29 @@
 import { Command } from './command'
-import { Node } from '../ast'
+import { Data } from './data'
+import { Registry } from '../registry'
 
 type Modifier = 'private'
 
+export interface Context {
+  dispatch: Dispatch
+  registry: Registry
+  interpreters: Map<string, Interpreter>
+}
+
 export type Dispatch = (
-  node: Node,
   command: Command
-) => AsyncGenerator<Command, any, any>
+) => AsyncGenerator<Data, any, any>
 
 export interface Interpreter {
   modifier?: Modifier
 
-  interpret(
-    node: Node,
+  preload?(
     command: Command,
-    dispatch: Dispatch
-  ): AsyncGenerator<Command, any, any>
+    context: Context
+  ): AsyncGenerator<Data, any, any>
+
+  interpret(
+    command: Command,
+    context: Context
+  ): AsyncGenerator<Data, any, any>
 }
