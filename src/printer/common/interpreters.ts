@@ -1,7 +1,12 @@
 import Handlebars from 'handlebars'
 
 import { Interpreter, Context } from '../interpreter'
-import { TagNode, Node, DocumentNode } from '../../ast'
+import {
+  TagNode,
+  Node,
+  DocumentNode,
+  TextNode,
+} from '../../ast'
 import { Command } from '../command'
 import { Data } from '../data'
 
@@ -114,6 +119,19 @@ export const interpreters: Record<string, Interpreter> = {
     },
   },
 
+  renderText: {
+    modifier: 'private',
+
+    interpret: async function* (
+      command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const textNode = command.node as TextNode
+
+      return textNode.value
+    },
+  },
+
   getParams: {
     interpret: async function* (
       command: Command,
@@ -161,8 +179,8 @@ export const interpreters: Record<string, Interpreter> = {
       }
 
       yield {
-        name: 'data',
-        data: { rendered: renderedChildNodes.join('') },
+        name: 'html',
+        content: renderedChildNodes.join(''),
       }
     },
   },
@@ -180,8 +198,8 @@ export const interpreters: Record<string, Interpreter> = {
       const rendered = template({ data })
 
       yield {
-        name: 'data',
-        data: { rendered },
+        name: 'html',
+        content: rendered,
       }
     },
   },

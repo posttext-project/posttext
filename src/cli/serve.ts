@@ -1,4 +1,5 @@
 import ws from 'ws'
+import fs from 'fs-extra'
 import Koa from 'koa'
 import http from 'http'
 import path from 'path'
@@ -10,10 +11,6 @@ import chokidar from 'chokidar'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
-import { Printer } from '../printer'
-import { Generator } from '../registry'
-import StdModule from '../modules/std'
-import { Parser } from '../parser'
 
 export class ServeCommand implements Command {
   private args: string[]
@@ -22,7 +19,7 @@ export class ServeCommand implements Command {
     this.args = args
   }
 
-  static new(options: CommandOptions): ServeCommand {
+  static create(options: CommandOptions): ServeCommand {
     return new ServeCommand(options)
   }
 
@@ -34,28 +31,13 @@ export class ServeCommand implements Command {
 
     const inputPath = path.resolve(process.cwd(), this.args[0])
 
-    router.get('/doc.html', async (ctx) => {
-      const compiler = Compiler.new({
-        parser: Parser.new(),
-        printer: Printer.new({
-          generator: Generator.new({
-            target: 'html',
-            rootModule: new StdModule(),
-          }),
-        }),
-      })
+    router.get('/doc.html', async (_ctx) => {
+      const compiler = Compiler.create()
 
-      const outputHtml = await compiler.compile({
-        input: {
-          file: path.resolve(process.cwd(), this.args[0]),
-        },
-        target: 'html',
-      })
+      const filePath = path.resolve(process.cwd(), this.args[0])
+      const input = await fs.readFile(filePath, 'utf-8')
 
-      ctx.body =
-        outputHtml !== undefined && outputHtml !== null
-          ? outputHtml
-          : ''
+      await compiler.compile(input)
     })
 
     app

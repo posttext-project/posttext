@@ -7,7 +7,7 @@ describe('Parser', () => {
     let parser: Parser
 
     beforeAll(() => {
-      parser = Parser.new()
+      parser = Parser.create()
     })
 
     test('document should be parsed correctly', () => {
