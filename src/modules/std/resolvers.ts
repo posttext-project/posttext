@@ -23,7 +23,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: 'getBlock',
+          template: '<section>{{{ data.content }}}</section>',
           data: {
             content,
           },
@@ -44,7 +44,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<h1>{{{ content }}}</h1>',
+          template: '<h1>{{{ data.content }}}</h1>',
           data: {
             content,
           },
@@ -65,7 +65,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<h2>{{{ content }}}</h2>',
+          template: '<h2>{{{ data.content }}}</h2>',
           data: {
             content,
           },
@@ -86,7 +86,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<h3>{{{ content }}}</h3>',
+          template: '<h3>{{{ data.content }}}</h3>',
           data: {
             content,
           },
@@ -107,7 +107,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<b>{{{ content }}}</b>',
+          template: '<b>{{{ data.content }}}</b>',
           data: {
             content,
           },
@@ -128,7 +128,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<i>{{{ content }}}</i>',
+          template: '<i>{{{ data.content }}}</i>',
           data: {
             content,
           },
@@ -149,7 +149,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<u>{{{ content }}}<u>',
+          template: '<u>{{{ data.content }}}<u>',
           data: {
             content,
           },
@@ -170,7 +170,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<p>{{{ content }}}</p>',
+          template: '<p>{{{ data.content }}}</p>',
           data: {
             content,
           },
@@ -191,8 +191,10 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<ul>{{{ content }}}</ul>',
-          data: content,
+          template: '<ul>{{{ data.content }}}</ul>',
+          data: {
+            content,
+          },
         }
       },
     },
@@ -208,7 +210,7 @@ export const tagResolvers = (
         }
         yield {
           name: 'html',
-          template: '<li>{{{ content }}}</li>',
+          template: '<li>{{{ data.content }}}</li>',
           data: {
             content,
           },
@@ -248,7 +250,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template:
-            '<pre class="language-{{ language }}"><code>{{{ code }}}</code></pre>',
+            '<pre class="language-{{ data.language }}"><code>{{{ data.code }}}</code></pre>',
           data: {
             language,
             code,

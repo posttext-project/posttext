@@ -79,7 +79,7 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
 
-      const resolver = this.registry.getTagResolver(
+      const resolver = context.registry.getTagResolver(
         node.id.name
       )
 
@@ -90,9 +90,12 @@ export const interpreters: Record<string, Interpreter> = {
       const iter = resolver.resolve()
       let iterResult = await iter.next()
       resolverLoop: while (!iterResult.done) {
-        const resolverCommand = iterResult.value
+        const resolverCommand = {
+          ...iterResult.value,
+          node,
+        }
 
-        const interpreter = this.interpreters.get(
+        const interpreter = context.interpreters.get(
           resolverCommand.name
         )
 
@@ -105,13 +108,15 @@ export const interpreters: Record<string, Interpreter> = {
 
         const commandIter = context.dispatch(resolverCommand)
 
-        const commandIterResult = await commandIter.next()
+        let commandIterResult = await commandIter.next()
         while (!commandIterResult.done) {
           if (commandIterResult.value.name === 'error') {
             break resolverLoop
           }
 
           yield commandIterResult.value
+
+          commandIterResult = await commandIter.next()
         }
 
         iterResult = await iter.next(commandIterResult.value)
@@ -128,7 +133,10 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const textNode = command.node as TextNode
 
-      return textNode.value
+      yield {
+        name: 'html',
+        content: textNode.value,
+      }
     },
   },
 
@@ -139,7 +147,7 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const tagNode = command.node as TagNode
 
-      return tagNode.params
+      return tagNode.params.map((param) => param.value)
     },
   },
 
@@ -170,18 +178,15 @@ export const interpreters: Record<string, Interpreter> = {
           name: 'render',
           node: childNode,
         })) {
-          if (data.name === 'data') {
-            const { rendered } = command.data
+          if (data.name === 'html') {
+            const content = data.content
 
-            renderedChildNodes.push(rendered)
+            renderedChildNodes.push(content)
           }
         }
       }
 
-      yield {
-        name: 'html',
-        content: renderedChildNodes.join(''),
-      }
+      return renderedChildNodes.join('')
     },
   },
 

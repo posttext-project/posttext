@@ -18,6 +18,13 @@ overrides:
 rules:
   'no-unused-vars': 'off'
   'require-yield': 'off'
+  'consistent-this':
+    - 2
+    - 'self'
+  '@typescript-eslint/no-this-alias':
+    - 'error'
+    - allowDestructuring: true
+      allowedNames: ['self']
   '@typescript-eslint/member-delimiter-style':
     - 'off'
     - delimiter: none

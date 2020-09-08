@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "dev": "gulp clean && gulp build && node lib/index.js",
+    "dev": "gulp clean && gulp build:cjs && node lib/index.js",
     "debug": "gulp clean && gulp build && node --inspect-brk lib/index.js",
     "build": "gulp clean && pnpm format && gulp build",
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",

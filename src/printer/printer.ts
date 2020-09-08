@@ -3,6 +3,7 @@ import { Interpreter, Context } from './interpreter'
 import { Command } from './command'
 import { Registry } from '../registry'
 import { AnonymousContext } from './context'
+import { Data } from './data'
 
 export interface PrinterComponents {
   registry: Registry
@@ -38,16 +39,23 @@ export class Printer {
   async print(input: PrinterInput): Promise<void> {
     const { ast } = input
 
+    const self = this
+    const context = AnonymousContext.create({
+      dispatch: async function* (
+        command: Command
+      ): AsyncGenerator<Data, any, any> {
+        return yield* self.interpret(command, context)
+      },
+      interpreters: this.interpreters,
+      registry: this.registry,
+    })
+
     const iter = this.interpret(
       {
         name: 'render',
         node: ast,
       },
-      AnonymousContext.create({
-        dispatch: this.interpret.bind(this),
-        interpreters: this.interpreters,
-        registry: this.registry,
-      })
+      context
     )
     const commands: Command[] = []
     for await (const command of iter) {
@@ -64,6 +72,6 @@ export class Printer {
       return
     }
 
-    yield* interpreter.interpret(command, context)
+    return yield* interpreter.interpret(command, context)
   }
 }

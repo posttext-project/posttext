@@ -33,7 +33,7 @@ export class AnonymousContext implements Context {
   async *dispatch(
     command: Command
   ): AsyncGenerator<Data, any, any> {
-    yield* this._dispatch(command)
+    return yield* this._dispatch(command)
   }
 
   get interpreters(): Map<string, Interpreter> {
