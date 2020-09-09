@@ -1,69 +1,29 @@
+import { DocumentNode } from '../ast'
+import { Interpreter, Context } from './interpreter'
 import { Command } from './command'
-import { Interpreter } from './interpreter'
-import { Dispatcher } from './dispatcher'
+import { Registry } from '../registry'
+import { AnonymousContext } from './context'
+import { Data } from './data'
+
+export interface PrinterComponents {
+  registry: Registry
+}
 
 export interface PrinterInput {
-  rootCommand: Command
+  ast: DocumentNode
 }
 
-export interface Printer<T> {
-  print(input: PrinterInput): Promise<T | null>
-}
+export class Printer {
+  private interpreters: Map<string, Interpreter>
+  private registry: Registry
 
-export interface PrinterStruct {
-  rootInterpreter: RootInterpreter
-}
-
-export class Printer<T> {
-  rootInterpreter: RootInterpreter
-
-  static new(): Printer<any> {
-    return new Printer({
-      rootInterpreter: RootInterpreter.new(),
-    })
+  static create(components: PrinterComponents): Printer {
+    return new Printer(components)
   }
 
-  constructor({ rootInterpreter }: PrinterStruct) {
-    this.rootInterpreter = rootInterpreter
-  }
-
-  print(input: PrinterInput): Promise<T | null> {
-    const { rootCommand } = input
-
-    const dispatcher = new RootDispatcher({
-      rootInterpreter: this.rootInterpreter,
-    })
-
-    const application = this.rootInterpreter.interpret(
-      rootCommand,
-      dispatcher
-    )
-
-    return this.run(application)
-  }
-
-  protected async run(application: Command[]): Promise<T | null>
-
-  protected async run(): Promise<T | null> {
-    return null
-  }
-}
-
-export interface RootInterpreterStruct {
-  interpreters: Map<string, Interpreter>
-}
-
-export class RootInterpreter implements Interpreter {
-  interpreters: Map<string, Interpreter>
-
-  static new(): RootInterpreter {
-    return new RootInterpreter()
-  }
-
-  constructor({
-    interpreters,
-  }: Partial<RootInterpreterStruct> = {}) {
-    this.interpreters = interpreters ?? new Map()
+  constructor({ registry }: PrinterComponents) {
+    this.interpreters = new Map()
+    this.registry = registry
   }
 
   registerInterpreters(
@@ -72,48 +32,46 @@ export class RootInterpreter implements Interpreter {
     for (const [name, interpreter] of Object.entries(
       interpreters
     )) {
-      this.registerInterpreter(name, interpreter)
+      this.interpreters.set(name, interpreter)
     }
   }
 
-  registerInterpreter(
-    name: string,
-    interpreter: Interpreter
-  ): void {
-    this.interpreters.set(name, interpreter)
+  async print(input: PrinterInput): Promise<void> {
+    const { ast } = input
+
+    const self = this
+    const context = AnonymousContext.create({
+      dispatch: async function* (
+        command: Command
+      ): AsyncGenerator<Data, any, any> {
+        return yield* self.interpret(command, context)
+      },
+      interpreters: this.interpreters,
+      registry: this.registry,
+    })
+
+    const iter = this.interpret(
+      {
+        name: 'render',
+        node: ast,
+      },
+      context
+    )
+    const commands: Command[] = []
+    for await (const command of iter) {
+      commands.push(command)
+    }
   }
 
-  interpret(
+  async *interpret(
     command: Command,
-    dispatcher: Dispatcher
-  ): Command[] {
-    if (this.interpreters.has(command.name)) {
-      return (
-        this.interpreters
-          .get(command.name)
-          ?.interpret(command, dispatcher) ?? []
-      )
+    context: Context
+  ): AsyncGenerator<Command, any, any> {
+    const interpreter = context.interpreters.get(command.name)
+    if (!interpreter) {
+      return
     }
 
-    return []
-  }
-}
-
-export interface RootDispatcherStruct {
-  rootInterpreter: RootInterpreter
-}
-
-export class RootDispatcher implements Dispatcher {
-  rootInterpreter: RootInterpreter
-
-  constructor({ rootInterpreter }: RootDispatcherStruct) {
-    this.rootInterpreter = rootInterpreter
-  }
-
-  dispatch(
-    command: Command,
-    dispatcher: Dispatcher
-  ): Command[] {
-    return this.rootInterpreter.interpret(command, dispatcher)
+    return yield* interpreter.interpret(command, context)
   }
 }

@@ -3,6 +3,7 @@ import path from 'path'
 
 import { CommandOptions, Command } from './command'
 import { Compiler } from '../compiler'
+import { interpreters } from '../printer/web'
 
 export class CompileCommand implements Command {
   private args: string[]
@@ -11,26 +12,18 @@ export class CompileCommand implements Command {
     this.args = args
   }
 
-  static new(options: CommandOptions): CompileCommand {
+  static create(options: CommandOptions): CompileCommand {
     return new CompileCommand(options)
   }
 
   async run(): Promise<void> {
-    const compiler = Compiler.new({
-      input: {
-        file: path.resolve(process.cwd(), this.args[0]),
-      },
-      target: 'html',
-    })
+    const filePath = path.resolve(process.cwd(), this.args[0])
+    const input = await fs.readFile(filePath, 'utf8')
 
-    const outputHtml = await compiler.compile()
+    const compiler = Compiler.create()
 
-    const inputPath = path.parse(this.args[0])
-    const outputPath = path.resolve(
-      inputPath.dir,
-      inputPath.name + '.html'
-    )
+    compiler.getPrinter().registerInterpreters(interpreters)
 
-    await fs.outputFile(outputPath, outputHtml)
+    await compiler.compile(input)
   }
 }

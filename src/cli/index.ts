@@ -75,7 +75,7 @@ export class CLI {
     args: string[],
     flags: meow.Options<any> = {}
   ): Promise<any> {
-    const command = CompileCommand.new({
+    const command = CompileCommand.create({
       args,
       flags,
     })
@@ -87,7 +87,7 @@ export class CLI {
     args: string[],
     flags: meow.Options<any> = {}
   ): Promise<any> {
-    const command = ServeCommand.new({
+    const command = ServeCommand.create({
       args,
       flags,
     })
@@ -99,7 +99,7 @@ export class CLI {
     args: string[],
     flags: meow.Options<any> = {}
   ): Promise<any> {
-    const command = PrintCommand.new({
+    const command = PrintCommand.create({
       args,
       flags,
     })

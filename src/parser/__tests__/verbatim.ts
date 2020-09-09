@@ -8,7 +8,7 @@ describe('Parser', () => {
     let parser: Parser
 
     beforeAll(() => {
-      parser = Parser.new()
+      parser = Parser.create()
     })
 
     test('verbatim should be parsed correctly', () => {

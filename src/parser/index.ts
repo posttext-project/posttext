@@ -10,7 +10,7 @@ import {
 } from '../ast'
 
 export class Parser {
-  static new(): Parser {
+  static create(): Parser {
     return new Parser()
   }
 

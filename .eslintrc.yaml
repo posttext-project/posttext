@@ -16,10 +16,20 @@ overrides:
       '@typescript-eslint/explicit-function-return-type':
         ['error']
 rules:
+  'no-unused-vars': 'off'
+  'require-yield': 'off'
+  'consistent-this':
+    - 2
+    - 'self'
+  '@typescript-eslint/no-this-alias':
+    - 'error'
+    - allowDestructuring: true
+      allowedNames: ['self']
   '@typescript-eslint/member-delimiter-style':
     - 'off'
     - delimiter: none
   '@typescript-eslint/explicit-function-return-type': 'off'
   '@typescript-eslint/no-use-before-define': 'off'
-  'no-unused-vars': 'off'
-  '@typescript-eslint/no-unused-vars': ['error']
+  '@typescript-eslint/no-unused-vars':
+    - 'error'
+    - argsIgnorePattern: '^_'

@@ -2,7 +2,8 @@ dependencies:
   '@koa/router': 8.0.8
   boxen: 4.2.0
   chalk: 4.1.0
-  cursornext: 0.2.2
+  chokidar: 3.4.2
+  cursornext: 0.2.3
   dot: 1.1.3
   handlebars: 4.7.6
   koa: 2.13.0
@@ -2023,7 +2024,6 @@ packages:
     dependencies:
       normalize-path: 3.0.0
       picomatch: 2.2.2
-    dev: true
     engines:
       node: '>= 8'
     resolution:
@@ -2463,7 +2463,6 @@ packages:
     resolution:
       integrity: sha512-Un7MIEDdUC5gNpcGDV97op1Ywk748MpHcFTHoYs6qnj1Z3j7I53VG3nwZhKzoBZmbdRNnb6WRdFlwl7tSDuZGw==
   /binary-extensions/2.1.0:
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -2532,7 +2531,6 @@ packages:
   /braces/3.0.2:
     dependencies:
       fill-range: 7.0.1
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -2820,7 +2818,6 @@ packages:
       is-glob: 4.0.1
       normalize-path: 3.0.0
       readdirp: 3.4.0
-    dev: true
     engines:
       node: '>= 8.10.0'
     optionalDependencies:
@@ -3338,10 +3335,10 @@ packages:
       node: '>=0.10.0'
     resolution:
       integrity: sha1-mI3zP+qxke95mmE2nddsF635V+o=
-  /cursornext/0.2.2:
+  /cursornext/0.2.3:
     dev: false
     resolution:
-      integrity: sha512-4ljt1hjODf65YYrtpQn/ka/y7LnYQfpVpnMY9Bu+Ms4KfUFCAzDeTLwIEY1ps3TVMZbR5h+qWrLrCt2WtFGjVg==
+      integrity: sha512-X5hnE9YMOxwCn+TI6W2zeCj4tc57OaLHiJ697lCRt1UO8pwHp9z/KM0djLTAy4T92bE2OFPWC7VEjs6Odte0Fw==
   /cyclist/1.0.1:
     dev: true
     resolution:
@@ -4265,7 +4262,6 @@ packages:
   /fill-range/7.0.1:
     dependencies:
       to-regex-range: 5.0.1
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -4494,7 +4490,6 @@ packages:
     resolution:
       integrity: sha512-oWb1Z6mkHIskLzEJ/XWX0srkpkTQ7vaopMQkyaEIoq0fmtFVxOthb8cCxeT+p3ynTdkk/RZwbgG4brR5BeWECw==
   /fsevents/2.1.3:
-    dev: true
     engines:
       node: ^8.16.0 || ^10.6.0 || >=11.0.0
     optional: true
@@ -4576,7 +4571,6 @@ packages:
   /glob-parent/5.1.1:
     dependencies:
       is-glob: 4.0.1
-    dev: true
     engines:
       node: '>= 6'
     resolution:
@@ -5255,7 +5249,6 @@ packages:
   /is-binary-path/2.1.0:
     dependencies:
       binary-extensions: 2.1.0
-    dev: true
     engines:
       node: '>=8'
     resolution:
@@ -5333,7 +5326,6 @@ packages:
     resolution:
       integrity: sha512-arnXMxT1hhoKo9k1LZdmlNyJdDDfy2v0fXjFlmok4+i8ul/6WlbVge9bhM74OpNPQPMGUToDtz+KXa1PneJxOA==
   /is-extglob/2.1.1:
-    dev: true
     engines:
       node: '>=0.10.0'
     resolution:
@@ -5379,7 +5371,6 @@ packages:
   /is-glob/4.0.1:
     dependencies:
       is-extglob: 2.1.1
-    dev: true
     engines:
       node: '>=0.10.0'
     resolution:
@@ -5426,7 +5417,6 @@ packages:
     resolution:
       integrity: sha512-rSklcAIlf1OmFdyAqbnWTLVelsQ58uvZ66S/ZyawjWqIviTWCjg2PzVGw8WUA+nNuPTqb4wgA+NszrJ+08LlgQ==
   /is-number/7.0.0:
-    dev: true
     engines:
       node: '>=0.12.0'
     resolution:
@@ -6985,7 +6975,6 @@ packages:
     resolution:
       integrity: sha1-GrKLVW4Zg2Oowab35vogE3/mrtk=
   /normalize-path/3.0.0:
-    dev: true
     engines:
       node: '>=0.10.0'
     resolution:
@@ -7535,7 +7524,6 @@ packages:
     resolution:
       integrity: sha1-Ywn04OX6kT7BxpMHrjZLSzd8nns=
   /picomatch/2.2.2:
-    dev: true
     engines:
       node: '>=8.6'
     resolution:
@@ -7975,7 +7963,6 @@ packages:
   /readdirp/3.4.0:
     dependencies:
       picomatch: 2.2.2
-    dev: true
     engines:
       node: '>=8.10.0'
     resolution:
@@ -9253,7 +9240,6 @@ packages:
   /to-regex-range/5.0.1:
     dependencies:
       is-number: 7.0.0
-    dev: true
     engines:
       node: '>=8.0'
     resolution:
@@ -10096,58 +10082,59 @@ packages:
     resolution:
       integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==
 specifiers:
-  '@babel/core': ^7.9.0
-  '@babel/preset-env': ^7.9.0
-  '@babel/preset-typescript': ^7.9.0
-  '@koa/router': ^8.0.5
-  '@rollup/plugin-typescript': ^4.1.1
-  '@types/dot': ^1.1.3
-  '@types/fs-extra': ^8.0.1
-  '@types/jest': ^25.1.4
-  '@types/js-yaml': ^3.12.2
-  '@types/koa': ^2.11.0
+  '@babel/core': ^7.11.6
+  '@babel/preset-env': ^7.11.5
+  '@babel/preset-typescript': ^7.10.4
+  '@koa/router': ^8.0.8
+  '@rollup/plugin-typescript': ^4.1.2
+  '@types/dot': ^1.1.4
+  '@types/fs-extra': ^8.1.1
+  '@types/jest': ^25.2.3
+  '@types/js-yaml': ^3.12.5
+  '@types/koa': ^2.11.4
   '@types/koa-static': ^4.0.1
   '@types/koa__router': ^8.0.2
-  '@types/prismjs': ^1.16.0
-  '@types/squirrelly': ^7.1.0
-  '@types/ws': ^7.2.4
-  '@typescript-eslint/eslint-plugin': ^2.29.0
-  '@typescript-eslint/parser': ^2.29.0
-  ava: ^3.7.1
-  babel-jest: ^25.1.0
+  '@types/prismjs': ^1.16.1
+  '@types/squirrelly': ^7.1.1
+  '@types/ws': ^7.2.6
+  '@typescript-eslint/eslint-plugin': ^2.34.0
+  '@typescript-eslint/parser': ^2.34.0
+  ava: ^3.12.1
+  babel-jest: ^25.5.1
   boxen: ^4.2.0
-  chalk: ^4.0.0
-  css-loader: ^3.4.0
-  cursornext: 0.2.2
+  chalk: ^4.1.0
+  chokidar: ^3.4.2
+  css-loader: ^3.6.0
+  cursornext: ^0.2.3
   del: ^5.1.0
   dot: ^1.1.3
   eslint: ^6.8.0
   eslint-config-prettier: ^6.11.0
-  eslint-plugin-prettier: ^3.1.3
+  eslint-plugin-prettier: ^3.1.4
   esm: ^3.2.25
-  fs-extra: ^9.0.0
+  fs-extra: ^9.0.1
   gulp: ^4.0.2
-  gulp-sourcemaps: ^2.6.4
+  gulp-sourcemaps: ^2.6.5
   gulp-typescript: ^6.0.0-alpha.1
   handlebars: ^4.7.6
-  husky: ^4.2.5
-  jest: ^25.1.0
-  js-yaml: ^3.13.1
-  koa: ^2.11.0
+  husky: ^4.3.0
+  jest: ^25.5.4
+  js-yaml: ^3.14.0
+  koa: ^2.13.0
   koa-static: ^5.0.0
-  meow: ^6.0.0
+  meow: ^6.1.1
   merge-stream: ^2.0.0
-  nyc: ^15.0.1
-  prettier: ^2.0.5
-  prismjs: ^1.17.1
-  rollup: ^2.7.1
-  rollup-plugin-terser: ^5.0.0
-  rollup-plugin-visualizer: ^4.0.4
+  nyc: ^15.1.0
+  prettier: ^2.1.1
+  prismjs: ^1.21.0
+  rollup: ^2.26.11
+  rollup-plugin-terser: ^5.3.1
+  rollup-plugin-visualizer: ^4.1.1
   strip-indent: ^3.0.0
-  style-loader: ^1.1.2
-  ts-loader: ^7.0.1
-  ts-node: ^8.3.0
-  tslib: ^1.10.0
-  typescript: ^3.5.2
-  webpack: ^4.41.4
-  ws: ^7.2.1
+  style-loader: ^1.2.1
+  ts-loader: ^7.0.5
+  ts-node: ^8.10.2
+  tslib: ^1.13.0
+  typescript: ^3.9.7
+  webpack: ^4.44.1
+  ws: ^7.3.1
