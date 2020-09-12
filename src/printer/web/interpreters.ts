@@ -22,6 +22,15 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
 
+      const preloadAsyncIter = context.dispatch({
+        name: 'preload',
+        node: node.body,
+      })
+
+      for await (const _data of preloadAsyncIter) {
+        /* pass */
+      }
+
       const collection: Data[] = []
       for (const childNode of node.body) {
         const asyncIter = context.dispatch({
@@ -50,6 +59,8 @@ export const interpreters: Record<string, Interpreter> = {
             </head>
             <body>
               {{{ content }}}
+
+              <script src="./bundle.js"></script>
             </body>
           </html>
         `)

@@ -48,25 +48,40 @@ export class Printer {
       },
       interpreters: this.interpreters,
       registry: this.registry,
+      stateMap: new Map(),
     })
 
-    const iter = this.interpret(
+    const preloadIter = this.interpret(
+      {
+        name: 'preload',
+        node: ast,
+      },
+      context
+    )
+
+    let preloadResult = await preloadIter.next()
+    while (!preloadResult.done) {
+      preloadResult = await preloadIter.next()
+    }
+
+    const renderIter = this.interpret(
       {
         name: 'render',
         node: ast,
       },
       context
     )
-    const commands: Command[] = []
-    for await (const command of iter) {
-      commands.push(command)
+
+    const collection: Data[] = []
+    for await (const data of renderIter) {
+      collection.push(data)
     }
   }
 
   async *interpret(
     command: Command,
     context: Context
-  ): AsyncGenerator<Command, any, any> {
+  ): AsyncGenerator<Data, any, any> {
     const interpreter = context.interpreters.get(command.name)
     if (!interpreter) {
       return

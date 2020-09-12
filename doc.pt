@@ -5,6 +5,12 @@
     This is an example document in \bold {PostText};!
   };
 
+  \code(markdown) =={
+    # Hello World!
+
+    This is a markdown example!
+  }==;
+
   \code(javascript) =={
     var a = 5;
 
