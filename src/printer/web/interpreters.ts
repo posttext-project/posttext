@@ -1,6 +1,8 @@
-import Handlebars from 'handlebars'
+import Handlebars from '../helpers/handlebars'
 import fs from 'fs-extra'
 import path from 'path'
+import prettier from 'prettier'
+import stripIndent from 'strip-indent'
 
 import { interpreters as commonInterpreters } from '../common'
 import { Interpreter, Context } from '../interpreter'
@@ -37,19 +39,21 @@ export const interpreters: Record<string, Interpreter> = {
         .map((data) => data.content)
         .join('')
 
-      const template = Handlebars.compile(`
-        <!DOCTYPE html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-            <title>Document</title>
-          </head>
-          <body>
-            {{{ content }}}
-          </body>
-        </html>
-      `)
+      const template = Handlebars.compile(
+        stripIndent(`
+          <!DOCTYPE html>
+          <html lang="en">
+            <head>
+              <meta charset="UTF-8" />
+              <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+              <title>Document</title>
+            </head>
+            <body>
+              {{{ content }}}
+            </body>
+          </html>
+        `)
+      )
 
       const rendered = template({
         content,
@@ -58,7 +62,7 @@ export const interpreters: Record<string, Interpreter> = {
       yield* context.dispatch({
         name: 'writeFile',
         file: 'index.html',
-        content: rendered,
+        content: prettier.format(rendered, { parser: 'html' }),
       })
     },
   },

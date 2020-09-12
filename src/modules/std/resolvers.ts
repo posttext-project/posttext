@@ -24,6 +24,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<section>{{{ data.content }}}</section>',
+          type: 'inline',
           data: {
             content,
           },
@@ -45,6 +46,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<h1>{{{ data.content }}}</h1>',
+          type: 'inline',
           data: {
             content,
           },
@@ -66,6 +68,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<h2>{{{ data.content }}}</h2>',
+          type: 'inline',
           data: {
             content,
           },
@@ -87,6 +90,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<h3>{{{ data.content }}}</h3>',
+          type: 'inline',
           data: {
             content,
           },
@@ -108,6 +112,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<b>{{{ data.content }}}</b>',
+          type: 'inline',
           data: {
             content,
           },
@@ -129,6 +134,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<i>{{{ data.content }}}</i>',
+          type: 'inline',
           data: {
             content,
           },
@@ -150,6 +156,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: '<u>{{{ data.content }}}<u>',
+          type: 'inline',
           data: {
             content,
           },
@@ -163,17 +170,38 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
-          name: 'getBlock',
+        const renderedChildNodes = yield {
+          name: 'getBlockChildNodes',
+          displayMode: true,
           index: 0,
         }
 
-        yield {
-          name: 'html',
-          template: '<p>{{{ data.content }}}</p>',
-          data: {
-            content,
-          },
+        for (const [
+          index,
+          renderedNode,
+        ] of renderedChildNodes.entries()) {
+          if (renderedNode.match(/$\s+^/)) {
+            continue
+          }
+
+          if (index % 2 === 0) {
+            yield {
+              name: 'html',
+              template: '<p>{{{ data.content }}}</p>',
+              type: 'inline',
+              data: {
+                content: renderedNode,
+              },
+            }
+          } else {
+            yield {
+              name: 'html',
+              template: '{{{ data.content }}}',
+              data: {
+                content: renderedNode,
+              },
+            }
+          }
         }
       },
     },
@@ -207,6 +235,7 @@ export const tagResolvers = (
       > {
         const content = yield {
           name: 'getBlock',
+          index: 0,
         }
         yield {
           name: 'html',
