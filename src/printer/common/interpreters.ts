@@ -1,4 +1,4 @@
-import Handlebars from 'handlebars'
+import Handlebars from '../helpers/handlebars'
 
 import { Interpreter, Context } from '../interpreter'
 import {
@@ -135,6 +135,7 @@ export const interpreters: Record<string, Interpreter> = {
 
       yield {
         name: 'html',
+        type: 'inline',
         content: textNode.value,
       }
     },
@@ -190,6 +191,108 @@ export const interpreters: Record<string, Interpreter> = {
     },
   },
 
+  getBlockChildNodes: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const tagNode = command.node as TagNode
+      const index = command.index ?? 0
+
+      const displayMode = command.displayMode as boolean
+
+      const block = tagNode.blocks[index]
+      if (block.body.length === 0) {
+        return []
+      }
+
+      const firstChild = block.body[0]
+      const childNodes =
+        firstChild.type !== 'Text'
+          ? [
+              {
+                type: 'Text',
+                value: '',
+              },
+              ...block.body,
+            ]
+          : block.body
+
+      const renderedChildNodes: string[] = []
+
+      if (displayMode) {
+        let currentNodeIsInline = true
+        let renderedChunk: string[] = []
+
+        for (const childNode of childNodes) {
+          for await (const data of context.dispatch({
+            name: 'render',
+            node: childNode,
+          })) {
+            if (data.name === 'html') {
+              if (
+                currentNodeIsInline ===
+                ((data.type as string | undefined) ===
+                  'inline')
+              ) {
+                const content = data.content as string
+
+                renderedChunk.push(content)
+              } else {
+                renderedChildNodes.push(renderedChunk.join(''))
+                currentNodeIsInline = !currentNodeIsInline
+
+                const content = data.content as string
+
+                renderedChunk = [content]
+              }
+            }
+          }
+        }
+
+        renderedChildNodes.push(renderedChunk.join(''))
+
+        return renderedChildNodes
+      } else {
+        for (const childNode of childNodes) {
+          const renderedChildNode: string[] = []
+
+          for await (const data of context.dispatch({
+            name: 'render',
+            node: childNode,
+          })) {
+            if (data.name === 'html') {
+              const content = data.content
+
+              renderedChildNode.push(content)
+            }
+          }
+
+          renderedChildNodes.push(renderedChildNode.join(''))
+        }
+      }
+
+      return renderedChildNodes
+    },
+  },
+
+  textContent: {
+    interpret: async function* (
+      command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const tagNode = command.node as TagNode
+      const index = command.index ?? 0
+
+      const block = tagNode.blocks[index]
+
+      return block.body
+        .filter((node) => node.type === 'Text')
+        .map((textNode: TextNode) => textNode.value)
+        .join('')
+    },
+  },
+
   html: {
     interpret: async function* (
       command: Command,
@@ -199,11 +302,13 @@ export const interpreters: Record<string, Interpreter> = {
         command.template ?? ''
       )
       const data = command.data ?? {}
+      const type = command.type as string | undefined
 
       const rendered = template({ data })
 
       yield {
         name: 'html',
+        type,
         content: rendered,
       }
     },

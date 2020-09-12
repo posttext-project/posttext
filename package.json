@@ -47,6 +47,7 @@
     "handlebars": "^4.7.6",
     "koa": "^2.13.0",
     "koa-static": "^5.0.0",
+    "memoizee": "^0.4.14",
     "meow": "^6.1.1",
     "prismjs": "^1.21.0",
     "tslib": "^1.13.0",
