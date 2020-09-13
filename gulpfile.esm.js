@@ -59,10 +59,6 @@ task('build:cjs', () => {
 
 task('build:assets', async () => {
   await buildWebpack(webpackConfig)
-
-  return src(['src/cli/assets/*.html'], {
-    base: path.resolve(__dirname, 'src'),
-  }).pipe(dest('lib'))
 })
 
 task('build', series(['build:cjs', 'build:assets']))

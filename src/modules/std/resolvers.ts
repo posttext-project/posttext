@@ -1,9 +1,8 @@
 import Prism from 'prismjs'
-import loadLanguages from 'prismjs/components'
+import loadLanguages from 'prismjs/components/'
 import stripIndent from 'strip-indent'
 
 import { Resolver, RegistryOptions } from '../../registry'
-import { supportedLanguages } from './prism'
 import { Command } from '../../printer'
 
 export const tagResolvers = (
@@ -248,8 +247,19 @@ export const tagResolvers = (
     },
 
     code: {
-      load: (): void => {
-        loadLanguages(supportedLanguages)
+      load: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const state = yield {
+          name: 'getState',
+        }
+        if (!state.languagesLoaded) {
+          loadLanguages()
+
+          state.languagesLoaded = true
+        }
       },
 
       resolve: async function* (): AsyncGenerator<
@@ -260,11 +270,7 @@ export const tagResolvers = (
         const params = yield {
           name: 'getParams',
         }
-        const language =
-          params[0] &&
-          supportedLanguages.indexOf(params[0]) !== -1
-            ? params[0]
-            : 'markdown'
+        const language = params[0]
         const textContent = yield {
           name: 'textContent',
           index: 0,

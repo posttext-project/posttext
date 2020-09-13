@@ -8,6 +8,7 @@ export interface Context {
   dispatch: Dispatch
   registry: Registry
   interpreters: Map<string, Interpreter>
+  getState(name: string): Record<string, any>
 }
 
 export type Dispatch = (

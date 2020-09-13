@@ -11,6 +11,156 @@ import { Command } from '../command'
 import { Data } from '../data'
 
 export const interpreters: Record<string, Interpreter> = {
+  preload: {
+    modifier: 'private',
+
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const node = command.node as
+        | DocumentNode
+        | TagNode
+        | TextNode
+
+      switch (node.type) {
+        case 'Document': {
+          yield* context.dispatch({
+            name: 'preloadDocument',
+            node,
+          })
+
+          return
+        }
+
+        case 'Tag': {
+          yield* context.dispatch({
+            name: 'preloadTag',
+            node,
+          })
+
+          return
+        }
+      }
+    },
+  },
+
+  preloadDocument: {
+    modifier: 'private',
+
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const node = command.node as DocumentNode
+
+      for (const childNode of node.body) {
+        if (childNode.type === 'Tag') {
+          yield* context.dispatch({
+            name: 'preload',
+            node: childNode,
+          })
+        }
+      }
+    },
+  },
+
+  preloadTag: {
+    modifier: 'private',
+
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const node = command.node as TagNode
+
+      const resolver = context.registry.getTagResolver(
+        node.id.name
+      )
+
+      if (!resolver) {
+        yield* context.dispatch({
+          name: 'preloadChildTags',
+          node,
+        })
+
+        return
+      }
+
+      const iter = resolver.load?.()
+
+      if (!iter) {
+        yield* context.dispatch({
+          name: 'preloadChildTags',
+          node,
+        })
+
+        return
+      }
+
+      let iterResult = await iter.next()
+      resolverLoop: while (!iterResult.done) {
+        const resolverCommand = {
+          ...iterResult.value,
+          node,
+        }
+
+        const interpreter = context.interpreters.get(
+          resolverCommand.name
+        )
+
+        if (
+          !interpreter ||
+          interpreter.modifier === 'private'
+        ) {
+          break
+        }
+
+        const commandIter = context.dispatch(resolverCommand)
+
+        let commandIterResult = await commandIter.next()
+        while (!commandIterResult.done) {
+          if (commandIterResult.value.name === 'break') {
+            break resolverLoop
+          }
+
+          yield commandIterResult.value
+
+          commandIterResult = await commandIter.next()
+        }
+
+        iterResult = await iter.next(commandIterResult.value)
+      }
+
+      yield* context.dispatch({
+        name: 'preloadChildTags',
+        node,
+      })
+    },
+  },
+
+  preloadChildTags: {
+    modifier: 'private',
+
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const tagNode = command.node as TagNode
+
+      for (const block of tagNode.blocks) {
+        for (const childNode of block.body) {
+          if (childNode.type === 'Tag') {
+            yield* context.dispatch({
+              name: 'preloadTag',
+              node: childNode,
+            })
+          }
+        }
+      }
+    },
+  },
+
   render: {
     modifier: 'private',
 
@@ -23,29 +173,29 @@ export const interpreters: Record<string, Interpreter> = {
       switch (node.type) {
         case 'Document': {
           return yield* context.dispatch({
-            ...command,
             name: 'renderDocument',
+            node,
           })
         }
 
         case 'Tag': {
           return yield* context.dispatch({
-            ...command,
             name: 'renderTag',
+            node,
           })
         }
 
         case 'Text': {
           return yield* context.dispatch({
-            ...command,
             name: 'renderText',
+            node,
           })
         }
 
         case 'Block': {
           return yield* context.dispatch({
-            ...command,
             name: 'renderBlock',
+            node,
           })
         }
       }
@@ -60,6 +210,15 @@ export const interpreters: Record<string, Interpreter> = {
       context: Context
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
+
+      const preloadAsyncIter = context.dispatch({
+        name: 'preload',
+        node: node.body,
+      })
+
+      for await (const _data of preloadAsyncIter) {
+        /* pass */
+      }
 
       for (const childNode of node.body) {
         yield* context.dispatch({
@@ -110,7 +269,7 @@ export const interpreters: Record<string, Interpreter> = {
 
         let commandIterResult = await commandIter.next()
         while (!commandIterResult.done) {
-          if (commandIterResult.value.name === 'error') {
+          if (commandIterResult.value.name === 'break') {
             break resolverLoop
           }
 
@@ -138,6 +297,22 @@ export const interpreters: Record<string, Interpreter> = {
         type: 'inline',
         content: textNode.value,
       }
+    },
+  },
+
+  getState: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const node = command.node as TagNode
+
+      const state = context.getState(node.id.name)
+      if (!state.resolverState) {
+        state.resolverState = {}
+      }
+
+      return state.resolverState
     },
   },
 
@@ -232,8 +407,7 @@ export const interpreters: Record<string, Interpreter> = {
             if (data.name === 'html') {
               if (
                 currentNodeIsInline ===
-                ((data.type as string | undefined) ===
-                  'inline')
+                ((data.type as string | undefined) === 'inline')
               ) {
                 const content = data.content as string
 
