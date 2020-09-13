@@ -319,6 +319,25 @@ export const interpreters: Record<string, Interpreter> = {
     },
   },
 
+  getAttrs: {
+    interpret: async function* (
+      command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const tagNode = command.node as TagNode
+
+      return tagNode.attrs
+        .filter((attr) => attr.id.name.indexOf(':') === -1)
+        .reduce(
+          (attrs, currAttr) => ({
+            ...attrs,
+            [currAttr.id.name]: currAttr.value,
+          }),
+          {}
+        )
+    },
+  },
+
   blockCount: {
     interpret: async function* (
       command: Command,
@@ -486,6 +505,23 @@ export const interpreters: Record<string, Interpreter> = {
         name: 'html',
         type,
         content: rendered,
+      }
+    },
+  },
+
+  metadata: {
+    interpret: async function* (
+      command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const metadata = command.metadata as Record<
+        string,
+        string
+      >
+
+      yield {
+        name: 'metadata',
+        metadata,
       }
     },
   },

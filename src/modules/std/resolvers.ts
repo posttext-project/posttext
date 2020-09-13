@@ -9,6 +9,27 @@ export const tagResolvers = (
   _options: RegistryOptions
 ): Record<string, Resolver> => {
   return {
+    posttext: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const attrs: Record<string, string> = yield {
+          name: 'getAttrs',
+        }
+
+        const title: string | undefined = attrs.title
+
+        yield {
+          name: 'metadata',
+          metadata: {
+            title,
+          },
+        }
+      },
+    },
+
     section: {
       resolve: async function* (): AsyncGenerator<
         Command,

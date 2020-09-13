@@ -43,6 +43,17 @@ export const interpreters: Record<string, Interpreter> = {
         }
       }
 
+      const metadata = collection
+        .filter((data) => data.name === 'metadata')
+        .map((data) => data.metadata)
+        .reduce(
+          (prevMetadata, metadata) => ({
+            ...prevMetadata,
+            ...metadata,
+          }),
+          {}
+        )
+
       const content = collection
         .filter((data) => data.name === 'html')
         .map((data) => data.content)
@@ -55,10 +66,10 @@ export const interpreters: Record<string, Interpreter> = {
             <head>
               <meta charset="UTF-8" />
               <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-              <title>PostText</title>
+              <title>{{ metadata.title }}</title>
             </head>
             <body>
-              {{{ content }}}
+              {{{ data.content }}}
 
               <script src="./bundle.js"></script>
             </body>
@@ -67,7 +78,13 @@ export const interpreters: Record<string, Interpreter> = {
       )
 
       const rendered = template({
-        content,
+        metadata: {
+          ...metadata,
+          title: metadata.title || 'PostText',
+        },
+        data: {
+          content,
+        },
       })
 
       yield* context.dispatch({
