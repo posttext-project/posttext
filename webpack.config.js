@@ -4,7 +4,7 @@ import webpack from 'webpack'
 export default {
   entry: path.resolve(__dirname, './src/cli/assets/bundle.ts'),
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(__dirname, 'lib/cli/assets'),
     filename: 'bundle.js',
   },
   mode: 'development',

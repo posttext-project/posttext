@@ -11,6 +11,7 @@ dependencies:
   memoizee: 0.4.14
   meow: 7.1.1
   prismjs: 1.21.0
+  rxjs: 6.6.3
   tslib: 2.0.1
   ws: 7.3.1
 devDependencies:
@@ -8513,6 +8514,14 @@ packages:
     dev: true
     resolution:
       integrity: sha1-6Eg5bwV9Ij8kOGkkYY4laUFh7Ec=
+  /rxjs/6.6.3:
+    dependencies:
+      tslib: 1.13.0
+    dev: false
+    engines:
+      npm: '>=2.0.0'
+    resolution:
+      integrity: sha512-trsQc+xYYXZ3urjOiJOuCOa5N3jAZ3eiSpQB5hIT8zGlL2QfnHLJ2r7GMkBGuIausdJN1OneaI6gQlsqNHHmZQ==
   /safe-buffer/5.1.2:
     resolution:
       integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==
@@ -9470,7 +9479,6 @@ packages:
     resolution:
       integrity: sha512-/TqB4SnererCDR/vb4S/QvSZvzQMJN8daAslg7MeaiHvD8rDZsSfXmNeNumyZZzMned72Xoq/isQljYSt8Ynfg==
   /tslib/1.13.0:
-    dev: true
     resolution:
       integrity: sha512-i/6DQjL8Xf3be4K/E6Wgpekn5Qasl1usyw++dAA35Ue5orEn65VIxOA+YvNNl9HV3qv70T7CNwjODHZrLwvd1Q==
   /tslib/2.0.1:
@@ -10286,6 +10294,7 @@ specifiers:
   rollup: ^2.26.11
   rollup-plugin-terser: ^7.0.2
   rollup-plugin-visualizer: ^4.1.1
+  rxjs: ^6.6.3
   strip-indent: ^3.0.0
   style-loader: ^1.2.1
   ts-loader: ^8.0.3

@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "dev": "gulp clean && gulp build:cjs && node lib/index.js",
+    "dev": "gulp clean && gulp build:cjs && gulp build:assets && node lib/index.js",
     "debug": "gulp clean && gulp build && node --inspect-brk lib/index.js",
     "build": "gulp clean && pnpm format && gulp build",
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
@@ -50,6 +50,7 @@
     "memoizee": "^0.4.14",
     "meow": "^7.1.1",
     "prismjs": "^1.21.0",
+    "rxjs": "^6.6.3",
     "tslib": "^2.0.1",
     "ws": "^7.3.1"
   },

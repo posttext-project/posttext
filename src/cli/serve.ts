@@ -8,12 +8,17 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
+import { Subject } from 'rxjs'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
+import { interpreters } from '../printer/web'
+import { Logger } from './helpers/logger'
 
 export class ServeCommand implements Command {
   private args: string[]
+
+  private logger = Logger.create()
 
   constructor({ args }: CommandOptions) {
     this.args = args
@@ -30,24 +35,72 @@ export class ServeCommand implements Command {
     const wss = new ws.Server({ server })
 
     const inputPath = path.resolve(process.cwd(), this.args[0])
+    const outputPath = path.resolve(process.cwd(), 'dist')
 
-    router.get('/doc.html', async (_ctx) => {
-      const compiler = Compiler.create()
-
-      const filePath = path.resolve(process.cwd(), this.args[0])
-      const input = await fs.readFile(filePath, 'utf-8')
-
-      await compiler.compile(input)
-    })
+    const reload$ = new Subject<boolean>()
 
     app
       .use(router.routes())
       .use(router.allowedMethods())
-      .use(serve(path.resolve(__dirname, 'assets')))
+      .use(serve(outputPath))
+
+    chokidar.watch(inputPath).on('change', async () => {
+      const bundleFile = path.resolve(
+        __dirname,
+        'assets/bundle.js'
+      )
+      const bundleFileMap = path.resolve(
+        __dirname,
+        'assets/bundle.js'
+      )
+
+      await fs.copyFile(
+        bundleFile,
+        path.resolve(outputPath, 'bundle.js')
+      )
+      await fs.copyFile(
+        bundleFileMap,
+        path.resolve(outputPath, 'bundle.js.map')
+      )
+
+      this.logger.log(
+        `Starting compiling ${chalk.blue(`'${this.args[0]}'`)}`
+      )
+      const startTime = new Date()
+
+      const compiler = Compiler.create()
+      compiler.getPrinter().registerInterpreters(interpreters)
+
+      const input = await fs.readFile(inputPath, 'utf-8')
+      await compiler.compile(input)
+
+      const endTime = new Date()
+
+      this.logger.log(
+        `Finished compiling ${chalk.blue(
+          `'${this.args[0]}'`
+        )} after ${chalk.magenta(
+          (
+            (endTime.getTime() - startTime.getTime()) /
+            1000
+          ).toPrecision(2)
+        )}s`
+      )
+
+      this.logger.log(
+        `Reloading ${chalk.blue(`'${this.args[0]}'`)}`
+      )
+
+      reload$.next(true)
+    })
 
     wss.on('connection', (ws) => {
-      chokidar.watch(inputPath).on('change', async () => {
+      const subscription = reload$.subscribe(() => {
         ws.send(JSON.stringify({ type: 'reload' }))
+      })
+
+      ws.on('close', () => {
+        subscription.unsubscribe()
       })
     })
 
