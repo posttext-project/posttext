@@ -32,3 +32,5 @@ jobs:
     - run: pnpm test
       env:
         CI: true
+    - run: pnpm format -- --check
+    - run: pnpm lint
