@@ -5,7 +5,7 @@ export class Logger {
     return new Logger()
   }
 
-  log(...message: string[]) {
+  log(...message: string[]): void {
     const time = new Date()
     console.log(
       `[${chalk.blue(
