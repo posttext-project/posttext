@@ -1,11 +1,13 @@
 import meow from 'meow'
 import { CompileCommand } from './compile'
 import { ServeCommand } from './serve'
-import { PrintCommand } from './print'
 import chalk from 'chalk'
+import { Logger } from './helpers/logger'
 
 export class CLI {
   private cli: meow.Result<any>
+
+  private logger: Logger = Logger.create()
 
   constructor({ cli }: { cli: meow.Result<any> }) {
     this.cli = cli
@@ -23,7 +25,6 @@ export class CLI {
         Commands
           compile       Build an input file.
           serve         Build and serve an input file.
-          print         Print the compiler output to stdout.
 
         Examples
           $ pt serve <input>
@@ -58,16 +59,11 @@ export class CLI {
 
           return
 
-        case 'print':
-          await this.print(args)
-
-          return
-
         default:
           this.cli.showHelp()
       }
     } catch (error) {
-      console.log(chalk.bgRed(' ERROR '), error)
+      this.logger.log(chalk.bgRed(' ERROR '), error)
     }
   }
 
@@ -88,18 +84,6 @@ export class CLI {
     flags: meow.Options<any> = {}
   ): Promise<any> {
     const command = ServeCommand.create({
-      args,
-      flags,
-    })
-
-    await command.run()
-  }
-
-  async print(
-    args: string[],
-    flags: meow.Options<any> = {}
-  ): Promise<any> {
-    const command = PrintCommand.create({
       args,
       flags,
     })

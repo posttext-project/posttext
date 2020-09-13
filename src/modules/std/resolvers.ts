@@ -9,13 +9,34 @@ export const tagResolvers = (
   _options: RegistryOptions
 ): Record<string, Resolver> => {
   return {
+    posttext: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const attrs: Record<string, string> = yield {
+          name: 'getAttrs',
+        }
+
+        const title: string | undefined = attrs.title
+
+        yield {
+          name: 'metadata',
+          metadata: {
+            title,
+          },
+        }
+      },
+    },
+
     section: {
       resolve: async function* (): AsyncGenerator<
         Command,
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -25,7 +46,7 @@ export const tagResolvers = (
           template: '<section>{{{ data.content }}}</section>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -37,7 +58,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -47,7 +68,7 @@ export const tagResolvers = (
           template: '<h1>{{{ data.content }}}</h1>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -59,7 +80,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -69,7 +90,7 @@ export const tagResolvers = (
           template: '<h2>{{{ data.content }}}</h2>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -81,7 +102,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -91,7 +112,7 @@ export const tagResolvers = (
           template: '<h3>{{{ data.content }}}</h3>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -103,7 +124,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -113,7 +134,7 @@ export const tagResolvers = (
           template: '<b>{{{ data.content }}}</b>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -125,7 +146,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -135,7 +156,7 @@ export const tagResolvers = (
           template: '<i>{{{ data.content }}}</i>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -147,7 +168,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -157,7 +178,7 @@ export const tagResolvers = (
           template: '<u>{{{ data.content }}}<u>',
           type: 'inline',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -169,16 +190,15 @@ export const tagResolvers = (
         void,
         any
       > {
-        const renderedChildNodes = yield {
+        const renderedChildNodes: string[] | undefined = yield {
           name: 'getBlockChildNodes',
           displayMode: true,
           index: 0,
         }
 
-        for (const [
-          index,
-          renderedNode,
-        ] of renderedChildNodes.entries()) {
+        for (const [index, renderedNode] of (
+          renderedChildNodes ?? []
+        ).entries()) {
           if (renderedNode.match(/$\s+^/)) {
             continue
           }
@@ -211,7 +231,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -220,7 +240,7 @@ export const tagResolvers = (
           name: 'html',
           template: '<ul>{{{ data.content }}}</ul>',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -232,7 +252,7 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content = yield {
+        const content: string | undefined = yield {
           name: 'getBlock',
           index: 0,
         }
@@ -240,7 +260,7 @@ export const tagResolvers = (
           name: 'html',
           template: '<li>{{{ data.content }}}</li>',
           data: {
-            content,
+            content: content ?? '',
           },
         }
       },
@@ -252,7 +272,7 @@ export const tagResolvers = (
         any,
         any
       > {
-        const state = yield {
+        const state: Record<string, any> = yield {
           name: 'getState',
         }
         if (!state.languagesLoaded) {
@@ -267,21 +287,36 @@ export const tagResolvers = (
         void,
         any
       > {
-        const params = yield {
+        const params: string[] = yield {
           name: 'getParams',
         }
-        const language = params[0]
-        const textContent = yield {
+        const language: string =
+          params[0] &&
+          Object.keys(Prism.languages).indexOf(params[0])
+            ? params[0]
+            : 'text'
+
+        const BEGIN_NEWLINE = /^\r?\n/
+        const END_NEWLINE = /\r?\n[\t ]+$/
+
+        const rawTextContent: string | undefined = yield {
           name: 'textContent',
           index: 0,
         }
-        const code = Prism.highlight(
-          stripIndent(textContent)
-            .replace(/^\r?\n/, '')
-            .replace(/\r?\n[\t ]+$/, ''),
-          Prism.languages[language],
-          language
-        )
+        const textContent: string = rawTextContent
+          ? stripIndent(rawTextContent)
+              .replace(BEGIN_NEWLINE, '')
+              .replace(END_NEWLINE, '')
+          : ''
+
+        const code: string =
+          language !== 'text'
+            ? Prism.highlight(
+                textContent,
+                Prism.languages[language],
+                language
+              )
+            : textContent
         yield {
           name: 'html',
           template:
