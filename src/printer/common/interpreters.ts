@@ -25,21 +25,17 @@ export const interpreters: Record<string, Interpreter> = {
 
       switch (node.type) {
         case 'Document': {
-          yield* context.dispatch({
+          return yield* context.dispatch({
             name: 'preloadDocument',
             node,
           })
-
-          return
         }
 
         case 'Tag': {
-          yield* context.dispatch({
+          return yield* context.dispatch({
             name: 'preloadTag',
             node,
           })
-
-          return
         }
       }
     },
@@ -79,23 +75,19 @@ export const interpreters: Record<string, Interpreter> = {
       )
 
       if (!resolver) {
-        yield* context.dispatch({
+        return yield* context.dispatch({
           name: 'preloadChildTags',
           node,
         })
-
-        return
       }
 
       const iter = resolver.load?.()
 
       if (!iter) {
-        yield* context.dispatch({
+        return yield* context.dispatch({
           name: 'preloadChildTags',
           node,
         })
-
-        return
       }
 
       let iterResult = await iter.next()
@@ -132,7 +124,7 @@ export const interpreters: Record<string, Interpreter> = {
         iterResult = await iter.next(commandIterResult.value)
       }
 
-      yield* context.dispatch({
+      return yield* context.dispatch({
         name: 'preloadChildTags',
         node,
       })
@@ -347,6 +339,9 @@ export const interpreters: Record<string, Interpreter> = {
       const index = command.index ?? 0
 
       const block = tagNode.blocks[index]
+      if (!block) {
+        return
+      }
 
       const renderedChildNodes: string[] = []
       for (const childNode of block.body) {
@@ -377,6 +372,10 @@ export const interpreters: Record<string, Interpreter> = {
       const displayMode = command.displayMode as boolean
 
       const block = tagNode.blocks[index]
+      if (!block) {
+        return
+      }
+
       if (block.body.length === 0) {
         return []
       }
@@ -459,6 +458,9 @@ export const interpreters: Record<string, Interpreter> = {
       const index = command.index ?? 0
 
       const block = tagNode.blocks[index]
+      if (!block) {
+        return
+      }
 
       return block.body
         .filter((node) => node.type === 'Text')

@@ -18,7 +18,7 @@ import { Logger } from './helpers/logger'
 export class ServeCommand implements Command {
   private args: string[]
 
-  private logger = Logger.create()
+  private logger: Logger = Logger.create()
 
   constructor({ args }: CommandOptions) {
     this.args = args
@@ -45,53 +45,59 @@ export class ServeCommand implements Command {
       .use(serve(outputPath))
 
     chokidar.watch(inputPath).on('change', async () => {
-      const bundleFile = path.resolve(
-        __dirname,
-        'assets/bundle.js'
-      )
-      const bundleFileMap = path.resolve(
-        __dirname,
-        'assets/bundle.js'
-      )
+      try {
+        const bundleFile = path.resolve(
+          __dirname,
+          'assets/bundle.js'
+        )
+        const bundleFileMap = path.resolve(
+          __dirname,
+          'assets/bundle.js'
+        )
 
-      await fs.copyFile(
-        bundleFile,
-        path.resolve(outputPath, 'bundle.js')
-      )
-      await fs.copyFile(
-        bundleFileMap,
-        path.resolve(outputPath, 'bundle.js.map')
-      )
+        await fs.copyFile(
+          bundleFile,
+          path.resolve(outputPath, 'bundle.js')
+        )
+        await fs.copyFile(
+          bundleFileMap,
+          path.resolve(outputPath, 'bundle.js.map')
+        )
 
-      this.logger.log(
-        `Starting compiling ${chalk.blue(`'${this.args[0]}'`)}`
-      )
-      const startTime = new Date()
+        this.logger.log(
+          `Starting compiling ${chalk.blue(
+            `'${this.args[0]}'`
+          )}`
+        )
+        const startTime = new Date()
 
-      const compiler = Compiler.create()
-      compiler.getPrinter().registerInterpreters(interpreters)
+        const compiler = Compiler.create()
+        compiler.getPrinter().registerInterpreters(interpreters)
 
-      const input = await fs.readFile(inputPath, 'utf-8')
-      await compiler.compile(input)
+        const input = await fs.readFile(inputPath, 'utf-8')
+        await compiler.compile(input)
 
-      const endTime = new Date()
+        const endTime = new Date()
 
-      this.logger.log(
-        `Finished compiling ${chalk.blue(
-          `'${this.args[0]}'`
-        )} after ${chalk.magenta(
-          (
-            (endTime.getTime() - startTime.getTime()) /
-            1000
-          ).toPrecision(2)
-        )}s`
-      )
+        this.logger.log(
+          `Finished compiling ${chalk.blue(
+            `'${this.args[0]}'`
+          )} after ${chalk.magenta(
+            `${(
+              (endTime.getTime() - startTime.getTime()) /
+              1000
+            ).toPrecision(2)} s`
+          )}`
+        )
 
-      this.logger.log(
-        `Reloading ${chalk.blue(`'${this.args[0]}'`)}`
-      )
+        this.logger.log(
+          `Reloading ${chalk.blue(`'${this.args[0]}'`)}`
+        )
 
-      reload$.next(true)
+        reload$.next(true)
+      } catch (error) {
+        this.logger.log(chalk.bgRed(' ERROR '), error)
+      }
     })
 
     wss.on('connection', (ws) => {
