@@ -116,6 +116,7 @@ export class ServeCommand implements Command {
       'assets/bundle.js'
     )
 
+    await fs.ensureDir(outputPath)
     await fs.copyFile(
       bundleFile,
       path.resolve(outputPath, 'bundle.js')
