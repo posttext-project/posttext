@@ -71,7 +71,9 @@ export class Parser {
 
     this.skip(cursor)
 
-    const attrs: AttributeNode[] | null = this.parseAttributes(cursor)
+    const attrs: AttributeNode[] | null = this.parseAttributes(
+      cursor
+    )
     if (!attrs) {
       cursor.moveTo(marker)
 
