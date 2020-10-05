@@ -28,7 +28,7 @@ export class ServeCommand implements Command {
     return new ServeCommand(options)
   }
 
-  async run(): Promise<any> {
+  async run(): Promise<void> {
     const app = new Koa()
     const server = http.createServer(app.callback())
     const router = new Router()
@@ -106,7 +106,7 @@ export class ServeCommand implements Command {
     })
   }
 
-  private async build(inputPath: string, outputPath: string) {
+  private async build(inputPath: string, outputPath: string): Promise<void> {
     const bundleFile = path.resolve(
       __dirname,
       'assets/bundle.js'
