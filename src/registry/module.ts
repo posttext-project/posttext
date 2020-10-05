@@ -1,5 +1,5 @@
 import { Resolver } from './resolver'
-import { RegistryOptions } from './registry';
+import { RegistryOptions } from './registry'
 
 export interface Module {
   getTagResolvers(

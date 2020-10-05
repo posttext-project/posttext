@@ -28,7 +28,7 @@ export class ServeCommand implements Command {
     return new ServeCommand(options)
   }
 
-  async run(): Promise<any> {
+  async run(): Promise<void> {
     const app = new Koa()
     const server = http.createServer(app.callback())
     const router = new Router()
@@ -39,6 +39,8 @@ export class ServeCommand implements Command {
 
     const reload$ = new Subject<boolean>()
 
+    await this.build(inputPath, outputPath)
+
     app
       .use(router.routes())
       .use(router.allowedMethods())
@@ -46,24 +48,6 @@ export class ServeCommand implements Command {
 
     chokidar.watch(inputPath).on('change', async () => {
       try {
-        const bundleFile = path.resolve(
-          __dirname,
-          'assets/bundle.js'
-        )
-        const bundleFileMap = path.resolve(
-          __dirname,
-          'assets/bundle.js'
-        )
-
-        await fs.copyFile(
-          bundleFile,
-          path.resolve(outputPath, 'bundle.js')
-        )
-        await fs.copyFile(
-          bundleFileMap,
-          path.resolve(outputPath, 'bundle.js.map')
-        )
-
         this.logger.log(
           `Starting compiling ${chalk.blue(
             `'${this.args[0]}'`
@@ -71,11 +55,7 @@ export class ServeCommand implements Command {
         )
         const startTime = new Date()
 
-        const compiler = Compiler.create()
-        compiler.getPrinter().registerInterpreters(interpreters)
-
-        const input = await fs.readFile(inputPath, 'utf-8')
-        await compiler.compile(input)
+        await this.build(inputPath, outputPath)
 
         const endTime = new Date()
 
@@ -124,5 +104,32 @@ export class ServeCommand implements Command {
         )
       )
     })
+  }
+
+  private async build(inputPath: string, outputPath: string): Promise<void> {
+    const bundleFile = path.resolve(
+      __dirname,
+      'assets/bundle.js'
+    )
+    const bundleFileMap = path.resolve(
+      __dirname,
+      'assets/bundle.js'
+    )
+
+    await fs.ensureDir(outputPath)
+    await fs.copyFile(
+      bundleFile,
+      path.resolve(outputPath, 'bundle.js')
+    )
+    await fs.copyFile(
+      bundleFileMap,
+      path.resolve(outputPath, 'bundle.js.map')
+    )
+
+    const compiler = Compiler.create()
+    compiler.getPrinter().registerInterpreters(interpreters)
+
+    const input = await fs.readFile(inputPath, 'utf-8')
+    await compiler.compile(input)
   }
 }
