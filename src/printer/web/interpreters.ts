@@ -17,6 +17,8 @@ import { Data } from '../data'
 export const interpreters: Record<string, Interpreter> = {
   ...commonInterpreters,
 
+  _renderDocument: commonInterpreters.renderDocument,
+
   renderDocument: {
     modifier: 'private',
 
@@ -26,25 +28,14 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
 
-      const preloadAsyncIter = context.dispatch({
-        name: 'preload',
-        node: node.body,
+      const collection: Data[] = []
+      const asyncIter = context.dispatch({
+        name: '_renderDocument',
+        node,
       })
 
-      for await (const _data of preloadAsyncIter) {
-        /* pass */
-      }
-
-      const collection: Data[] = []
-      for (const childNode of node.body) {
-        const asyncIter = context.dispatch({
-          name: 'render',
-          node: childNode,
-        })
-
-        for await (const data of asyncIter) {
-          collection.push(data)
-        }
+      for await (const data of asyncIter) {
+        collection.push(data)
       }
 
       const metadata = collection
