@@ -271,7 +271,7 @@ export const tagResolvers = (
     },
 
     code: {
-      load: async function* (): AsyncGenerator<
+      preload: async function* (): AsyncGenerator<
         Command,
         any,
         any

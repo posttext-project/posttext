@@ -11,7 +11,7 @@ import stripIndent from 'strip-indent'
 import { interpreters as commonInterpreters } from '../common'
 import { Interpreter, Context } from '../interpreter'
 import { Command } from '../command'
-import { DocumentNode } from '../../ast'
+import { DocumentNode } from '../ast'
 import { Data } from '../data'
 
 export const interpreters: Record<string, Interpreter> = {

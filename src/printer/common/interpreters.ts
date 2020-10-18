@@ -5,12 +5,7 @@
 import Handlebars from '../helpers/handlebars'
 
 import { Interpreter, Context } from '../interpreter'
-import {
-  TagNode,
-  Node,
-  DocumentNode,
-  TextNode,
-} from '../../ast'
+import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
 
@@ -85,7 +80,7 @@ export const interpreters: Record<string, Interpreter> = {
         })
       }
 
-      const iter = resolver.load?.()
+      const iter = resolver.preload?.()
 
       if (!iter) {
         return yield* context.dispatch({
@@ -206,15 +201,6 @@ export const interpreters: Record<string, Interpreter> = {
       context: Context
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
-
-      const preloadAsyncIter = context.dispatch({
-        name: 'preload',
-        node: node.body,
-      })
-
-      for await (const _data of preloadAsyncIter) {
-        /* pass */
-      }
 
       for (const childNode of node.body) {
         yield* context.dispatch({

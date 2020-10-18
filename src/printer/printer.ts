@@ -2,19 +2,25 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { DocumentNode } from '../ast'
+import * as ast from '../ast'
 import { Interpreter, Context } from './interpreter'
 import { Command } from './command'
 import { Registry } from '../registry'
 import { AnonymousContext } from './context'
 import { Data } from './data'
+import {
+  BlockNode,
+  DocumentNode,
+  TagNode,
+  TextNode,
+} from './ast'
 
 export interface PrinterComponents {
   registry: Registry
 }
 
 export interface PrinterInput {
-  ast: DocumentNode
+  ast: ast.DocumentNode
 }
 
 export class Printer {
@@ -40,8 +46,59 @@ export class Printer {
     }
   }
 
+  private copyInput(
+    node:
+      | ast.DocumentNode
+      | ast.BlockNode
+      | ast.TagNode
+      | ast.TextNode
+  ): DocumentNode | BlockNode | TagNode | TextNode {
+    switch (node.type) {
+      case 'Document': {
+        return {
+          ...node,
+          body: node.body.map(this.copyInput.bind(this)),
+        }
+      }
+
+      case 'Block': {
+        return {
+          ...node,
+          body: node.body.map(this.copyInput.bind(this)),
+        }
+      }
+
+      case 'Tag': {
+        return {
+          ...node,
+          __metadata: {},
+          attrs: node.attrs.map((attr) => ({
+            ...attr,
+            id: {
+              ...attr.id,
+            },
+          })),
+          params: node.params.map((param) => ({
+            ...param,
+          })),
+          blocks: node.blocks.map(this.copyInput.bind(this)),
+        }
+      }
+
+      case 'Text': {
+        return {
+          ...node,
+        }
+      }
+    }
+
+    return node
+  }
+
   async print(input: PrinterInput): Promise<void> {
-    const { ast } = input
+    const { ast: inputAst } = input
+
+    const ast = this.copyInput(inputAst)
 
     const self = this
     const context = AnonymousContext.create({
