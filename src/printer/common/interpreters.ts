@@ -515,4 +515,51 @@ export const interpreters: Record<string, Interpreter> = {
       }
     },
   },
+
+  send: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const node = command.node as TagNode
+      const tag = command.tag as symbol
+
+      const data = command.data
+
+      if (!node.__metadata.send) {
+        node.__metadata.send = {}
+      }
+
+      if (!node.__metadata.send[tag]) {
+        node.__metadata.send[tag] = []
+      }
+
+      node.__metadata.send[tag].push(data)
+
+      const state = context.getState(tag)
+
+      if (!state.send) {
+        state.send = {}
+      }
+
+      if (!state.send[tag]) {
+        state.send[tag] = []
+      }
+
+      state.send[tag].push(data)
+    },
+  },
+
+  receive: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const tag = command.tag as symbol
+
+      const state = context.getState(tag)
+
+      return state?.send?.[tag]?.slice?.() ?? []
+    },
+  },
 }

@@ -12,7 +12,8 @@ export interface Context {
   dispatch: Dispatch
   registry: Registry
   interpreters: Map<string, Interpreter>
-  getState(name: string): Record<string, any>
+  getState(key: string | symbol): Record<string | symbol, any>
+  clone(): Context
 }
 
 export type Dispatch = (

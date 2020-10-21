@@ -11,7 +11,7 @@ export interface AnonymousContextComponents {
   dispatch: Dispatch
   interpreters: Map<string, Interpreter>
   registry: Registry
-  stateMap: Map<string, Interpreter>
+  stateMap: Map<string | symbol, Interpreter>
 }
 
 export class AnonymousContext implements Context {
@@ -19,7 +19,7 @@ export class AnonymousContext implements Context {
   private _interpreters: Map<string, Interpreter>
   private _registry: Registry
 
-  private _stateMap: Map<string, any>
+  private _stateMap: Map<string | symbol, any>
 
   static create(
     components: AnonymousContextComponents
@@ -53,17 +53,26 @@ export class AnonymousContext implements Context {
     return this._registry
   }
 
-  getState(name: string): Record<string, any> {
-    const state = this._stateMap.get(name)
+  getState(key: string | symbol): Record<string | symbol, any> {
+    const state = this._stateMap.get(key)
 
     if (!state) {
       const newState = {}
 
-      this._stateMap.set(name, newState)
+      this._stateMap.set(key, newState)
 
       return newState
     }
 
     return state
+  }
+
+  clone(): AnonymousContext {
+    return AnonymousContext.create({
+      dispatch: this._dispatch,
+      interpreters: this._interpreters,
+      registry: this._registry,
+      stateMap: this._stateMap,
+    })
   }
 }
