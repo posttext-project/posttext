@@ -57,6 +57,7 @@ export class Printer {
       case 'Document': {
         return {
           ...node,
+          __metadata: {},
           body: node.body.map(this.copyInput.bind(this)),
         }
       }
