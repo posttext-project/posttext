@@ -9,6 +9,9 @@ import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
 
+const TagState = Symbol('TagState')
+const SendReceive = Symbol('SendReceive')
+
 export const interpreters: Record<string, Interpreter> = {
   preload: {
     modifier: 'private',
@@ -289,12 +292,12 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
 
-      const state = context.getState(node.id.name)
-      if (!state.resolverState) {
-        state.resolverState = {}
+      const state = context.getState(TagState)
+      if (!state[node.id.name]) {
+        state[node.id.name] = {}
       }
 
-      return state.resolverState
+      return state[node.id.name]
     },
   },
 
@@ -522,7 +525,7 @@ export const interpreters: Record<string, Interpreter> = {
       context: Context
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
-      const tag = command.tag as symbol
+      const symbol = command.symbol as symbol
 
       const data = command.data
 
@@ -530,23 +533,19 @@ export const interpreters: Record<string, Interpreter> = {
         node.__metadata.send = {}
       }
 
-      if (!node.__metadata.send[tag]) {
-        node.__metadata.send[tag] = []
+      if (!node.__metadata.send[symbol]) {
+        node.__metadata.send[symbol] = []
       }
 
-      node.__metadata.send[tag].push(data)
+      node.__metadata.send[symbol].push(data)
 
-      const state = context.getState(tag)
+      const state = context.getState(SendReceive) as any
 
-      if (!state.send) {
-        state.send = {}
+      if (!state[symbol]) {
+        state[symbol] = []
       }
 
-      if (!state.send[tag]) {
-        state.send[tag] = []
-      }
-
-      state.send[tag].push(data)
+      state[symbol].push(data)
     },
   },
 
@@ -555,11 +554,11 @@ export const interpreters: Record<string, Interpreter> = {
       command: Command,
       context: Context
     ): AsyncGenerator<Data, any, any> {
-      const tag = command.tag as symbol
+      const symbol = command.symbol as symbol
 
-      const state = context.getState(tag)
+      const state = context.getState(SendReceive) as any
 
-      return state?.send?.[tag]?.slice?.() ?? []
+      return state[symbol]?.slice?.() ?? []
     },
   },
 }
