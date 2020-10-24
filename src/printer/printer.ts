@@ -121,9 +121,8 @@ export class Printer {
       context
     )
 
-    let preloadResult = await preloadIter.next()
-    while (!preloadResult.done) {
-      preloadResult = await preloadIter.next()
+    for await (const _data of preloadIter) {
+      /* empty */
     }
 
     const renderIter = this.interpret(

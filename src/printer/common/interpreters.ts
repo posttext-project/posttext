@@ -3,14 +3,18 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import Handlebars from '../helpers/handlebars'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Interpreter, Context } from '../interpreter'
 import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
+import { runAsyncIterator } from '../helpers/iterator'
 
-const TagState = Symbol('TagState')
-const SendReceive = Symbol('SendReceive')
+const TAG_STATE = Symbol('TagState')
+const SEND_RECEIVE = Symbol('SendReceive')
+
+const TEMPLATES = Symbol('Templates')
 
 export const interpreters: Record<string, Interpreter> = {
   preload: {
@@ -292,7 +296,7 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
 
-      const state = context.getState(TagState)
+      const state = context.getState(TAG_STATE)
       if (!state[node.id.name]) {
         state[node.id.name] = {}
       }
@@ -484,7 +488,7 @@ export const interpreters: Record<string, Interpreter> = {
   html: {
     interpret: async function* (
       command: Command,
-      _context: Context
+      context: Context
     ): AsyncGenerator<Data, any, any> {
       const template = Handlebars.compile(
         command.template ?? ''
@@ -492,13 +496,42 @@ export const interpreters: Record<string, Interpreter> = {
       const data = command.data ?? {}
       const type = command.type as string | undefined
 
-      const rendered = template({ data })
+      const templates = context.getState(TEMPLATES)
+
+      const rendered = template({ data, templates })
+
+      const {
+        collection,
+        last: templateId,
+      } = await runAsyncIterator(
+        context.dispatch({
+          name: 'uuid',
+        })
+      )
+      yield* collection
+
+      templates[templateId] = rendered
 
       yield {
         name: 'html',
         type,
         content: rendered,
       }
+
+      return templateId
+    },
+  },
+
+  drop: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const templateId = command.templateId ?? ('' as string)
+
+      const templates = context.getState(TEMPLATES)
+
+      delete templates[templateId]
     },
   },
 
@@ -539,7 +572,7 @@ export const interpreters: Record<string, Interpreter> = {
 
       node.__metadata.send[symbol].push(data)
 
-      const state = context.getState(SendReceive) as any
+      const state = context.getState(SEND_RECEIVE) as any
 
       if (!state[symbol]) {
         state[symbol] = []
@@ -556,9 +589,18 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const symbol = command.symbol as symbol
 
-      const state = context.getState(SendReceive) as any
+      const state = context.getState(SEND_RECEIVE) as any
 
       return state[symbol]?.slice?.() ?? []
+    },
+  },
+
+  uuid: {
+    interpret: async function* (
+      _command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      return uuidv4()
     },
   },
 }
