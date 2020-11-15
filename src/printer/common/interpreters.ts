@@ -9,12 +9,9 @@ import { Interpreter, Context } from '../interpreter'
 import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
-import { runAsyncIterator } from '../helpers/iterator'
 
 const TAG_STATE = Symbol('TagState')
 const SEND_RECEIVE = Symbol('SendReceive')
-
-const TEMPLATES = Symbol('Templates')
 
 export const interpreters: Record<string, Interpreter> = {
   preload: {
@@ -488,7 +485,7 @@ export const interpreters: Record<string, Interpreter> = {
   html: {
     interpret: async function* (
       command: Command,
-      context: Context
+      _context: Context
     ): AsyncGenerator<Data, any, any> {
       const template = Handlebars.compile(
         command.template ?? ''
@@ -496,42 +493,13 @@ export const interpreters: Record<string, Interpreter> = {
       const data = command.data ?? {}
       const type = command.type as string | undefined
 
-      const templates = context.getState(TEMPLATES)
-
-      const rendered = template({ data, templates })
-
-      const {
-        collection,
-        last: templateId,
-      } = await runAsyncIterator(
-        context.dispatch({
-          name: 'uuid',
-        })
-      )
-      yield* collection
-
-      templates[templateId] = rendered
+      const rendered = template({ data })
 
       yield {
         name: 'html',
         type,
         content: rendered,
       }
-
-      return templateId
-    },
-  },
-
-  drop: {
-    interpret: async function* (
-      command: Command,
-      context: Context
-    ): AsyncGenerator<Data, any, any> {
-      const templateId = command.templateId ?? ('' as string)
-
-      const templates = context.getState(TEMPLATES)
-
-      delete templates[templateId]
     },
   },
 
