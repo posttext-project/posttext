@@ -3,16 +3,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import Handlebars from '../helpers/handlebars'
+import { v4 as uuidv4 } from 'uuid'
 
 import { Interpreter, Context } from '../interpreter'
-import {
-  TagNode,
-  Node,
-  DocumentNode,
-  TextNode,
-} from '../../ast'
+import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
+
+const TAG_STATE = Symbol('TagState')
+const SEND_RECEIVE = Symbol('SendReceive')
 
 export const interpreters: Record<string, Interpreter> = {
   preload: {
@@ -85,7 +84,7 @@ export const interpreters: Record<string, Interpreter> = {
         })
       }
 
-      const iter = resolver.load?.()
+      const iter = resolver.preload?.()
 
       if (!iter) {
         return yield* context.dispatch({
@@ -207,15 +206,6 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
 
-      const preloadAsyncIter = context.dispatch({
-        name: 'preload',
-        node: node.body,
-      })
-
-      for await (const _data of preloadAsyncIter) {
-        /* pass */
-      }
-
       for (const childNode of node.body) {
         yield* context.dispatch({
           name: 'render',
@@ -303,12 +293,12 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
 
-      const state = context.getState(node.id.name)
-      if (!state.resolverState) {
-        state.resolverState = {}
+      const state = context.getState(TAG_STATE)
+      if (!state[node.id.name]) {
+        state[node.id.name] = {}
       }
 
-      return state.resolverState
+      return state[node.id.name]
     },
   },
 
@@ -503,13 +493,19 @@ export const interpreters: Record<string, Interpreter> = {
       const data = command.data ?? {}
       const type = command.type as string | undefined
 
+      const emit = command.emit as boolean | undefined
+
       const rendered = template({ data })
 
-      yield {
-        name: 'html',
-        type,
-        content: rendered,
+      if (emit !== false) {
+        yield {
+          name: 'html',
+          type,
+          content: rendered,
+        }
       }
+
+      return rendered
     },
   },
 
@@ -527,6 +523,46 @@ export const interpreters: Record<string, Interpreter> = {
         name: 'metadata',
         metadata,
       }
+    },
+  },
+
+  send: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const topic = command.topic as symbol
+      const data = command.data
+
+      const state = context.getState(SEND_RECEIVE) as any
+
+      if (!state[topic]) {
+        state[topic] = []
+      }
+
+      state[topic].push(data)
+    },
+  },
+
+  receive: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const topic = command.topic as symbol
+
+      const state = context.getState(SEND_RECEIVE) as any
+
+      return state[topic]?.slice?.() ?? []
+    },
+  },
+
+  uuid: {
+    interpret: async function* (
+      _command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      return uuidv4()
     },
   },
 }

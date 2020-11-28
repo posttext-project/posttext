@@ -35,7 +35,8 @@
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
-    "coverage": "jest --coverage"
+    "coverage": "jest --coverage",
+    "add-license": "ts-node scripts/add-license -f templates/Exhibit-A.ts src/**/*.{ts,js} *.{ts,js}"
   },
   "dependencies": {
     "@koa/router": "^9.4.0",
@@ -52,6 +53,7 @@
     "prismjs": "^1.21.0",
     "rxjs": "^6.6.3",
     "tslib": "^2.0.1",
+    "uuid": "^8.3.1",
     "ws": "^7.3.1"
   },
   "devDependencies": {
@@ -80,6 +82,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "esm": "^3.2.25",
     "fs-extra": "^9.0.1",
+    "glob": "^7.1.6",
     "gulp": "^4.0.2",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-typescript": "^6.0.0-alpha.1",
