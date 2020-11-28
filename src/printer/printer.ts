@@ -122,7 +122,7 @@ export class Printer {
     )
 
     for await (const _data of preloadIter) {
-      /* empty */
+      /* pass */
     }
 
     const renderIter = this.interpret(

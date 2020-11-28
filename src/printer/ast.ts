@@ -14,7 +14,7 @@ export interface BlockNode extends ast.BlockNode {
 }
 
 export interface TagNode extends ast.TagNode {
-  __metadata: Record<string, any>
+  __metadata: Record<string | symbol, any>
   blocks: BlockNode[]
 }
 

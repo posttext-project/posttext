@@ -493,13 +493,19 @@ export const interpreters: Record<string, Interpreter> = {
       const data = command.data ?? {}
       const type = command.type as string | undefined
 
+      const emit = command.emit as boolean | undefined
+
       const rendered = template({ data })
 
-      yield {
-        name: 'html',
-        type,
-        content: rendered,
+      if (emit !== false) {
+        yield {
+          name: 'html',
+          type,
+          content: rendered,
+        }
       }
+
+      return rendered
     },
   },
 
@@ -525,28 +531,16 @@ export const interpreters: Record<string, Interpreter> = {
       command: Command,
       context: Context
     ): AsyncGenerator<Data, any, any> {
-      const node = command.node as TagNode
-      const symbol = command.symbol as symbol
-
+      const topic = command.topic as symbol
       const data = command.data
-
-      if (!node.__metadata.send) {
-        node.__metadata.send = {}
-      }
-
-      if (!node.__metadata.send[symbol]) {
-        node.__metadata.send[symbol] = []
-      }
-
-      node.__metadata.send[symbol].push(data)
 
       const state = context.getState(SEND_RECEIVE) as any
 
-      if (!state[symbol]) {
-        state[symbol] = []
+      if (!state[topic]) {
+        state[topic] = []
       }
 
-      state[symbol].push(data)
+      state[topic].push(data)
     },
   },
 
@@ -555,11 +549,11 @@ export const interpreters: Record<string, Interpreter> = {
       command: Command,
       context: Context
     ): AsyncGenerator<Data, any, any> {
-      const symbol = command.symbol as symbol
+      const topic = command.topic as symbol
 
       const state = context.getState(SEND_RECEIVE) as any
 
-      return state[symbol]?.slice?.() ?? []
+      return state[topic]?.slice?.() ?? []
     },
   },
 
