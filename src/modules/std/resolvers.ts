@@ -434,11 +434,18 @@ export const tagResolvers = (
             : -1
 
           if (nextItemLevel === stack.length) {
+            const counter = stack
+              .concat([currentItem])
+              .slice(1)
+              .map((item) => item.previous.length + 1)
+              .join('.')
+
             const renderedItem = yield {
               name: 'html',
               template: `
                 <li>
-                  {{ data.content }}
+                  <span>{{ data.counter }}</span>
+                  <span>{{ data.content }}</span>
                   {{#if data.children.length}}
                   <ul>
                     {{#each data.children}}
@@ -452,6 +459,7 @@ export const tagResolvers = (
               data: {
                 content: currentItem.content,
                 children: currentItem.children,
+                counter,
               },
             }
             currentItem = {
@@ -480,17 +488,23 @@ export const tagResolvers = (
               previous: [],
             })
           } else {
+            const counter = stack
+              .concat([currentItem])
+              .slice(1)
+              .map((item) => item.previous.length + 1)
+              .join('.')
+
             if (nextItem) {
               tocItems.unshift(nextItem)
             }
-
             let parentItem = stack.pop()
 
             const renderedItem = yield {
               name: 'html',
               template: `
                 <li>
-                  {{ data.content }}
+                <span>{{ data.counter }}</span>
+                <span>{{ data.content }}</span>
                   {{#if data.children.length}}
                   <ul>
                     {{#each data.children}}
@@ -504,6 +518,7 @@ export const tagResolvers = (
               data: {
                 content: currentItem.content,
                 children: currentItem.children,
+                counter,
               },
             }
 
