@@ -110,7 +110,10 @@ export class ServeCommand implements Command {
     })
   }
 
-  private async build(inputPath: string, outputPath: string): Promise<void> {
+  private async build(
+    inputPath: string,
+    outputPath: string
+  ): Promise<void> {
     const bundleFile = path.resolve(
       __dirname,
       'assets/bundle.js'
