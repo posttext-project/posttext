@@ -356,6 +356,18 @@ export const tagResolvers = (
           loadLanguages()
 
           state.languagesLoaded = true
+
+          yield {
+            name: 'addDeps',
+            deps: [
+              {
+                type: 'css',
+                id: 'prismjs/themes/prism.css',
+                src: 'prismjs/themes/prism.css',
+                version: '^1.21.0',
+              },
+            ],
+          }
         }
       },
 

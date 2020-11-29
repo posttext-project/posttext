@@ -29,7 +29,7 @@
   },
   "scripts": {
     "start": "node lib/index.js",
-    "dev": "gulp clean && gulp build:cjs && gulp build:assets && node lib/index.js",
+    "dev": "gulp clean && gulp build:cjs && node lib/index.js",
     "debug": "gulp clean && gulp build && node --inspect-brk lib/index.js",
     "build": "gulp clean && pnpm format && gulp build",
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
@@ -40,6 +40,7 @@
   },
   "dependencies": {
     "@koa/router": "^9.4.0",
+    "@types/webpack": "^4.41.25",
     "boxen": "^4.2.0",
     "chalk": "^4.1.0",
     "chokidar": "^3.4.2",

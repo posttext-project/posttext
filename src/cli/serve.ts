@@ -16,7 +16,7 @@ import { Subject } from 'rxjs'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '../compiler'
-import { interpreters } from '../printer/web'
+import { getInterpreters } from '../printer/web'
 import { Logger } from './helpers/logger'
 
 export class ServeCommand implements Command {
@@ -114,24 +114,11 @@ export class ServeCommand implements Command {
     inputPath: string,
     outputPath: string
   ): Promise<void> {
-    const bundleFile = path.resolve(
-      __dirname,
-      'assets/bundle.js'
-    )
-    const bundleFileMap = path.resolve(
-      __dirname,
-      'assets/bundle.js'
-    )
-
     await fs.ensureDir(outputPath)
-    await fs.copyFile(
-      bundleFile,
-      path.resolve(outputPath, 'bundle.js')
-    )
-    await fs.copyFile(
-      bundleFileMap,
-      path.resolve(outputPath, 'bundle.js.map')
-    )
+
+    const interpreters = getInterpreters({
+      js: [path.resolve(__dirname, 'assets/bundle.ts')],
+    })
 
     const compiler = Compiler.create()
     compiler.getPrinter().registerInterpreters(interpreters)

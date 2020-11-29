@@ -113,29 +113,16 @@ export class Printer {
       stateMap: new Map(),
     })
 
-    const preloadIter = this.interpret(
+    const printIter = this.interpret(
       {
-        name: 'preload',
-        node: ast,
+        name: 'print',
+        ast: ast,
       },
       context
     )
 
-    for await (const _data of preloadIter) {
+    for await (const _data of printIter) {
       /* pass */
-    }
-
-    const renderIter = this.interpret(
-      {
-        name: 'render',
-        node: ast,
-      },
-      context
-    )
-
-    const collection: Data[] = []
-    for await (const data of renderIter) {
-      collection.push(data)
     }
   }
 
