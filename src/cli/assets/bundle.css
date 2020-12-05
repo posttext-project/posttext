@@ -1,3 +1,7 @@
+* {
+  box-sizing: border-box;
+}
+
 .std_toc__list {
   list-style-type: none;
   list-style-image: none;
@@ -10,4 +14,11 @@
 
 .std_toc__number {
   padding-right: 0.5em;
+}
+
+.std_blockquote {
+  border-left: 0.25em solid #dfe2e5;
+  color: #6a737d;
+  padding: 0 1em;
+  margin: 0;
 }

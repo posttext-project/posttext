@@ -571,5 +571,59 @@ export const tagResolvers = (
         }
       },
     },
+
+    blockquote: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const renderedChildNodes: string[] | undefined = yield {
+          name: 'getBlockChildNodes',
+          displayMode: true,
+          index: 0,
+        }
+
+        const quoteChildNodes: string[] = []
+
+        for (const [index, renderedNode] of (
+          renderedChildNodes ?? []
+        ).entries()) {
+          if (renderedNode.match(/$\s+^/)) {
+            continue
+          }
+
+          if (index % 2 === 0) {
+            for (const content of renderedNode.split(/\n+/)) {
+              const node = yield {
+                name: 'html',
+                template: '<p>{{{ data.content }}}</p>',
+                type: 'inline',
+                emit: false,
+                data: {
+                  content,
+                },
+              }
+
+              quoteChildNodes.push(node)
+            }
+          } else {
+            quoteChildNodes.push(renderedNode)
+          }
+        }
+
+        yield {
+          name: 'html',
+          template: `
+            <blockquote class="std_blockquote">
+              {{{ data.content }}}
+            </blockquote>
+          `,
+          data: {
+            content: quoteChildNodes.join(''),
+          },
+        }
+      },
+    },
   }
 }
