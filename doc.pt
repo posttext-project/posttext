@@ -2,7 +2,9 @@
   title=Getting Started - PostText;
 ];
 
-\toc {};
+\section {
+  \toc {Table of contents};
+};
 
 \section {
   \title {Hello, World!};

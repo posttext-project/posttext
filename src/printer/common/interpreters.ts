@@ -9,11 +9,46 @@ import { Interpreter, Context } from '../interpreter'
 import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
+import * as ast from '../../ast'
 
 const TAG_STATE = Symbol('TagState')
 const SEND_RECEIVE = Symbol('SendReceive')
 
 export const interpreters: Record<string, Interpreter> = {
+  print: {
+    modifier: 'private',
+
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const documentAst = command.ast as
+        | ast.DocumentNode
+        | ast.BlockNode
+        | ast.TagNode
+        | ast.TextNode
+
+      const preloadIter = context.dispatch({
+        name: 'preload',
+        node: documentAst,
+      })
+
+      for await (const _data of preloadIter) {
+        /* pass */
+      }
+
+      const renderIter = context.dispatch({
+        name: 'render',
+        node: documentAst,
+      })
+
+      const collection: Data[] = []
+      for await (const data of renderIter) {
+        collection.push(data)
+      }
+    },
+  },
+
   preload: {
     modifier: 'private',
 
@@ -563,6 +598,31 @@ export const interpreters: Record<string, Interpreter> = {
       _context: Context
     ): AsyncGenerator<Data, any, any> {
       return uuidv4()
+    },
+  },
+
+  addDeps: {
+    interpret: async function* (
+      command: Command,
+      _context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const depsType = command.type as 'js' | 'css' | undefined
+
+      for (const dep of command.deps as any[]) {
+        const type =
+          depsType ?? (dep.type as 'js' | 'css' | undefined)
+        const id = dep.id as string | undefined
+        const src = dep.src as string | undefined
+        const version = dep.version as string | undefined
+
+        yield {
+          name: 'dependency',
+          type,
+          id,
+          src,
+          version,
+        }
+      }
     },
   },
 }

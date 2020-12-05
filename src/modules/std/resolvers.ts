@@ -356,6 +356,18 @@ export const tagResolvers = (
           loadLanguages()
 
           state.languagesLoaded = true
+
+          yield {
+            name: 'addDeps',
+            deps: [
+              {
+                type: 'css',
+                id: 'prismjs/themes/prism.css',
+                src: 'prismjs/themes/prism.css',
+                version: '^1.21.0',
+              },
+            ],
+          }
         }
       },
 
@@ -443,11 +455,11 @@ export const tagResolvers = (
             const renderedItem = yield {
               name: 'html',
               template: `
-                <li>
-                  <span>{{ data.counter }}</span>
-                  <span>{{ data.content }}</span>
+                <li class="std_toc__item">
+                  <span class="std_toc__number">{{ data.counter }}</span>
+                  <span class="std_toc__text">{{ data.content }}</span>
                   {{#if data.children.length}}
-                  <ul>
+                  <ul class="std_toc__list">
                     {{#each data.children}}
                       {{{ this }}}
                     {{/each}}
@@ -502,11 +514,11 @@ export const tagResolvers = (
             const renderedItem = yield {
               name: 'html',
               template: `
-                <li>
-                <span>{{ data.counter }}</span>
-                <span>{{ data.content }}</span>
+                <li class="std_toc__item">
+                  <span class="std_toc__number">{{ data.counter }}</span>
+                  <span class="std_toc__text">{{ data.content }}</span>
                   {{#if data.children.length}}
-                  <ul>
+                  <ul class="std_toc__list">
                     {{#each data.children}}
                       {{{ this }}}
                     {{/each}}
@@ -535,10 +547,18 @@ export const tagResolvers = (
 
         const rootItem = stack.pop()
 
+        const content: string | undefined = yield {
+          name: 'getBlock',
+          index: 0,
+        }
+
         yield {
           name: 'html',
           template: `
-            <ul>
+            <h1 class="std_toc__title">
+              {{{ data.content }}}
+            </h1>
+            <ul class="std_toc__list">
               {{#each data.items}}
                 {{{ this }}}
               {{/each}}
@@ -546,6 +566,7 @@ export const tagResolvers = (
           `,
           data: {
             items: rootItem.children,
+            content,
           },
         }
       },
