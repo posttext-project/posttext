@@ -8,6 +8,7 @@ import path from 'path'
 import webpack from 'webpack'
 import prettier from 'prettier'
 import stripIndent from 'strip-indent'
+import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 
 import { interpreters as commonInterpreters } from '../common'
 import { Interpreter, Context } from '../interpreter'
@@ -18,11 +19,13 @@ import * as ast from '../../ast'
 export interface InterpreterOptions {
   js: string[]
   css: string[]
+  mode: 'development' | 'production' | 'none' | undefined
 }
 
 export const getInterpreters = ({
   js = [],
   css = [],
+  mode = 'development',
 }: Partial<InterpreterOptions> = {}): Record<
   string,
   Interpreter
@@ -95,11 +98,14 @@ export const getInterpreters = ({
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <title>{{ metadata.title }}</title>
+                {{#if data.production}}
+                <link rel="stylesheet" href="./main.css">
+                {{/if}}
               </head>
               <body>
                 {{{ data.content }}}
   
-                <script src="./bundle.js"></script>
+                <script src="./main.js"></script>
               </body>
             </html>
           `)
@@ -112,6 +118,7 @@ export const getInterpreters = ({
           },
           data: {
             content,
+            production: mode !== 'development',
           },
         })
 
@@ -173,18 +180,31 @@ export const getInterpreters = ({
             entry: [...jsDeps, ...cssDeps],
             output: {
               path: path.resolve('dist'),
-              filename: 'bundle.js',
+              filename: '[name].js',
+              publicPath: path.resolve('dist'),
             },
-            mode: 'development',
+            mode,
             devtool: false,
             target: 'web',
             module: {
               rules: [
-                { test: /\.ts$/i, use: 'ts-loader' },
+                {
+                  test: /\.ts$/i,
+                  use: [
+                    {
+                      loader: 'ts-loader',
+                      options: {
+                        transpileOnly: true,
+                      },
+                    },
+                  ],
+                },
                 {
                   test: /\.css$/i,
                   use: [
-                    'style-loader',
+                    mode === 'development'
+                      ? 'style-loader'
+                      : MiniCssExtractPlugin.loader,
                     {
                       loader: 'css-loader',
                     },
@@ -194,21 +214,37 @@ export const getInterpreters = ({
             },
             resolve: {
               modules: ['node_modules'],
+              extensions: ['.ts', '.tsx', '.js', '.css'],
             },
-            plugins: [
-              new webpack.SourceMapDevToolPlugin({
-                filename: 'bundle.js.map',
-              }),
-            ],
+            plugins: ([] as any[]).concat(
+              mode === 'development'
+                ? [
+                    new webpack.SourceMapDevToolPlugin({
+                      filename: '[name].js.map',
+                    }),
+                  ]
+                : [
+                    new MiniCssExtractPlugin({
+                      filename: '[name].css',
+                    }),
+                  ]
+            ),
           })
 
           await new Promise((resolve, reject) => {
-            compiler.run((err, _stats) => {
+            compiler.run((err, stats) => {
               if (err) {
                 reject(err)
               }
 
-              resolve()
+              console.log(
+                stats?.toString({
+                  chunks: false,
+                  colors: true,
+                })
+              )
+
+              resolve(true)
             })
           })
         }

@@ -3,6 +3,10 @@
 ];
 
 \section {
+  \toc {Table of contents};
+};
+
+\section {
   \title {Hello, World!};
 
   \paragraph {

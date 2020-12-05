@@ -10,5 +10,6 @@
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "typeRoots": ["node_modules/@types", "src/types"]
-  }
+  },
+  "exclude": ["dist", "lib"]
 }

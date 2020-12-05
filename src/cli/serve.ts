@@ -118,6 +118,8 @@ export class ServeCommand implements Command {
 
     const interpreters = getInterpreters({
       js: [path.resolve(__dirname, 'assets/bundle.ts')],
+      css: [path.resolve(__dirname, 'assets/bundle.css')],
+      mode: 'development',
     })
 
     const compiler = Compiler.create()

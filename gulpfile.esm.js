@@ -16,7 +16,7 @@ task('build:cjs', () => {
   const tsProject = ts.createProject('tsconfig.json')
 
   return merge(
-    src(['src/**/*.ts', '!src/**/assets/**/*.ts'], {
+    src(['src/**/*.ts', '!src/**/assets/**/*'], {
       base: path.resolve(__dirname, 'src'),
     })
       .pipe(sourcemaps.init())
@@ -28,7 +28,7 @@ task('build:cjs', () => {
         })
       )
       .pipe(dest('lib')),
-    src(['src/**/assets/**/*.ts'], {
+    src(['src/**/assets/**/*'], {
       base: path.resolve(__dirname, 'src'),
     }).pipe(dest('lib'))
   )
