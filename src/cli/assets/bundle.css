@@ -4,6 +4,12 @@
 
 body {
   padding-bottom: 300px;
+  font-family: Nimbus Sans L;
+}
+
+code {
+  font-family: JetBrains Mono;
+  font-size: 0.92rem;
 }
 
 .std_toc__list {
