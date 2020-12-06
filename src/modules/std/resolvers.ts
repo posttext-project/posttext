@@ -699,9 +699,9 @@ export const tagResolvers = (
                   }
                 )
                 paragraph = []
-
-                nodes.push(childNode.content)
               }
+
+              nodes.push(childNode.content)
             }
           }
         }
