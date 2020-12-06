@@ -267,34 +267,91 @@ export const tagResolvers = (
         void,
         any
       > {
-        const renderedChildNodes: string[] | undefined = yield {
+        const childNodes: any[] | undefined = yield {
           name: 'getBlockChildNodes',
           displayMode: true,
           index: 0,
         }
 
-        for (const [index, renderedNode] of (
-          renderedChildNodes ?? []
-        ).entries()) {
-          if (renderedNode.match(/$\s+^/)) {
-            continue
-          }
+        let paragraph: string[] = []
+        for (const childNode of childNodes ?? []) {
+          switch (childNode.type) {
+            case 'text': {
+              const chunks = childNode.content
+                .split(/(\n[^\S\n]*){2,}/)
+                .filter(
+                  (chunk) => chunk && !chunk.match(/^\s+$/)
+                )
+                .map((chunk) =>
+                  chunk.replace(/\s\s\n/g, '<br>')
+                )
 
-          if (index % 2 === 0) {
+              for (const chunk of chunks.slice(0, -1)) {
+                paragraph.push(chunk)
+
+                const content = paragraph.join('')
+                if (content) {
+                  yield {
+                    name: 'html',
+                    template: '<p>{{{ data.content }}}</p>',
+                    data: {
+                      content,
+                    },
+                  }
+                }
+
+                paragraph = []
+              }
+
+              if (chunks.length) {
+                const lastChunk = chunks.slice(-1)[0]
+
+                paragraph.push(lastChunk)
+              }
+
+              break
+            }
+
+            case 'inline': {
+              paragraph.push(childNode.content)
+
+              break
+            }
+
+            default: {
+              if (paragraph.length !== 0) {
+                const content = paragraph.join('')
+                if (content) {
+                  yield {
+                    name: 'html',
+                    template: '<p>{{{ data.content }}}</p>',
+                    data: {
+                      content,
+                    },
+                  }
+                  paragraph = []
+                }
+              }
+
+              yield {
+                name: 'html',
+                template: '{{{ data.content }}}',
+                data: {
+                  content: childNode.content,
+                },
+              }
+            }
+          }
+        }
+
+        if (paragraph.length !== 0) {
+          const content = paragraph.join('')
+          if (content) {
             yield {
               name: 'html',
               template: '<p>{{{ data.content }}}</p>',
-              type: 'inline',
               data: {
-                content: renderedNode,
-              },
-            }
-          } else {
-            yield {
-              name: 'html',
-              template: '{{{ data.content }}}',
-              data: {
-                content: renderedNode,
+                content,
               },
             }
           }
@@ -578,38 +635,89 @@ export const tagResolvers = (
         any,
         any
       > {
-        const renderedChildNodes: string[] | undefined = yield {
+        const childNodes: any[] | undefined = yield {
           name: 'getBlockChildNodes',
           displayMode: true,
           index: 0,
         }
 
-        const quoteChildNodes: string[] = []
+        let paragraph: string[] = []
+        const nodes: string[] = []
+        for (const childNode of childNodes ?? []) {
+          switch (childNode.type) {
+            case 'text': {
+              const chunks = childNode.content
+                .split(/(\n[^\S\n]*){2,}/)
+                .filter(
+                  (chunk) => chunk && !chunk.match(/^\s+$/)
+                )
+                .map((chunk) =>
+                  chunk.replace(/\s\s\n/g, '<br>')
+                )
 
-        for (const [index, renderedNode] of (
-          renderedChildNodes ?? []
-        ).entries()) {
-          if (renderedNode.match(/$\s+^/)) {
-            continue
-          }
+              for (const chunk of chunks.slice(0, -1)) {
+                paragraph.push(chunk)
+                nodes.push(
+                  yield {
+                    name: 'html',
+                    template: '<p>{{{ data.content }}}</p>',
+                    emit: false,
+                    data: {
+                      content: paragraph.join(''),
+                    },
+                  }
+                )
 
-          if (index % 2 === 0) {
-            for (const content of renderedNode.split(/\n+/)) {
-              const node = yield {
-                name: 'html',
-                template: '<p>{{{ data.content }}}</p>',
-                type: 'inline',
-                emit: false,
-                data: {
-                  content,
-                },
+                paragraph = []
               }
 
-              quoteChildNodes.push(node)
+              if (chunks.length) {
+                const lastChunk = chunks.slice(-1)[0]
+
+                paragraph.push(lastChunk)
+              }
+
+              break
             }
-          } else {
-            quoteChildNodes.push(renderedNode)
+
+            case 'inline': {
+              paragraph.push(childNode.content)
+
+              break
+            }
+
+            default: {
+              if (paragraph.length !== 0) {
+                nodes.push(
+                  yield {
+                    name: 'html',
+                    template: '<p>{{{ data.content }}}</p>',
+                    emit: false,
+                    data: {
+                      content: paragraph.join(''),
+                    },
+                  }
+                )
+                paragraph = []
+
+                nodes.push(childNode.content)
+              }
+            }
           }
+        }
+
+        if (paragraph.length !== 0) {
+          const content = paragraph.join('')
+          nodes.push(
+            yield {
+              name: 'html',
+              template: '<p>{{{ data.content }}}</p>',
+              emit: false,
+              data: {
+                content,
+              },
+            }
+          )
         }
 
         yield {
@@ -620,7 +728,7 @@ export const tagResolvers = (
             </blockquote>
           `,
           data: {
-            content: quoteChildNodes.join(''),
+            content: nodes.join(''),
           },
         }
       },

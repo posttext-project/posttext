@@ -2,6 +2,10 @@
   box-sizing: border-box;
 }
 
+body {
+  padding-bottom: 300px;
+}
+
 .std_toc__list {
   list-style-type: none;
   list-style-image: none;
