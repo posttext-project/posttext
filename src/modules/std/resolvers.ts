@@ -279,9 +279,6 @@ export const tagResolvers = (
             case 'text': {
               const chunks = childNode.content
                 .split(/(\n[^\S\n]*){2,}/)
-                .filter(
-                  (chunk) => chunk && !chunk.match(/^\s+$/)
-                )
                 .map((chunk) =>
                   chunk.replace(/\s\s\n/g, '<br>')
                 )
@@ -290,7 +287,7 @@ export const tagResolvers = (
                 paragraph.push(chunk)
 
                 const content = paragraph.join('')
-                if (content) {
+                if (!content.match(/^\s*$/g)) {
                   yield {
                     name: 'html',
                     template: '<p>{{{ data.content }}}</p>',
@@ -321,7 +318,7 @@ export const tagResolvers = (
             default: {
               if (paragraph.length !== 0) {
                 const content = paragraph.join('')
-                if (content) {
+                if (!content.match(/^\s*$/g)) {
                   yield {
                     name: 'html',
                     template: '<p>{{{ data.content }}}</p>',
@@ -329,8 +326,9 @@ export const tagResolvers = (
                       content,
                     },
                   }
-                  paragraph = []
                 }
+
+                paragraph = []
               }
 
               yield {
@@ -346,7 +344,7 @@ export const tagResolvers = (
 
         if (paragraph.length !== 0) {
           const content = paragraph.join('')
-          if (content) {
+          if (!content.match(/^\s*$/g)) {
             yield {
               name: 'html',
               template: '<p>{{{ data.content }}}</p>',
@@ -648,25 +646,26 @@ export const tagResolvers = (
             case 'text': {
               const chunks = childNode.content
                 .split(/(\n[^\S\n]*){2,}/)
-                .filter(
-                  (chunk) => chunk && !chunk.match(/^\s+$/)
-                )
                 .map((chunk) =>
                   chunk.replace(/\s\s\n/g, '<br>')
                 )
 
               for (const chunk of chunks.slice(0, -1)) {
                 paragraph.push(chunk)
-                nodes.push(
-                  yield {
-                    name: 'html',
-                    template: '<p>{{{ data.content }}}</p>',
-                    emit: false,
-                    data: {
-                      content: paragraph.join(''),
-                    },
-                  }
-                )
+
+                const content = paragraph.join('')
+                if (!content.match(/^\s*$/g)) {
+                  nodes.push(
+                    yield {
+                      name: 'html',
+                      template: '<p>{{{ data.content }}}</p>',
+                      emit: false,
+                      data: {
+                        content,
+                      },
+                    }
+                  )
+                }
 
                 paragraph = []
               }
@@ -688,16 +687,20 @@ export const tagResolvers = (
 
             default: {
               if (paragraph.length !== 0) {
-                nodes.push(
-                  yield {
-                    name: 'html',
-                    template: '<p>{{{ data.content }}}</p>',
-                    emit: false,
-                    data: {
-                      content: paragraph.join(''),
-                    },
-                  }
-                )
+                const content = paragraph.join('')
+                if (!content.match(/^\s*$/g)) {
+                  nodes.push(
+                    yield {
+                      name: 'html',
+                      template: '<p>{{{ data.content }}}</p>',
+                      emit: false,
+                      data: {
+                        content,
+                      },
+                    }
+                  )
+                }
+
                 paragraph = []
               }
 
@@ -708,16 +711,18 @@ export const tagResolvers = (
 
         if (paragraph.length !== 0) {
           const content = paragraph.join('')
-          nodes.push(
-            yield {
-              name: 'html',
-              template: '<p>{{{ data.content }}}</p>',
-              emit: false,
-              data: {
-                content,
-              },
-            }
-          )
+          if (!content.match(/^\s*$/g)) {
+            nodes.push(
+              yield {
+                name: 'html',
+                template: '<p>{{{ data.content }}}</p>',
+                emit: false,
+                data: {
+                  content,
+                },
+              }
+            )
+          }
         }
 
         yield {
