@@ -9,9 +9,13 @@
 \section {
   \title {Hello, World!};
 
+  \subtitle {Paragraph};
+
   \paragraph {
     This is an example document in \bold {PostText};!
   };
+
+  \subtitle {Code};
 
   \code(javascript) =={
     var a = 5;
@@ -21,6 +25,8 @@
     }
   }==;
 
+  \subtitle {List};
+
   \paragraph {
     This is a list of items:
 
@@ -29,5 +35,13 @@
       \item {Second item};
       \item {Third item};
     };
+  };
+
+  \subtitle {Blockquote};
+
+  \blockquote {
+    Understand well as I may, my comprehension can only be an infinitesimal fraction of all I want to understand.
+    
+    - Ada Lovelace
   };
 };

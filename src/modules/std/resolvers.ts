@@ -267,34 +267,89 @@ export const tagResolvers = (
         void,
         any
       > {
-        const renderedChildNodes: string[] | undefined = yield {
+        const childNodes: any[] | undefined = yield {
           name: 'getBlockChildNodes',
           displayMode: true,
           index: 0,
         }
 
-        for (const [index, renderedNode] of (
-          renderedChildNodes ?? []
-        ).entries()) {
-          if (renderedNode.match(/$\s+^/)) {
-            continue
-          }
+        let paragraph: string[] = []
+        for (const childNode of childNodes ?? []) {
+          switch (childNode.type) {
+            case 'text': {
+              const chunks = childNode.content
+                .split(/(\n[^\S\n]*){2,}/)
+                .map((chunk) =>
+                  chunk.replace(/\s\s\n/g, '<br>')
+                )
 
-          if (index % 2 === 0) {
+              for (const chunk of chunks.slice(0, -1)) {
+                paragraph.push(chunk)
+
+                const content = paragraph.join('')
+                if (!content.match(/^\s*$/g)) {
+                  yield {
+                    name: 'html',
+                    template: '<p>{{{ data.content }}}</p>',
+                    data: {
+                      content,
+                    },
+                  }
+                }
+
+                paragraph = []
+              }
+
+              if (chunks.length) {
+                const lastChunk = chunks.slice(-1)[0]
+
+                paragraph.push(lastChunk)
+              }
+
+              break
+            }
+
+            case 'inline': {
+              paragraph.push(childNode.content)
+
+              break
+            }
+
+            default: {
+              if (paragraph.length !== 0) {
+                const content = paragraph.join('')
+                if (!content.match(/^\s*$/g)) {
+                  yield {
+                    name: 'html',
+                    template: '<p>{{{ data.content }}}</p>',
+                    data: {
+                      content,
+                    },
+                  }
+                }
+
+                paragraph = []
+              }
+
+              yield {
+                name: 'html',
+                template: '{{{ data.content }}}',
+                data: {
+                  content: childNode.content,
+                },
+              }
+            }
+          }
+        }
+
+        if (paragraph.length !== 0) {
+          const content = paragraph.join('')
+          if (!content.match(/^\s*$/g)) {
             yield {
               name: 'html',
               template: '<p>{{{ data.content }}}</p>',
-              type: 'inline',
               data: {
-                content: renderedNode,
-              },
-            }
-          } else {
-            yield {
-              name: 'html',
-              template: '{{{ data.content }}}',
-              data: {
-                content: renderedNode,
+                content,
               },
             }
           }
@@ -567,6 +622,118 @@ export const tagResolvers = (
           data: {
             items: rootItem.children,
             content,
+          },
+        }
+      },
+    },
+
+    blockquote: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const childNodes: any[] | undefined = yield {
+          name: 'getBlockChildNodes',
+          displayMode: true,
+          index: 0,
+        }
+
+        let paragraph: string[] = []
+        const nodes: string[] = []
+        for (const childNode of childNodes ?? []) {
+          switch (childNode.type) {
+            case 'text': {
+              const chunks = childNode.content
+                .split(/(\n[^\S\n]*){2,}/)
+                .map((chunk) =>
+                  chunk.replace(/\s\s\n/g, '<br>')
+                )
+
+              for (const chunk of chunks.slice(0, -1)) {
+                paragraph.push(chunk)
+
+                const content = paragraph.join('')
+                if (!content.match(/^\s*$/g)) {
+                  nodes.push(
+                    yield {
+                      name: 'html',
+                      template: '<p>{{{ data.content }}}</p>',
+                      emit: false,
+                      data: {
+                        content,
+                      },
+                    }
+                  )
+                }
+
+                paragraph = []
+              }
+
+              if (chunks.length) {
+                const lastChunk = chunks.slice(-1)[0]
+
+                paragraph.push(lastChunk)
+              }
+
+              break
+            }
+
+            case 'inline': {
+              paragraph.push(childNode.content)
+
+              break
+            }
+
+            default: {
+              if (paragraph.length !== 0) {
+                const content = paragraph.join('')
+                if (!content.match(/^\s*$/g)) {
+                  nodes.push(
+                    yield {
+                      name: 'html',
+                      template: '<p>{{{ data.content }}}</p>',
+                      emit: false,
+                      data: {
+                        content,
+                      },
+                    }
+                  )
+                }
+
+                paragraph = []
+              }
+
+              nodes.push(childNode.content)
+            }
+          }
+        }
+
+        if (paragraph.length !== 0) {
+          const content = paragraph.join('')
+          if (!content.match(/^\s*$/g)) {
+            nodes.push(
+              yield {
+                name: 'html',
+                template: '<p>{{{ data.content }}}</p>',
+                emit: false,
+                data: {
+                  content,
+                },
+              }
+            )
+          }
+        }
+
+        yield {
+          name: 'html',
+          template: `
+            <blockquote class="std_blockquote">
+              {{{ data.content }}}
+            </blockquote>
+          `,
+          data: {
+            content: nodes.join(''),
           },
         }
       },

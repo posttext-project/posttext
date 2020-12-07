@@ -76,6 +76,15 @@ class AddLicenseCommand {
     let success = true
     for (const file of matches) {
       const content = await fs.readFile(file, 'utf8')
+      const crlf = content.indexOf('\r\n') !== -1
+
+      if (crlf !== (license.indexOf('\r\n') !== -1)) {
+        if (crlf) {
+          license = license.replace(/\n/g, '\r\n')
+        } else {
+          license = license.replace(/\r\n/g, '\n')
+        }
+      }
 
       if (!content.includes(license)) {
         success = false

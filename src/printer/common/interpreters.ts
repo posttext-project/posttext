@@ -315,7 +315,7 @@ export const interpreters: Record<string, Interpreter> = {
 
       yield {
         name: 'html',
-        type: 'inline',
+        type: 'text',
         content: textNode.value,
       }
     },
@@ -417,8 +417,6 @@ export const interpreters: Record<string, Interpreter> = {
       const tagNode = command.node as TagNode
       const index = command.index ?? 0
 
-      const displayMode = command.displayMode as boolean
-
       const block = tagNode.blocks[index]
       if (!block) {
         return
@@ -428,72 +426,24 @@ export const interpreters: Record<string, Interpreter> = {
         return []
       }
 
-      const firstChild = block.body[0]
-      const childNodes =
-        firstChild.type !== 'Text'
-          ? [
-              {
-                type: 'Text',
-                value: '',
-              },
-              ...block.body,
-            ]
-          : block.body
+      const childNodes = block.body
+      const transformedChildNodes: any[] = []
 
-      const renderedChildNodes: string[] = []
-
-      if (displayMode) {
-        let currentNodeIsInline = true
-        let renderedChunk: string[] = []
-
-        for (const childNode of childNodes) {
-          for await (const data of context.dispatch({
-            name: 'render',
-            node: childNode,
-          })) {
-            if (data.name === 'html') {
-              if (
-                currentNodeIsInline ===
-                ((data.type as string | undefined) === 'inline')
-              ) {
-                const content = data.content as string
-
-                renderedChunk.push(content)
-              } else {
-                renderedChildNodes.push(renderedChunk.join(''))
-                currentNodeIsInline = !currentNodeIsInline
-
-                const content = data.content as string
-
-                renderedChunk = [content]
-              }
-            }
+      for (const childNode of childNodes) {
+        for await (const data of context.dispatch({
+          name: 'render',
+          node: childNode,
+        })) {
+          if (data.name === 'html') {
+            transformedChildNodes.push({
+              type: data.type,
+              content: data.content,
+            })
           }
-        }
-
-        renderedChildNodes.push(renderedChunk.join(''))
-
-        return renderedChildNodes
-      } else {
-        for (const childNode of childNodes) {
-          const renderedChildNode: string[] = []
-
-          for await (const data of context.dispatch({
-            name: 'render',
-            node: childNode,
-          })) {
-            if (data.name === 'html') {
-              const content = data.content
-
-              renderedChildNode.push(content)
-            }
-          }
-
-          renderedChildNodes.push(renderedChildNode.join(''))
         }
       }
 
-      return renderedChildNodes
+      return transformedChildNodes
     },
   },
 

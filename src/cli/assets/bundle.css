@@ -1,3 +1,17 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  padding-bottom: 300px;
+  font-family: Nimbus Sans L;
+}
+
+code {
+  font-family: JetBrains Mono;
+  font-size: 0.92rem;
+}
+
 .std_toc__list {
   list-style-type: none;
   list-style-image: none;
@@ -10,4 +24,11 @@
 
 .std_toc__number {
   padding-right: 0.5em;
+}
+
+.std_blockquote {
+  border-left: 0.25em solid #dfe2e5;
+  color: #6a737d;
+  padding: 0 1em;
+  margin: 0;
 }
