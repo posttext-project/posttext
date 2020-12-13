@@ -5,6 +5,7 @@
 import Prism from 'prismjs'
 import loadLanguages from 'prismjs/components/'
 import stripIndent from 'strip-indent'
+import qrcode from 'qrcode'
 
 import { Resolver, RegistryOptions } from '../../registry'
 import { Command } from '../../printer'
@@ -734,6 +735,73 @@ export const tagResolvers = (
           `,
           data: {
             content: nodes.join(''),
+          },
+        }
+      },
+    },
+
+    image: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const link: string | undefined = yield {
+          name: 'textContent',
+          index: 0,
+        } ?? ''
+
+        const alt: string | undefined = yield {
+          name: 'textContent',
+          index: 1,
+        }
+
+        yield {
+          name: 'html',
+          template: `
+            <img src="{{ data.link }}"{{#if data.alt}} alt="{{ data.alt }}"{{/if}}>
+          `,
+          data: {
+            link,
+            alt,
+          },
+        }
+      },
+    },
+
+    qrcode: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const content: string | undefined = yield {
+          name: 'textContent',
+          index: 0,
+        } ?? ''
+
+        const svg = await new Promise((resolve, reject) => {
+          qrcode.toString(
+            content,
+            {
+              type: 'svg',
+              margin: 1,
+            },
+            (err, text) => {
+              if (err) {
+                reject(err)
+              }
+
+              resolve(text)
+            }
+          )
+        })
+
+        yield {
+          name: 'html',
+          template: '<div class="std_qrcode">{{{ data.content }}}</div>',
+          data: {
+            content: svg,
           },
         }
       },
