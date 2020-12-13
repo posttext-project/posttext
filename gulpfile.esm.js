@@ -37,5 +37,6 @@ task('build:cjs', () => {
 task('build', series(['build:cjs']))
 
 task('clean', async () => {
-  return await del('lib')
+  await del('lib')
+  await del('dist')
 })

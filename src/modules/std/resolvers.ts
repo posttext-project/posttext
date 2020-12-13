@@ -6,6 +6,7 @@ import Prism from 'prismjs'
 import loadLanguages from 'prismjs/components/'
 import stripIndent from 'strip-indent'
 import qrcode from 'qrcode'
+import path from 'path'
 
 import { Resolver, RegistryOptions } from '../../registry'
 import { Command } from '../../printer'
@@ -756,15 +757,44 @@ export const tagResolvers = (
           index: 1,
         }
 
-        yield {
-          name: 'html',
-          template: `
-            <img src="{{ data.link }}"{{#if data.alt}} alt="{{ data.alt }}"{{/if}}>
-          `,
-          data: {
-            link,
-            alt,
-          },
+        if (!link) {
+          return
+        }
+
+        const isUrl = link.match(/(^|^http:|^https:)\/\//)
+
+        if (isUrl) {
+          yield {
+            name: 'html',
+            template: `
+              <div class="std_image">
+                <img src="{{ data.link }}"{{#if data.alt}} alt="{{ data.alt }}"{{/if}}>
+              </div>
+            `,
+            data: {
+              link,
+              alt,
+            },
+          }
+        } else {
+          const dest = yield {
+            name: 'copyFile',
+            src: link,
+            dest: path.join('images', path.basename(link)),
+          }
+
+          yield {
+            name: 'html',
+            template: `
+              <div class="std_image">
+                <img src="{{ data.link }}"{{#if data.alt}} alt="{{ data.alt }}"{{/if}}>
+              </div>
+            `,
+            data: {
+              link: dest,
+              alt,
+            },
+          }
         }
       },
     },
@@ -799,7 +829,8 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<div class="std_qrcode">{{{ data.content }}}</div>',
+          template:
+            '<div class="std_qrcode">{{{ data.content }}}</div>',
           data: {
             content: svg,
           },

@@ -139,6 +139,24 @@ export const getInterpreters = ({
       },
     },
 
+    copyFile: {
+      interpret: async function* (
+        command: Command,
+        _context: Context
+      ): AsyncGenerator<Data, any, any> {
+        const src = command.src as string
+        const dest = command.dest as string
+
+        // TODO: Secure file path.
+
+        const outputPath = path.resolve('dist', dest)
+
+        await fs.copy(src, outputPath)
+
+        return path.relative(path.resolve('dist'), outputPath)
+      },
+    },
+
     writeFile: {
       modifier: 'private',
 
@@ -148,6 +166,8 @@ export const getInterpreters = ({
       ): AsyncGenerator<Data, any, any> {
         const file = command.file as string
         const content = command.content as string
+
+        // TODO: Secure file path.
 
         const filePath = path.resolve('dist', file)
 
