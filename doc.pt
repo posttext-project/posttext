@@ -44,4 +44,12 @@
     
     - Ada Lovelace
   };
+
+  \subtitle {Image};
+
+  \image {https://i.imgur.com/AD3MbBi.jpeg};
+
+  \subtitle {QRCode};
+
+  \qrcode {PostText};
 };
