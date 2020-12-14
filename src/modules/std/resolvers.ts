@@ -196,7 +196,7 @@ export const tagResolvers = (
           template: '<b>{{{ data.content }}}</b>',
           type: 'inline',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -218,7 +218,7 @@ export const tagResolvers = (
           template: '<i>{{{ data.content }}}</i>',
           type: 'inline',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -240,7 +240,7 @@ export const tagResolvers = (
           template: '<u>{{{ data.content }}}<u>',
           type: 'inline',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -377,7 +377,7 @@ export const tagResolvers = (
           name: 'html',
           template: '<li>{{{ data.content }}}</li>',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },

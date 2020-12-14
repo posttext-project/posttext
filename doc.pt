@@ -8,7 +8,9 @@
 
 \subsection {Paragraph};
 
-This is an example document in \bold {PostText};!
+\paragraph {
+  This is an example document in \bold {PostText};!
+};
 
 \subsection {Code};
 
@@ -22,7 +24,9 @@ This is an example document in \bold {PostText};!
 
 \subsection {List};
 
-This is a list of items:
+\paragraph {
+  This is a list of items:
+};
 
 \list {
   \item {First item};
