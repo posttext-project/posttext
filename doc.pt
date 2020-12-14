@@ -2,54 +2,46 @@
   title=Getting Started - PostText;
 ];
 
-\section {
-  \toc {Table of contents};
+\toc {Table of contents};
+
+\section {Hello, World!};
+
+\subsection {Paragraph};
+
+This is an example document in \bold {PostText};!
+
+\subsection {Code};
+
+\code(javascript) ==={
+  var a = 5;
+
+  function print() {
+    console.log(a);
+  }
+}===;
+
+\subsection {List};
+
+This is a list of items:
+
+\list {
+  \item {First item};
+  \item {Second item};
+  \item {Third item};
 };
 
-\section {
-  \title {Hello, World!};
+\subsection {Blockquote};
 
-  \subtitle {Paragraph};
-
-  \paragraph {
-    This is an example document in \bold {PostText};!
-  };
-
-  \subtitle {Code};
-
-  \code(javascript) =={
-    var a = 5;
-
-    function print() {
-      console.log(a);
-    }
-  }==;
-
-  \subtitle {List};
-
-  \paragraph {
-    This is a list of items:
-
-    \list {
-      \item {First item};
-      \item {Second item};
-      \item {Third item};
-    };
-  };
-
-  \subtitle {Blockquote};
-
-  \blockquote {
-    Understand well as I may, my comprehension can only be an infinitesimal fraction of all I want to understand.
-    
-    - Ada Lovelace
-  };
-
-  \subtitle {Image};
-
-  \image {https://i.imgur.com/AD3MbBi.jpeg};
-
-  \subtitle {QRCode};
-
-  \qrcode {PostText};
+\blockquote {
+  Understand well as I may, my comprehension can only be an infinitesimal fraction of all I want to understand.
+  
+  - Ada Lovelace
 };
+
+\subsection {Image};
+
+\image {https://i.imgur.com/AD3MbBi.jpeg};
+
+\subsection {QRCode};
+
+\qrcode {PostText};
