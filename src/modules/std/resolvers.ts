@@ -12,7 +12,12 @@ import { Resolver, RegistryOptions } from '../../registry'
 import { Command } from '../../printer'
 
 export const TOC = Symbol('Toc')
-export const tocDef = [null, 'title', 'subtitle', 'subsubtitle']
+export const tocDef = [
+  null,
+  'section',
+  'subsection',
+  'subsubsection',
+]
 
 export const tagResolvers = (
   _options: RegistryOptions
@@ -50,28 +55,6 @@ export const tagResolvers = (
     },
 
     section: {
-      resolve: async function* (): AsyncGenerator<
-        Command,
-        void,
-        any
-      > {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
-
-        yield {
-          name: 'html',
-          template: '<section>{{{ data.content }}}</section>',
-          type: 'inline',
-          data: {
-            content: content ?? '',
-          },
-        }
-      },
-    },
-
-    title: {
       preload: async function* (): AsyncGenerator<
         Command,
         void,
@@ -86,7 +69,7 @@ export const tagResolvers = (
           name: 'send',
           topic: TOC,
           data: {
-            tagName: 'title',
+            tagName: 'section',
             content,
           },
         }
@@ -113,7 +96,7 @@ export const tagResolvers = (
       },
     },
 
-    subtitle: {
+    subsection: {
       preload: async function* (): AsyncGenerator<
         Command,
         void,
@@ -128,7 +111,7 @@ export const tagResolvers = (
           name: 'send',
           topic: TOC,
           data: {
-            tagName: 'subtitle',
+            tagName: 'subsection',
             content,
           },
         }
@@ -155,7 +138,7 @@ export const tagResolvers = (
       },
     },
 
-    subsubtitle: {
+    subsubsection: {
       preload: async function* (): AsyncGenerator<
         Command,
         void,
@@ -170,7 +153,7 @@ export const tagResolvers = (
           name: 'send',
           topic: TOC,
           data: {
-            tagName: 'subsubtitle',
+            tagName: 'subsubsection',
             content,
           },
         }
@@ -213,7 +196,7 @@ export const tagResolvers = (
           template: '<b>{{{ data.content }}}</b>',
           type: 'inline',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -235,7 +218,7 @@ export const tagResolvers = (
           template: '<i>{{{ data.content }}}</i>',
           type: 'inline',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -257,7 +240,7 @@ export const tagResolvers = (
           template: '<u>{{{ data.content }}}<u>',
           type: 'inline',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -394,7 +377,7 @@ export const tagResolvers = (
           name: 'html',
           template: '<li>{{{ data.content }}}</li>',
           data: {
-            content: content ?? '',
+            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
         }
       },
@@ -833,6 +816,28 @@ export const tagResolvers = (
             '<div class="std_qrcode">{{{ data.content }}}</div>',
           data: {
             content: svg,
+          },
+        }
+      },
+    },
+
+    box: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const content: string | undefined = yield {
+          name: 'getBlock',
+          index: 0,
+        }
+
+        yield {
+          name: 'html',
+          template: '<section>{{{ data.content }}}</section>',
+          type: 'inline',
+          data: {
+            content: content ?? '',
           },
         }
       },
