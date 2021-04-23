@@ -129,7 +129,7 @@ export const interpreters: Record<string, Interpreter> = {
       }
 
       let iterResult = await iter.next()
-      resolverLoop: while (!iterResult.done) {
+      while (!iterResult.done) {
         const resolverCommand = {
           ...iterResult.value,
           node,
@@ -146,20 +146,11 @@ export const interpreters: Record<string, Interpreter> = {
           break
         }
 
-        const commandIter = context.dispatch(resolverCommand)
+        const commandResult = yield* context.dispatch(
+          resolverCommand
+        )
 
-        let commandIterResult = await commandIter.next()
-        while (!commandIterResult.done) {
-          if (commandIterResult.value.name === 'break') {
-            break resolverLoop
-          }
-
-          yield commandIterResult.value
-
-          commandIterResult = await commandIter.next()
-        }
-
-        iterResult = await iter.next(commandIterResult.value)
+        iterResult = await iter.next(commandResult)
       }
 
       return yield* context.dispatch({
@@ -269,7 +260,7 @@ export const interpreters: Record<string, Interpreter> = {
 
       const iter = resolver.resolve()
       let iterResult = await iter.next()
-      resolverLoop: while (!iterResult.done) {
+      while (!iterResult.done) {
         const resolverCommand = {
           ...iterResult.value,
           node,
@@ -286,20 +277,11 @@ export const interpreters: Record<string, Interpreter> = {
           break
         }
 
-        const commandIter = context.dispatch(resolverCommand)
+        const commandResult = yield* context.dispatch(
+          resolverCommand
+        )
 
-        let commandIterResult = await commandIter.next()
-        while (!commandIterResult.done) {
-          if (commandIterResult.value.name === 'break') {
-            break resolverLoop
-          }
-
-          yield commandIterResult.value
-
-          commandIterResult = await commandIter.next()
-        }
-
-        iterResult = await iter.next(commandIterResult.value)
+        iterResult = await iter.next(commandResult)
       }
     },
   },
