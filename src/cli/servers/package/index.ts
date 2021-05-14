@@ -2,37 +2,48 @@ import path from 'path'
 import chalk from 'chalk'
 import fs from 'fs-extra'
 import chokidar from 'chokidar'
-import { Logger } from '../../helpers/logger'
 import boxen from 'boxen'
 
+import { Compiler } from '../../../compiler'
+import { Logger } from '../../helpers/logger'
+
 export interface PackageServerOptions {
-  rootPath: string
+  input: string
+}
+
+export interface PackageServerComponents {
+  options: PackageServerOptions
+
+  logger: Logger
 }
 
 export class PackageServer {
-  rootPath: string
+  options: PackageServerOptions
 
-  logger: Logger = Logger.create()
+  logger: Logger
 
   static create({
-    rootPath,
-  }: PackageServerOptions): PackageServer {
+    options,
+    logger,
+  }: PackageServerComponents): PackageServer {
     return new PackageServer({
-      rootPath,
+      options,
+      logger,
     })
   }
 
-  constructor({ rootPath }: PackageServerOptions) {
-    this.rootPath = rootPath
+  constructor({ options, logger }: PackageServerComponents) {
+    this.options = options
+    this.logger = logger
   }
 
   async serve(): Promise<void> {
-    const outputPath = path.resolve(process.cwd(), 'dist')
-    const inputPath = path.resolve(this.rootPath)
+    const outputPath = path.resolve(process.cwd(), 'target')
+    const inputPath = path.resolve(this.options.input)
 
-    await this.build(this.rootPath, outputPath)
+    await this.build(inputPath, outputPath)
 
-    console.log(
+    this.logger.log(
       boxen(`${chalk.yellow('open')}      ${outputPath}`, {
         borderColor: 'yellow',
         margin: 1,
@@ -42,8 +53,10 @@ export class PackageServer {
 
     chokidar.watch(inputPath).on('change', async () => {
       try {
-        this.logger.log(
-          `Start compiling ${chalk.blue(`'${this.rootPath}'`)}`
+        this.logger.info(
+          `Start compiling ${chalk.blue(
+            `'${this.options.input}'`
+          )}`
         )
         const startTime = new Date().getTime()
 
@@ -53,13 +66,13 @@ export class PackageServer {
           1_000
         ).toPrecision()
 
-        this.logger.log(
+        this.logger.info(
           `Finished compiling ${chalk.blue(
-            `'${this.rootPath}'`
+            `'${this.options.input}'`
           )} after ${chalk.magenta(deltaTime)} s`
         )
       } catch (error) {
-        this.logger.log(chalk.bgRed(' ERROR ', error))
+        this.logger.error(chalk.bgRed(' ERROR ', error))
       }
     })
   }
@@ -69,5 +82,9 @@ export class PackageServer {
     outputPath: string
   ): Promise<void> {
     await fs.ensureDir(outputPath)
+
+    const compiler = Compiler.create()
+
+    compiler.compile(inputPath)
   }
 }

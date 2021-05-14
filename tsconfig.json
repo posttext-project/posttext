@@ -1,10 +1,11 @@
 {
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
-    "target": "es5",
+    "target": "ESNext",
     "importHelpers": true,
     "alwaysStrict": true,
     "strictNullChecks": true,

@@ -17,12 +17,14 @@ import { Data } from '../data'
 import * as ast from '../../ast'
 
 export interface InterpreterOptions {
+  output: string
   js: string[]
   css: string[]
   mode: 'development' | 'production' | 'none' | undefined
 }
 
 export const getInterpreters = ({
+  output = 'target/dist',
   js = [],
   css = [],
   mode = 'development',
@@ -149,7 +151,7 @@ export const getInterpreters = ({
 
         // TODO: Secure file path.
 
-        const outputPath = path.resolve('dist', dest)
+        const outputPath = path.resolve(output, dest)
 
         await fs.copy(src, outputPath)
 

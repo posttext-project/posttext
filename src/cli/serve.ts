@@ -7,12 +7,16 @@ import fs from 'fs-extra'
 import { Command, CommandOptions } from './command'
 import { FileServer } from './servers/file'
 import { PackageServer } from './servers/package'
+import { Logger } from './helpers/logger'
 
 export class ServeCommand implements Command {
   private args: string[]
 
-  constructor({ args }: CommandOptions) {
+  private logger: Logger
+
+  constructor({ args, logger }: CommandOptions) {
     this.args = args
+    this.logger = logger
   }
 
   static create(options: CommandOptions): ServeCommand {
@@ -31,11 +35,19 @@ export class ServeCommand implements Command {
 
   private async servePackage(): Promise<void> {
     return PackageServer.create({
-      rootPath: this.args[0],
+      options: {
+        input: this.args[0],
+      },
+      logger: this.logger,
     }).serve()
   }
 
   private async serveFile(): Promise<void> {
-    return FileServer.create({ input: this.args[0] }).serve()
+    return FileServer.create({
+      options: {
+        input: this.args[0],
+      },
+      logger: this.logger,
+    }).serve()
   }
 }

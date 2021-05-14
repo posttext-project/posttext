@@ -67,7 +67,7 @@ export class CLI {
           this.cli.showHelp()
       }
     } catch (error) {
-      this.logger.log(chalk.bgRed(' ERROR '), error)
+      this.logger.error(chalk.bgRed(' ERROR '), error)
     }
   }
 
@@ -78,6 +78,7 @@ export class CLI {
     const command = CompileCommand.create({
       args,
       flags,
+      logger: this.logger,
     })
 
     await command.run()
@@ -90,6 +91,7 @@ export class CLI {
     const command = ServeCommand.create({
       args,
       flags,
+      logger: this.logger,
     })
 
     await command.run()

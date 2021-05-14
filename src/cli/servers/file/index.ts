@@ -1,8 +1,6 @@
 import ws from 'ws'
 import Koa from 'koa'
-import { Compiler } from '../../../compiler'
 import fs from 'fs-extra'
-import { getInterpreters } from '../../../printer/web'
 import path from 'path'
 import http from 'http'
 import serve from 'koa-static'
@@ -10,30 +8,43 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
+
 import { Subject } from 'rxjs'
 import { Logger } from '../../helpers/logger'
+import { Compiler } from '../../../compiler'
+import { getInterpreters } from '../../../printer/web'
 
 export interface FileServerOptions {
   input: string
   port?: number
 }
 
-export class FileServer {
-  input: string
-  port: number
+export interface FileServerComponents {
+  options: FileServerOptions
+  logger: Logger
+}
 
-  logger: Logger = Logger.create()
+export class FileServer {
+  options: FileServerOptions
+
+  logger: Logger
 
   static create({
-    input,
-    port = 8080,
-  }: FileServerOptions): FileServer {
-    return new FileServer({ input, port })
+    options,
+    logger,
+  }: FileServerComponents): FileServer {
+    return new FileServer({
+      options: {
+        ...options,
+        port: options.port ?? 8080,
+      },
+      logger,
+    })
   }
 
-  constructor({ input, port }: FileServerOptions) {
-    this.input = input
-    this.port = port!
+  constructor({ options, logger }: FileServerComponents) {
+    this.options = options
+    this.logger = logger
   }
 
   async serve(): Promise<void> {
@@ -42,8 +53,14 @@ export class FileServer {
     const router = new Router()
     const wss = new ws.Server({ server })
 
-    const inputPath = path.resolve(process.cwd(), this.input)
-    const outputPath = path.resolve(process.cwd(), 'dist')
+    const inputPath = path.resolve(
+      process.cwd(),
+      this.options.input
+    )
+    const outputPath = path.resolve(
+      process.cwd(),
+      'target/dist'
+    )
 
     const reload$ = new Subject<boolean>()
 
@@ -57,7 +74,9 @@ export class FileServer {
     chokidar.watch(inputPath).on('change', async () => {
       try {
         this.logger.log(
-          `Starting compiling ${chalk.blue(`'${this.input}'`)}`
+          `Starting compiling ${chalk.blue(
+            `'${this.options.input}'`
+          )}`
         )
         const startTime = new Date().getTime()
 
@@ -69,19 +88,19 @@ export class FileServer {
           1_000
         ).toPrecision()
 
-        this.logger.log(
+        this.logger.info(
           `Finished compiling ${chalk.blue(
-            `'${this.input}'`
+            `'${this.options.input}'`
           )} after ${chalk.magenta(deltaTime)} s`
         )
 
-        this.logger.log(
-          `Reloading ${chalk.blue(`'${this.input}'`)}`
+        this.logger.info(
+          `Reloading ${chalk.blue(`'${this.options.input}'`)}`
         )
 
         reload$.next(true)
       } catch (error) {
-        this.logger.log(chalk.bgRed(' ERROR '), error)
+        this.logger.error(error)
       }
     })
 
@@ -95,11 +114,11 @@ export class FileServer {
       })
     })
 
-    server.listen(this.port, () => {
-      console.log(
+    server.listen(this.options.port, () => {
+      this.logger.log(
         boxen(
           `${chalk.yellow('serve')}      http://localhost:${
-            this.port
+            this.options.port
           }`,
           {
             borderColor: 'yellow',

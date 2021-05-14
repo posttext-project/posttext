@@ -8,11 +8,11 @@ import path from 'path'
 import merge from 'merge-stream'
 import sourcemaps from 'gulp-sourcemaps'
 
-import { src, task, series, dest } from 'gulp'
+import { src, task, dest } from 'gulp'
 
 const reporter = ts.reporter.fullReporter(true)
 
-task('build:cjs', () => {
+task('build', () => {
   const tsProject = ts.createProject('tsconfig.json')
 
   return merge(
@@ -33,8 +33,6 @@ task('build:cjs', () => {
     }).pipe(dest('lib'))
   )
 })
-
-task('build', series(['build:cjs']))
 
 task('clean', async () => {
   await del('lib')
