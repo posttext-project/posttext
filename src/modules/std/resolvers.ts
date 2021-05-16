@@ -618,96 +618,25 @@ export const tagResolvers = (
         any,
         any
       > {
-        const childNodes: any[] | undefined = yield {
-          name: 'getBlockChildNodes',
-          displayMode: true,
-          index: 0,
-        }
-
-        let paragraph: string[] = []
-        const nodes: string[] = []
-        for (const childNode of childNodes ?? []) {
-          switch (childNode.type) {
-            case 'text': {
-              const chunks = childNode.content
-                .split(/(\n[^\S\n]*){2,}/)
-                .map((chunk) =>
-                  chunk.replace(/\s\s\n/g, '<br>')
-                )
-
-              for (const chunk of chunks.slice(0, -1)) {
-                paragraph.push(chunk)
-
-                const content = paragraph.join('')
-                if (!content.match(/^\s*$/g)) {
-                  nodes.push(
-                    yield {
-                      name: 'html',
-                      template: '<p>{{{ data.content }}}</p>',
-                      emit: false,
-                      data: {
-                        content,
-                      },
-                    }
-                  )
-                }
-
-                paragraph = []
-              }
-
-              if (chunks.length) {
-                const lastChunk = chunks.slice(-1)[0]
-
-                paragraph.push(lastChunk)
-              }
-
-              break
-            }
-
-            case 'inline': {
-              paragraph.push(childNode.content)
-
-              break
-            }
-
-            default: {
-              if (paragraph.length !== 0) {
-                const content = paragraph.join('')
-                if (!content.match(/^\s*$/g)) {
-                  nodes.push(
-                    yield {
-                      name: 'html',
-                      template: '<p>{{{ data.content }}}</p>',
-                      emit: false,
-                      data: {
-                        content,
-                      },
-                    }
-                  )
-                }
-
-                paragraph = []
-              }
-
-              nodes.push(childNode.content)
-            }
-          }
-        }
-
-        if (paragraph.length !== 0) {
-          const content = paragraph.join('')
-          if (!content.match(/^\s*$/g)) {
-            nodes.push(
+        const content = yield {
+          name: 'getBlockInlines',
+          transform: {
+            inlines: async function* (
+              content
+            ): AsyncGenerator<Command, any, any> {
               yield {
                 name: 'html',
-                template: '<p>{{{ data.content }}}</p>',
-                emit: false,
+                template: `
+                  <p>
+                    {{{ data.content }}}
+                  </p>
+                `,
                 data: {
                   content,
                 },
               }
-            )
-          }
+            },
+          },
         }
 
         yield {
@@ -718,7 +647,7 @@ export const tagResolvers = (
             </blockquote>
           `,
           data: {
-            content: nodes.join(''),
+            content,
           },
         }
       },
