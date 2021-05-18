@@ -621,8 +621,36 @@ export const tagResolvers = (
         const content = yield {
           name: 'getBlockInlines',
           transform: {
+            text: async function* (
+              textContent: string
+            ): AsyncGenerator<Command, any, any> {
+              const paragraphs = textContent
+                .split(/(?:\n\r?[ ]?)+/)
+                .filter((chunk) => !/^\s+$/.test(chunk))
+
+              for (const [
+                index,
+                paragraph,
+              ] of paragraphs.entries()) {
+                yield {
+                  name: 'html',
+                  template: `{{{ data.content }}}`,
+                  type: 'text',
+                  data: {
+                    content: paragraph,
+                  },
+                }
+
+                if (index !== paragraphs.length - 1) {
+                  yield {
+                    name: 'html',
+                    type: 'hard-break',
+                  }
+                }
+              }
+            },
             inlines: async function* (
-              content
+              content: string
             ): AsyncGenerator<Command, any, any> {
               yield {
                 name: 'html',

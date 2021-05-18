@@ -489,6 +489,9 @@ export const interpreters: Record<string, Interpreter> = {
       const transformInlines = command?.transform?.inlines as (
         content: string
       ) => AsyncGenerator<Data, any, any>
+      const transformText = command?.transform?.text as (
+        content: string
+      ) => AsyncGenerator<Data, any, any>
 
       const block = tagNode.blocks[index]
       if (!block) {
@@ -508,6 +511,41 @@ export const interpreters: Record<string, Interpreter> = {
           node: childNode,
         })) {
           if (data.name === 'html') {
+            if (data.type === 'hard-break') {
+              transformedChildNodes.push({
+                type: 'block',
+                content: '',
+              })
+
+              continue
+            }
+
+            if (data.type === 'text') {
+              for await (const childData of context.dispatch({
+                name: 'render',
+                node: tagNode,
+                resolve: transformText.bind(null, data.content),
+              })) {
+                if (childData.name === 'html') {
+                  if (childData.type === 'hard-break') {
+                    transformedChildNodes.push({
+                      type: 'block',
+                      content: '',
+                    })
+
+                    continue
+                  }
+
+                  transformedChildNodes.push({
+                    type: childData.type,
+                    content: childData.content,
+                  })
+                }
+              }
+
+              continue
+            }
+
             transformedChildNodes.push({
               type: data.type,
               content: data.content,
