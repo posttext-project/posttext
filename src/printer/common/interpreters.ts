@@ -245,12 +245,34 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
 
-      for (const childNode of node.body) {
-        yield* context.dispatch({
-          name: 'render',
-          node: childNode,
-        })
+      if (!context.registry.getTagResolver('__root__')) {
+        for (const childNode of node.body) {
+          yield* context.dispatch({
+            name: 'render',
+            node: childNode,
+          })
+        }
+
+        return
       }
+
+      const tagNode: ast.TagNode = {
+        type: 'Tag',
+        id: { name: '__root__', type: 'Identifier' },
+        attrs: [],
+        params: [],
+        blocks: [
+          {
+            type: 'Block',
+            body: node.body,
+          },
+        ],
+      }
+
+      yield* context.dispatch({
+        name: 'render',
+        node: tagNode,
+      })
     },
   },
 
@@ -264,7 +286,7 @@ export const interpreters: Record<string, Interpreter> = {
       const node = command.node as TagNode
       const resolve = command.resolve as () => AsyncGenerator<
         Data,
-        any,
+        void,
         any
       >
 
@@ -493,6 +515,10 @@ export const interpreters: Record<string, Interpreter> = {
         content: string
       ) => AsyncGenerator<Data, any, any>
 
+      const transformBlock = command?.transform?.block as (
+        content: string
+      ) => AsyncGenerator<Data, any, any>
+
       const block = tagNode.blocks[index]
       if (!block) {
         return
@@ -564,12 +590,12 @@ export const interpreters: Record<string, Interpreter> = {
           if (lastItem[0].type === 'block') {
             if (childNode.type === 'block' || !childNode.type) {
               return [
-                items.slice(0, items.length - 1),
+                ...items.slice(0, items.length - 1),
                 [...lastItem, childNode],
               ]
-            } else {
-              return [...items, [childNode]]
             }
+
+            return [...items, [childNode]]
           }
 
           if (childNode.type === 'block' || !childNode.type) {
@@ -577,29 +603,23 @@ export const interpreters: Record<string, Interpreter> = {
           }
 
           return [
-            items.slice(0, items.length - 1),
+            ...items.slice(0, items.length - 1),
             [...lastItem, childNode],
           ]
         }, [])
         .map((childNodes) => {
-          if (
-            childNodes[0].type === 'block' ||
-            !childNodes[0].type
-          ) {
-            return async function* (): AsyncGenerator<
-              Data,
-              any,
-              any
-            > {
-              return ''
-            }
-          }
-
           const content = childNodes
             .map((childNode) => {
               return childNode.content
             })
             .join('')
+
+          if (
+            childNodes[0].type === 'block' ||
+            !childNodes[0].type
+          ) {
+            return transformBlock.bind(null, content)
+          }
 
           return transformInlines.bind(null, content)
         })

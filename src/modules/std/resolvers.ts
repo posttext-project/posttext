@@ -10,6 +10,7 @@ import path from 'path'
 
 import { Resolver, RegistryOptions } from '../../registry'
 import { Command } from '../../printer'
+import { extractParagraphs } from '../../ptlib'
 
 export const TOC = Symbol('Toc')
 export const tocDef = [
@@ -23,6 +24,29 @@ export const tagResolvers = (
   _options: RegistryOptions
 ): Record<string, Resolver> => {
   return {
+    __root__: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const content = yield {
+          name: 'getBlockInlines',
+          transform: {
+            ...extractParagraphs,
+          },
+        }
+
+        yield {
+          name: 'html',
+          template: `{{{ data.content }}}`,
+          data: {
+            content,
+          },
+        }
+      },
+    },
+
     posttext: {
       resolve: async function* (): AsyncGenerator<
         Command,
@@ -51,6 +75,27 @@ export const tagResolvers = (
         any
       > {
         /* pass */
+      },
+    },
+
+    title: {
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const content: string | undefined = yield {
+          name: 'getBlock',
+          index: 0,
+        }
+
+        yield {
+          name: 'html',
+          template: '<h1>{{{ data.content }}}</h1>',
+          data: {
+            content: content ?? '',
+          },
+        }
       },
     },
 
@@ -87,8 +132,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<h1>{{{ data.content }}}</h1>',
-          type: 'inline',
+          template: '<h2>{{{ data.content }}}</h2>',
           data: {
             content: content ?? '',
           },
@@ -129,8 +173,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<h2>{{{ data.content }}}</h2>',
-          type: 'inline',
+          template: '<h3>{{{ data.content }}}</h3>',
           data: {
             content: content ?? '',
           },
@@ -171,8 +214,7 @@ export const tagResolvers = (
 
         yield {
           name: 'html',
-          template: '<h3>{{{ data.content }}}</h3>',
-          type: 'inline',
+          template: '<h4>{{{ data.content }}}</h4>',
           data: {
             content: content ?? '',
           },
@@ -242,102 +284,6 @@ export const tagResolvers = (
           data: {
             content: content?.replace(/\s\s\n/g, '<br>') ?? '',
           },
-        }
-      },
-    },
-
-    paragraph: {
-      resolve: async function* (): AsyncGenerator<
-        Command,
-        void,
-        any
-      > {
-        const childNodes: any[] | undefined = yield {
-          name: 'getBlockChildNodes',
-          displayMode: true,
-          index: 0,
-        }
-
-        let paragraph: string[] = []
-        for (const childNode of childNodes ?? []) {
-          switch (childNode.type) {
-            case 'text': {
-              const chunks = childNode.content
-                .split(/(\n[^\S\n]*){2,}/)
-                .map((chunk) =>
-                  chunk.replace(/\s\s\n/g, '<br>')
-                )
-
-              for (const chunk of chunks.slice(0, -1)) {
-                paragraph.push(chunk)
-
-                const content = paragraph.join('')
-                if (!content.match(/^\s*$/g)) {
-                  yield {
-                    name: 'html',
-                    template: '<p>{{{ data.content }}}</p>',
-                    data: {
-                      content,
-                    },
-                  }
-                }
-
-                paragraph = []
-              }
-
-              if (chunks.length) {
-                const lastChunk = chunks.slice(-1)[0]
-
-                paragraph.push(lastChunk)
-              }
-
-              break
-            }
-
-            case 'inline': {
-              paragraph.push(childNode.content)
-
-              break
-            }
-
-            default: {
-              if (paragraph.length !== 0) {
-                const content = paragraph.join('')
-                if (!content.match(/^\s*$/g)) {
-                  yield {
-                    name: 'html',
-                    template: '<p>{{{ data.content }}}</p>',
-                    data: {
-                      content,
-                    },
-                  }
-                }
-
-                paragraph = []
-              }
-
-              yield {
-                name: 'html',
-                template: '{{{ data.content }}}',
-                data: {
-                  content: childNode.content,
-                },
-              }
-            }
-          }
-        }
-
-        if (paragraph.length !== 0) {
-          const content = paragraph.join('')
-          if (!content.match(/^\s*$/g)) {
-            yield {
-              name: 'html',
-              template: '<p>{{{ data.content }}}</p>',
-              data: {
-                content,
-              },
-            }
-          }
         }
       },
     },
@@ -595,9 +541,9 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template: `
-            <h1 class="std_toc__title">
+            <h2 class="std_toc__title">
               {{{ data.content }}}
-            </h1>
+            </h2>
             <ul class="std_toc__list">
               {{#each data.items}}
                 {{{ this }}}
@@ -621,49 +567,7 @@ export const tagResolvers = (
         const content = yield {
           name: 'getBlockInlines',
           transform: {
-            text: async function* (
-              textContent: string
-            ): AsyncGenerator<Command, any, any> {
-              const paragraphs = textContent
-                .split(/(?:\n\r?[ ]?)+/)
-                .filter((chunk) => !/^\s+$/.test(chunk))
-
-              for (const [
-                index,
-                paragraph,
-              ] of paragraphs.entries()) {
-                yield {
-                  name: 'html',
-                  template: `{{{ data.content }}}`,
-                  type: 'text',
-                  data: {
-                    content: paragraph,
-                  },
-                }
-
-                if (index !== paragraphs.length - 1) {
-                  yield {
-                    name: 'html',
-                    type: 'hard-break',
-                  }
-                }
-              }
-            },
-            inlines: async function* (
-              content: string
-            ): AsyncGenerator<Command, any, any> {
-              yield {
-                name: 'html',
-                template: `
-                  <p>
-                    {{{ data.content }}}
-                  </p>
-                `,
-                data: {
-                  content,
-                },
-              }
-            },
+            ...extractParagraphs,
           },
         }
 
@@ -784,17 +688,22 @@ export const tagResolvers = (
         void,
         any
       > {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
+        const content = yield {
+          name: 'getBlockInlines',
+          transform: {
+            ...extractParagraphs,
+          },
         }
 
         yield {
           name: 'html',
-          template: '<section>{{{ data.content }}}</section>',
-          type: 'inline',
+          template: `
+            <div class="std_box">
+              {{{ data.content }}}
+            </div>
+          `,
           data: {
-            content: content ?? '',
+            content,
           },
         }
       },
