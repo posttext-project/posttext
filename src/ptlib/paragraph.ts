@@ -6,7 +6,7 @@ export const extractParagraphs = {
   ): AsyncGenerator<Command, void, any> {
     const paragraphs = textContent
       .split(/(?:\n\r?[ ]?)+/)
-      .filter((chunk) => !/^\s+$/.test(chunk))
+      .filter((chunk) => !/^\s*$/.test(chunk))
 
     for (const [index, paragraph] of paragraphs.entries()) {
       yield {

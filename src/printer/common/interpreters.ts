@@ -508,10 +508,10 @@ export const interpreters: Record<string, Interpreter> = {
       const tagNode = command.node as TagNode
       const index = command.index ?? 0
 
-      const transformInlines = command?.transform?.inlines as (
+      const transformText = command?.transform?.text as (
         content: string
       ) => AsyncGenerator<Data, any, any>
-      const transformText = command?.transform?.text as (
+      const transformInlines = command?.transform?.inlines as (
         content: string
       ) => AsyncGenerator<Data, any, any>
 
@@ -587,7 +587,10 @@ export const interpreters: Record<string, Interpreter> = {
           }
 
           const lastItem = items[items.length - 1]
-          if (lastItem[0].type === 'block') {
+          if (
+            lastItem[0].type === 'block' ||
+            !lastItem[0].type
+          ) {
             if (childNode.type === 'block' || !childNode.type) {
               return [
                 ...items.slice(0, items.length - 1),
@@ -654,7 +657,8 @@ export const interpreters: Record<string, Interpreter> = {
         command.template ?? ''
       )
       const data = command.data ?? {}
-      const type = command.type as string | undefined
+      const type =
+        (command.type as string | undefined) || 'block'
 
       const emit = command.emit as boolean | undefined
 
