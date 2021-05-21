@@ -10,6 +10,11 @@ import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
 import * as ast from '../../ast'
+import {
+  blockTransformDefault,
+  inlinesTransformDefault,
+  textTransformDefault,
+} from './getBlockInlines'
 
 const TAG_STATE = Symbol('TagState')
 const SEND_RECEIVE = Symbol('SendReceive')
@@ -508,14 +513,17 @@ export const interpreters: Record<string, Interpreter> = {
       const tagNode = command.node as TagNode
       const index = command.index ?? 0
 
-      const transformText = command?.transform?.text as (
+      const transformText = (command?.transform?.text ??
+        textTransformDefault) as (
         content: string
       ) => AsyncGenerator<Data, any, any>
-      const transformInlines = command?.transform?.inlines as (
+      const transformInlines = (command?.transform?.inlines ??
+        inlinesTransformDefault) as (
         content: string
       ) => AsyncGenerator<Data, any, any>
 
-      const transformBlock = command?.transform?.block as (
+      const transformBlock = (command?.transform?.block ??
+        blockTransformDefault) as (
         content: string
       ) => AsyncGenerator<Data, any, any>
 
