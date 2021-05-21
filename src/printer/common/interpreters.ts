@@ -10,6 +10,11 @@ import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
 import * as ast from '../../ast'
+import {
+  blockTransformDefault,
+  inlinesTransformDefault,
+  textTransformDefault,
+} from './getBlockInlines'
 
 const TAG_STATE = Symbol('TagState')
 const SEND_RECEIVE = Symbol('SendReceive')
@@ -203,6 +208,7 @@ export const interpreters: Record<string, Interpreter> = {
       switch (node.type) {
         case 'Document': {
           return yield* context.dispatch({
+            ...command,
             name: 'renderDocument',
             node,
           })
@@ -210,6 +216,7 @@ export const interpreters: Record<string, Interpreter> = {
 
         case 'Tag': {
           return yield* context.dispatch({
+            ...command,
             name: 'renderTag',
             node,
           })
@@ -217,6 +224,7 @@ export const interpreters: Record<string, Interpreter> = {
 
         case 'Text': {
           return yield* context.dispatch({
+            ...command,
             name: 'renderText',
             node,
           })
@@ -224,6 +232,7 @@ export const interpreters: Record<string, Interpreter> = {
 
         case 'Block': {
           return yield* context.dispatch({
+            ...command,
             name: 'renderBlock',
             node,
           })
@@ -241,12 +250,34 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as DocumentNode
 
-      for (const childNode of node.body) {
-        yield* context.dispatch({
-          name: 'render',
-          node: childNode,
-        })
+      if (!context.registry.getTagResolver('__root__')) {
+        for (const childNode of node.body) {
+          yield* context.dispatch({
+            name: 'render',
+            node: childNode,
+          })
+        }
+
+        return
       }
+
+      const tagNode: ast.TagNode = {
+        type: 'Tag',
+        id: { name: '__root__', type: 'Identifier' },
+        attrs: [],
+        params: [],
+        blocks: [
+          {
+            type: 'Block',
+            body: node.body,
+          },
+        ],
+      }
+
+      yield* context.dispatch({
+        name: 'render',
+        node: tagNode,
+      })
     },
   },
 
@@ -258,10 +289,17 @@ export const interpreters: Record<string, Interpreter> = {
       context: Context
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
+      const resolve = command.resolve as () => AsyncGenerator<
+        Data,
+        void,
+        any
+      >
 
-      const resolver = context.registry.getTagResolver(
-        node.id.name
-      )
+      const resolver = command.resolve
+        ? {
+            resolve,
+          }
+        : context.registry.getTagResolver(node.id.name)
 
       if (!resolver) {
         return
@@ -467,6 +505,157 @@ export const interpreters: Record<string, Interpreter> = {
     },
   },
 
+  getBlockInlines: {
+    interpret: async function* (
+      command: Command,
+      context: Context
+    ): AsyncGenerator<Data, any, any> {
+      const tagNode = command.node as TagNode
+      const index = command.index ?? 0
+
+      const transformText = (command?.transform?.text ??
+        textTransformDefault) as (
+        content: string
+      ) => AsyncGenerator<Data, any, any>
+      const transformInlines = (command?.transform?.inlines ??
+        inlinesTransformDefault) as (
+        content: string
+      ) => AsyncGenerator<Data, any, any>
+
+      const transformBlock = (command?.transform?.block ??
+        blockTransformDefault) as (
+        content: string
+      ) => AsyncGenerator<Data, any, any>
+
+      const block = tagNode.blocks[index]
+      if (!block) {
+        return
+      }
+
+      if (block.body.length === 0) {
+        return []
+      }
+
+      const childNodes = block.body
+      const transformedChildNodes: any[] = []
+
+      for (const childNode of childNodes) {
+        for await (const data of context.dispatch({
+          name: 'render',
+          node: childNode,
+        })) {
+          if (data.name === 'html') {
+            if (data.type === 'hard-break') {
+              transformedChildNodes.push({
+                type: 'block',
+                content: '',
+              })
+
+              continue
+            }
+
+            if (data.type === 'text') {
+              for await (const childData of context.dispatch({
+                name: 'render',
+                node: tagNode,
+                resolve: transformText.bind(null, data.content),
+              })) {
+                if (childData.name === 'html') {
+                  if (childData.type === 'hard-break') {
+                    transformedChildNodes.push({
+                      type: 'block',
+                      content: '',
+                    })
+
+                    continue
+                  }
+
+                  transformedChildNodes.push({
+                    type: childData.type,
+                    content: childData.content,
+                  })
+                }
+              }
+
+              continue
+            }
+
+            transformedChildNodes.push({
+              type: data.type,
+              content: data.content,
+            })
+          }
+        }
+      }
+
+      const dispatchers = transformedChildNodes
+        .reduce((items, childNode) => {
+          if (items.length === 0) {
+            return [[childNode]]
+          }
+
+          const lastItem = items[items.length - 1]
+          if (
+            lastItem[0].type === 'block' ||
+            !lastItem[0].type
+          ) {
+            if (childNode.type === 'block' || !childNode.type) {
+              return [
+                ...items.slice(0, items.length - 1),
+                [...lastItem, childNode],
+              ]
+            }
+
+            return [...items, [childNode]]
+          }
+
+          if (childNode.type === 'block' || !childNode.type) {
+            return [...items, [childNode]]
+          }
+
+          return [
+            ...items.slice(0, items.length - 1),
+            [...lastItem, childNode],
+          ]
+        }, [])
+        .map((childNodes) => {
+          const content = childNodes
+            .map((childNode) => {
+              return childNode.content
+            })
+            .join('')
+
+          if (
+            childNodes[0].type === 'block' ||
+            !childNodes[0].type
+          ) {
+            return transformBlock.bind(null, content)
+          }
+
+          return transformInlines.bind(null, content)
+        })
+        .map((resolve) => {
+          return context.dispatch({
+            name: 'render',
+            node: tagNode,
+            resolve,
+          })
+        })
+
+      const renderedInlines: string[] = []
+
+      for (const dispatcher of dispatchers) {
+        for await (const data of dispatcher) {
+          if (data.name === 'html') {
+            renderedInlines.push(data.content)
+          }
+        }
+      }
+
+      return renderedInlines.join('')
+    },
+  },
+
   html: {
     interpret: async function* (
       command: Command,
@@ -476,7 +665,8 @@ export const interpreters: Record<string, Interpreter> = {
         command.template ?? ''
       )
       const data = command.data ?? {}
-      const type = command.type as string | undefined
+      const type =
+        (command.type as string | undefined) || 'block'
 
       const emit = command.emit as boolean | undefined
 
