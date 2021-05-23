@@ -365,6 +365,11 @@ export const interpreters: Record<string, Interpreter> = {
       context: Context
     ): AsyncGenerator<Data, any, any> {
       const node = command.node as TagNode
+      const symbol = command.node as symbol
+
+      if (symbol) {
+        return context.getState(symbol)
+      }
 
       const state = context.getState(TAG_STATE)
       if (!state[node.id.name]) {
@@ -751,16 +756,12 @@ export const interpreters: Record<string, Interpreter> = {
       for (const dep of command.deps as any[]) {
         const type =
           depsType ?? (dep.type as 'js' | 'css' | undefined)
-        const id = dep.id as string | undefined
         const src = dep.src as string | undefined
-        const version = dep.version as string | undefined
 
         yield {
           name: 'dependency',
           type,
-          id,
           src,
-          version,
         }
       }
     },

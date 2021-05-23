@@ -118,7 +118,7 @@ export class Parser {
   }
 
   parseIdentifier(cursor: Cursor): IdentifierNode | null {
-    const execArr = cursor.exec(/[a-zA-Z][a-zA-Z0-9_-]+/gy)
+    const execArr = cursor.exec(/[a-zA-Z][a-zA-Z0-9_'-]+/gy)
 
     if (execArr) {
       const name = execArr[0]

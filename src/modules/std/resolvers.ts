@@ -7,10 +7,14 @@ import loadLanguages from 'prismjs/components/'
 import stripIndent from 'strip-indent'
 import qrcode from 'qrcode'
 import path from 'path'
+import katex from 'katex'
 
 import { Resolver, RegistryOptions } from '../../registry'
 import { Command } from '../../printer'
 import { extractParagraphs } from '../../ptlib'
+
+const KATEX_STATE = Symbol('KatexState')
+const CODE_BLOCK_STATE = Symbol('CodeBlockState')
 
 export const TOC = Symbol('Toc')
 export const tocDef = [
@@ -337,20 +341,19 @@ export const tagResolvers = (
       > {
         const state: Record<string, any> = yield {
           name: 'getState',
+          symbol: CODE_BLOCK_STATE,
         }
         if (!state.languagesLoaded) {
-          loadLanguages()
-
           state.languagesLoaded = true
+
+          loadLanguages()
 
           yield {
             name: 'addDeps',
             deps: [
               {
                 type: 'css',
-                id: 'prismjs/themes/prism.css',
                 src: 'prismjs/themes/prism.css',
-                version: '^1.21.0',
               },
             ],
           }
@@ -395,10 +398,183 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template:
-            '<pre class="language-{{ data.language }}"><code>{{{ data.code }}}</code></pre>',
+            '<pre><code class="language-{{ data.language }}">{{{ data.code }}}</code></pre>',
           data: {
             language,
             code,
+          },
+        }
+      },
+    },
+
+    "code'": {
+      preload: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const state: Record<string, any> = yield {
+          name: 'getState',
+          symbol: CODE_BLOCK_STATE,
+        }
+        if (!state.languagesLoaded) {
+          state.languagesLoaded = true
+
+          loadLanguages()
+
+          yield {
+            name: 'addDeps',
+            deps: [
+              {
+                type: 'css',
+                src: 'prismjs/themes/prism.css',
+              },
+            ],
+          }
+        }
+      },
+
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const params: string[] = yield {
+          name: 'getParams',
+        }
+        const language: string =
+          params[0] &&
+          Object.keys(Prism.languages).indexOf(params[0])
+            ? params[0]
+            : 'text'
+
+        const BEGIN_NEWLINE = /^\r?\n/
+        const END_NEWLINE = /\r?\n[\t ]+$/
+
+        const rawTextContent: string | undefined = yield {
+          name: 'textContent',
+          index: 0,
+        }
+        const textContent: string = rawTextContent
+          ? stripIndent(rawTextContent)
+              .replace(BEGIN_NEWLINE, '')
+              .replace(END_NEWLINE, '')
+          : ''
+
+        const code: string =
+          language !== 'text'
+            ? Prism.highlight(
+                textContent,
+                Prism.languages[language],
+                language
+              )
+            : textContent
+        yield {
+          name: 'html',
+          template:
+            '<code class="language-{{ data.language }}">{{{ data.code }}}</code>',
+          type: 'inline',
+          data: {
+            language,
+            code,
+          },
+        }
+      },
+    },
+
+    katex: {
+      preload: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const state: Record<string, any> = yield {
+          name: 'getState',
+          symbol: KATEX_STATE,
+        }
+        if (!state.katexLoaded) {
+          state.katexLoaded = true
+
+          yield {
+            name: 'addDeps',
+            deps: [
+              {
+                type: 'css',
+                src: 'katex/dist/katex.css',
+              },
+            ],
+          }
+        }
+      },
+
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const rawTextContent: string | undefined = yield {
+          name: 'textContent',
+        }
+
+        const content = katex.renderToString(rawTextContent, {
+          throwOnError: false,
+          displayMode: true,
+        })
+
+        yield {
+          name: 'html',
+          template: `{{{ data.content }}}`,
+          data: {
+            content,
+          },
+        }
+      },
+    },
+
+    "katex'": {
+      preload: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const state: Record<string, any> = yield {
+          name: 'getState',
+          symbol: KATEX_STATE,
+        }
+        if (!state.katexLoaded) {
+          state.katexLoaded = true
+
+          yield {
+            name: 'addDeps',
+            deps: [
+              {
+                type: 'css',
+                src: 'katex/dist/katex.css',
+              },
+            ],
+          }
+        }
+      },
+
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        void,
+        any
+      > {
+        const rawTextContent: string | undefined = yield {
+          name: 'textContent',
+        }
+
+        const content = katex.renderToString(rawTextContent, {
+          throwOnError: false,
+        })
+
+        yield {
+          name: 'html',
+          template: `{{{ data.content }}}`,
+          type: 'inline',
+          data: {
+            content,
           },
         }
       },
