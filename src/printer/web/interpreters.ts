@@ -17,12 +17,14 @@ import { Data } from '../data'
 import * as ast from '../../ast'
 
 export interface InterpreterOptions {
+  output: string
   js: string[]
   css: string[]
   mode: 'development' | 'production' | 'none' | undefined
 }
 
 export const getInterpreters = ({
+  output = path.resolve(process.cwd(), 'dist'),
   js = [],
   css = [],
   mode = 'development',
@@ -149,11 +151,11 @@ export const getInterpreters = ({
 
         // TODO: Secure file path.
 
-        const outputPath = path.resolve('dist', dest)
+        const outputPath = path.resolve(output, dest)
 
         await fs.copy(src, outputPath)
 
-        return path.relative(path.resolve('dist'), outputPath)
+        return path.relative(output, outputPath)
       },
     },
 
@@ -199,9 +201,8 @@ export const getInterpreters = ({
           const compiler = webpack({
             entry: [...jsDeps, ...cssDeps],
             output: {
-              path: path.resolve('dist'),
+              path: output,
               filename: '[name].js',
-              publicPath: path.resolve('dist'),
             },
             mode,
             devtool: false,
@@ -229,6 +230,14 @@ export const getInterpreters = ({
                       loader: 'css-loader',
                     },
                   ],
+                },
+                {
+                  test: /\.(png|svg|jpg|jpeg|gif)$/i,
+                  type: 'asset/resource',
+                },
+                {
+                  test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                  type: 'asset/resource',
                 },
               ],
             },

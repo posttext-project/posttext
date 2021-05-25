@@ -42,6 +42,7 @@ specifiers:
   husky: ^4.3.8
   jest: ^26.6.3
   js-yaml: ^3.14.1
+  katex: ^0.13.11
   koa: ^2.13.1
   koa-static: ^5.0.0
   memoizee: ^0.4.15
@@ -63,6 +64,7 @@ specifiers:
   tslib: ^2.2.0
   typescript: ^4.2.4
   uuid: ^8.3.2
+  webfontloader: ^1.6.28
   webpack: ^5.32.0
   ws: ^7.4.4
 
@@ -74,6 +76,7 @@ dependencies:
   cursornext: 0.2.4
   dot: 1.1.3
   handlebars: 4.7.7
+  katex: 0.13.11
   koa: 2.13.1
   koa-static: 5.0.0
   memoizee: 0.4.15
@@ -84,6 +87,7 @@ dependencies:
   rxjs: 6.6.7
   tslib: 2.2.0
   uuid: 8.3.2
+  webfontloader: 1.6.28
   ws: 7.4.4
 
 devDependencies:
@@ -3129,6 +3133,11 @@ packages:
     resolution: {integrity: sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==}
     dev: true
 
+  /commander/6.2.1:
+    resolution: {integrity: sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==}
+    engines: {node: '>= 6'}
+    dev: false
+
   /common-path-prefix/3.0.0:
     resolution: {integrity: sha512-QE33hToZseCH3jS0qN96O/bSh3kaw/h+Tq7ngyY9eWDUnTlTNUyqfqvCXioLe5Na5jFsL78ra/wuBU4iuEgd4w==}
     dev: true
@@ -5900,6 +5909,13 @@ packages:
   /just-debounce/1.1.0:
     resolution: {integrity: sha512-qpcRocdkUmf+UTNBYx5w6dexX5J31AKK1OmPwH630a83DdVVUIngk55RSAiIGpQyoH0dlr872VHfPjnQnK1qDQ==}
     dev: true
+
+  /katex/0.13.11:
+    resolution: {integrity: sha512-yJBHVIgwlAaapzlbvTpVF/ZOs8UkTj/sd46Fl8+qAf2/UiituPYVeapVD8ADZtqyRg/qNWUKt7gJoyYVWLrcXw==}
+    hasBin: true
+    dependencies:
+      commander: 6.2.1
+    dev: false
 
   /keygrip/1.1.0:
     resolution: {integrity: sha512-iYSchDJ+liQ8iwbSI2QqsQOvqv58eJCEanyJPJi+Khyu8smkcKSFUCbPwzFcL7YVtZ6eONjqRX/38caJ7QjRAQ==}
@@ -8972,6 +8988,10 @@ packages:
     dependencies:
       defaults: 1.0.3
     dev: true
+
+  /webfontloader/1.6.28:
+    resolution: {integrity: sha1-23hhKSU8tujq5UwvsF+HCvZnW64=}
+    dev: false
 
   /webidl-conversions/5.0.0:
     resolution: {integrity: sha512-VlZwKPCkYKxQgeSbH5EyngOmRp7Ww7I9rQLERETtf5ofd9pGeswWiOtogpEO850jziPRarreGxn5QIiTqpb2wA==}

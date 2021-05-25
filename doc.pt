@@ -45,3 +45,11 @@ This is a list of items:
 \subsection {QRCode};
 
 \qrcode {PostText};
+
+\subsection {Mathematical Equations};
+
+This is an example mathematical equation in PostText: \katex' ==={
+  f(x) = \int_{-\infty}^\infty
+    \hat{f}(\xi)\,e^{2 \pi i \xi x}
+    \,d\xi
+}===;

@@ -117,6 +117,7 @@ export class ServeCommand implements Command {
     await fs.ensureDir(outputPath)
 
     const interpreters = getInterpreters({
+      output: outputPath,
       js: [path.resolve(__dirname, 'assets/bundle.ts')],
       css: [path.resolve(__dirname, 'assets/bundle.css')],
       mode: 'development',
