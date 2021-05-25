@@ -7,7 +7,7 @@ import path from 'path'
 
 import { CommandOptions, Command } from './command'
 import { Compiler } from '../compiler'
-import { interpreters } from '../printer/web'
+import { getInterpreters } from '../printer/web'
 
 export class CompileCommand implements Command {
   private args: string[]
@@ -21,12 +21,18 @@ export class CompileCommand implements Command {
   }
 
   async run(): Promise<void> {
-    const filePath = path.resolve(process.cwd(), this.args[0])
-    const input = await fs.readFile(filePath, 'utf8')
+    const inputPath = path.resolve(process.cwd(), this.args[0])
+    const outputPath = path.resolve(process.cwd(), 'dist')
+    const input = await fs.readFile(inputPath, 'utf8')
 
     const compiler = Compiler.create()
 
-    compiler.getPrinter().registerInterpreters(interpreters)
+    compiler.getPrinter().registerInterpreters(
+      getInterpreters({
+        output: outputPath,
+        css: [path.resolve(__dirname, 'assets/bundle.css')],
+      })
+    )
 
     await compiler.compile(input)
   }

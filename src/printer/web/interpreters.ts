@@ -24,7 +24,7 @@ export interface InterpreterOptions {
 }
 
 export const getInterpreters = ({
-  output = 'dist',
+  output = path.resolve(process.cwd(), 'dist'),
   js = [],
   css = [],
   mode = 'development',
