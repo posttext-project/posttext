@@ -482,6 +482,37 @@ export const tagResolvers = (
       },
     },
 
+    emoji: {
+      preload: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        const state: Record<string, any> = yield {
+          name: 'getState',
+        }
+        if (!state.twemojiLoaded) {
+          state.twemojiLoaded = true
+
+          yield {
+            name: 'addDeps',
+            deps: [
+              {
+                type: 'static',
+                src: 'twemoji/dist'
+              }
+            ]
+          }
+        }
+      },
+
+      resolve: async function* (): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {},
+    },
+
     katex: {
       preload: async function* (): AsyncGenerator<
         Command,
