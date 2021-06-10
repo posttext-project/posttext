@@ -1,0 +1,15 @@
+{
+  "name": "@posttext/parser",
+  "version": "0.1.0",
+  "description": "The parser for Posttext",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "parser"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0"
+}

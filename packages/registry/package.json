@@ -1,0 +1,15 @@
+{
+  "name": "@posttext/registry",
+  "version": "0.1.0",
+  "description": "The library for registering modules in Posttext",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "registry"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0"
+}

@@ -1,0 +1,15 @@
+{
+  "name": "@posttext/cli",
+  "version": "0.1.0",
+  "description": "The Posttext CLI",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "cli"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0"
+}

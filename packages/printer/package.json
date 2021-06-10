@@ -1,0 +1,15 @@
+{
+  "name": "@posttext/printer",
+  "version": "0.1.0",
+  "description": "The printer for Posttext",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "printer"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0"
+}
