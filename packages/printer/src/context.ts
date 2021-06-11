@@ -5,7 +5,7 @@
 import { Context, Dispatch, Interpreter } from './interpreter'
 import { Command } from './command'
 import { Data } from './data'
-import { Registry } from '../registry'
+import { Registry } from '@posttext/registry'
 
 export interface AnonymousContextComponents {
   dispatch: Dispatch

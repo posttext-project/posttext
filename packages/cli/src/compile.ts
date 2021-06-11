@@ -6,8 +6,8 @@ import fs from 'fs-extra'
 import path from 'path'
 
 import { CommandOptions, Command } from './command'
-import { Compiler } from '../compiler'
-import { getInterpreters } from '../printer/web'
+import { Compiler } from '@posttext/compiler'
+import { getInterpreters } from '@posttext/printer/web'
 
 export class CompileCommand implements Command {
   private args: string[]

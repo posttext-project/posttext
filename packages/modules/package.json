@@ -11,5 +11,10 @@
     "modules"
   ],
   "author": "clitetailor",
-  "license": "MPL-2.0"
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@posttext/printer": "workspace:^0.1.0",
+    "@posttext/ptlib": "workspace:^0.1.0",
+    "@posttext/registry": "workspace:^0.1.0"
+  }
 }

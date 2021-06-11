@@ -1,6 +1,6 @@
 {
-  "name": "@posttext/postext",
-  "version": "0.0.1",
+  "name": "@posttext/build",
+  "version": "0.1.0",
   "description": "The next generation markup language for everyone!",
   "keywords": [
     "text",

@@ -9,9 +9,9 @@ import qrcode from 'qrcode'
 import path from 'path'
 import katex from 'katex'
 
-import { Resolver, RegistryOptions } from '../../registry'
-import { Command } from '../../printer'
-import { extractParagraphs } from '../../ptlib'
+import { Resolver, RegistryOptions } from '@posttext/registry'
+import { Command } from '@posttext/printer'
+import { extractParagraphs } from '@posttext/ptlib'
 
 const KATEX_STATE = Symbol('KatexState')
 const CODE_BLOCK_STATE = Symbol('CodeBlockState')

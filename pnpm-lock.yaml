@@ -1,142 +1,185 @@
 lockfileVersion: 5.3
 
-specifiers:
-  '@babel/core': ^7.13.15
-  '@babel/preset-env': ^7.13.15
-  '@babel/preset-typescript': ^7.13.0
-  '@koa/router': ^10.0.0
-  '@rollup/plugin-typescript': ^8.2.1
-  '@types/dot': ^1.1.4
-  '@types/fs-extra': ^9.0.11
-  '@types/jest': ^26.0.22
-  '@types/js-yaml': ^3.12.6
-  '@types/koa': ^2.13.1
-  '@types/koa-static': ^4.0.1
-  '@types/koa__router': ^8.0.4
-  '@types/mini-css-extract-plugin': ^1.4.1
-  '@types/prismjs': ^1.16.5
-  '@types/squirrelly': ^7.1.1
-  '@types/webpack': ^4.41.27
-  '@types/ws': ^7.4.1
-  '@typescript-eslint/eslint-plugin': ^4.22.0
-  '@typescript-eslint/parser': ^4.22.0
-  ava: 3.14.0
-  babel-jest: ^26.6.3
-  boxen: ^4.2.0
-  chalk: ^4.1.0
-  chokidar: ^3.5.1
-  css-loader: ^5.2.1
-  cursornext: ^0.2.4
-  del: ^6.0.0
-  dot: ^1.1.3
-  eslint: ^7.24.0
-  eslint-config-prettier: ^7.2.0
-  eslint-plugin-prettier: ^3.3.1
-  esm: ^3.2.25
-  fs-extra: ^9.1.0
-  glob: ^7.1.6
-  gulp: ^4.0.2
-  gulp-sourcemaps: ^3.0.0
-  gulp-typescript: ^6.0.0-alpha.1
-  handlebars: ^4.7.7
-  husky: ^4.3.8
-  jest: ^26.6.3
-  js-yaml: ^3.14.1
-  katex: ^0.13.11
-  koa: ^2.13.1
-  koa-static: ^5.0.0
-  memoizee: ^0.4.15
-  meow: ^8.1.2
-  merge-stream: ^2.0.0
-  mini-css-extract-plugin: ^1.4.1
-  nyc: ^15.1.0
-  prettier: ^2.2.1
-  prismjs: ^1.23.0
-  qrcode: ^1.4.4
-  rollup: ^2.45.2
-  rollup-plugin-terser: ^7.0.2
-  rollup-plugin-visualizer: ^4.2.2
-  rxjs: ^6.6.7
-  strip-indent: ^3.0.0
-  style-loader: ^2.0.0
-  ts-loader: ^8.1.0
-  ts-node: ^9.1.1
-  tslib: ^2.2.0
-  typescript: ^4.2.4
-  uuid: ^8.3.2
-  webfontloader: ^1.6.28
-  webpack: ^5.32.0
-  ws: ^7.4.4
+importers:
 
-dependencies:
-  '@koa/router': 10.0.0
-  boxen: 4.2.0
-  chalk: 4.1.0
-  chokidar: 3.5.1
-  cursornext: 0.2.4
-  dot: 1.1.3
-  handlebars: 4.7.7
-  katex: 0.13.11
-  koa: 2.13.1
-  koa-static: 5.0.0
-  memoizee: 0.4.15
-  meow: 8.1.2
-  mini-css-extract-plugin: 1.4.1_webpack@5.32.0
-  prismjs: 1.23.0
-  qrcode: 1.4.4
-  rxjs: 6.6.7
-  tslib: 2.2.0
-  uuid: 8.3.2
-  webfontloader: 1.6.28
-  ws: 7.4.4
+  .:
+    specifiers:
+      '@babel/core': ^7.13.15
+      '@babel/preset-env': ^7.13.15
+      '@babel/preset-typescript': ^7.13.0
+      '@koa/router': ^10.0.0
+      '@rollup/plugin-typescript': ^8.2.1
+      '@types/dot': ^1.1.4
+      '@types/fs-extra': ^9.0.11
+      '@types/jest': ^26.0.22
+      '@types/js-yaml': ^3.12.6
+      '@types/koa': ^2.13.1
+      '@types/koa__router': ^8.0.4
+      '@types/koa-static': ^4.0.1
+      '@types/mini-css-extract-plugin': ^1.4.1
+      '@types/prismjs': ^1.16.5
+      '@types/squirrelly': ^7.1.1
+      '@types/webpack': ^4.41.27
+      '@types/ws': ^7.4.1
+      '@typescript-eslint/eslint-plugin': ^4.22.0
+      '@typescript-eslint/parser': ^4.22.0
+      ava: 3.14.0
+      babel-jest: ^26.6.3
+      boxen: ^4.2.0
+      chalk: ^4.1.0
+      chokidar: ^3.5.1
+      css-loader: ^5.2.1
+      cursornext: ^0.2.4
+      del: ^6.0.0
+      dot: ^1.1.3
+      eslint: ^7.24.0
+      eslint-config-prettier: ^7.2.0
+      eslint-plugin-prettier: ^3.3.1
+      esm: ^3.2.25
+      fs-extra: ^9.1.0
+      glob: ^7.1.6
+      gulp: ^4.0.2
+      gulp-sourcemaps: ^3.0.0
+      gulp-typescript: ^6.0.0-alpha.1
+      handlebars: ^4.7.7
+      husky: ^4.3.8
+      jest: ^26.6.3
+      js-yaml: ^3.14.1
+      katex: ^0.13.11
+      koa: ^2.13.1
+      koa-static: ^5.0.0
+      memoizee: ^0.4.15
+      meow: ^8.1.2
+      merge-stream: ^2.0.0
+      mini-css-extract-plugin: ^1.4.1
+      nyc: ^15.1.0
+      prettier: ^2.2.1
+      prismjs: ^1.23.0
+      qrcode: ^1.4.4
+      rollup: ^2.45.2
+      rollup-plugin-terser: ^7.0.2
+      rollup-plugin-visualizer: ^4.2.2
+      rxjs: ^6.6.7
+      strip-indent: ^3.0.0
+      style-loader: ^2.0.0
+      ts-loader: ^8.1.0
+      ts-node: ^9.1.1
+      tslib: ^2.2.0
+      typescript: ^4.2.4
+      uuid: ^8.3.2
+      webfontloader: ^1.6.28
+      webpack: ^5.32.0
+      ws: ^7.4.4
+    dependencies:
+      '@koa/router': 10.0.0
+      boxen: 4.2.0
+      chalk: 4.1.0
+      chokidar: 3.5.1
+      cursornext: 0.2.4
+      dot: 1.1.3
+      handlebars: 4.7.7
+      katex: 0.13.11
+      koa: 2.13.1
+      koa-static: 5.0.0
+      memoizee: 0.4.15
+      meow: 8.1.2
+      mini-css-extract-plugin: 1.4.1_webpack@5.32.0
+      prismjs: 1.23.0
+      qrcode: 1.4.4
+      rxjs: 6.6.7
+      tslib: 2.2.0
+      uuid: 8.3.2
+      webfontloader: 1.6.28
+      ws: 7.4.4
+    devDependencies:
+      '@babel/core': 7.13.15
+      '@babel/preset-env': 7.13.15_@babel+core@7.13.15
+      '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
+      '@rollup/plugin-typescript': 8.2.1_d21869dc49fccc93d6599238c3a50ee6
+      '@types/dot': 1.1.4
+      '@types/fs-extra': 9.0.11
+      '@types/jest': 26.0.22
+      '@types/js-yaml': 3.12.6
+      '@types/koa': 2.13.1
+      '@types/koa__router': 8.0.4
+      '@types/koa-static': 4.0.1
+      '@types/mini-css-extract-plugin': 1.4.1
+      '@types/prismjs': 1.16.5
+      '@types/squirrelly': 7.1.1
+      '@types/webpack': 4.41.27
+      '@types/ws': 7.4.1
+      '@typescript-eslint/eslint-plugin': 4.22.0_9acede93a3623dd7abe65c65a7010e73
+      '@typescript-eslint/parser': 4.22.0_eslint@7.24.0+typescript@4.2.4
+      ava: 3.14.0
+      babel-jest: 26.6.3_@babel+core@7.13.15
+      css-loader: 5.2.1_webpack@5.32.0
+      del: 6.0.0
+      eslint: 7.24.0
+      eslint-config-prettier: 7.2.0_eslint@7.24.0
+      eslint-plugin-prettier: 3.3.1_b144c793cc2fdccdc22afde27a813969
+      esm: 3.2.25
+      fs-extra: 9.1.0
+      glob: 7.1.6
+      gulp: 4.0.2
+      gulp-sourcemaps: 3.0.0
+      gulp-typescript: 6.0.0-alpha.1_typescript@4.2.4
+      husky: 4.3.8
+      jest: 26.6.3_ts-node@9.1.1
+      js-yaml: 3.14.1
+      merge-stream: 2.0.0
+      nyc: 15.1.0
+      prettier: 2.2.1
+      rollup: 2.45.2
+      rollup-plugin-terser: 7.0.2_rollup@2.45.2
+      rollup-plugin-visualizer: 4.2.2_rollup@2.45.2
+      strip-indent: 3.0.0
+      style-loader: 2.0.0_webpack@5.32.0
+      ts-loader: 8.1.0_typescript@4.2.4+webpack@5.32.0
+      ts-node: 9.1.1_typescript@4.2.4
+      typescript: 4.2.4
+      webpack: 5.32.0
 
-devDependencies:
-  '@babel/core': 7.13.15
-  '@babel/preset-env': 7.13.15_@babel+core@7.13.15
-  '@babel/preset-typescript': 7.13.0_@babel+core@7.13.15
-  '@rollup/plugin-typescript': 8.2.1_d21869dc49fccc93d6599238c3a50ee6
-  '@types/dot': 1.1.4
-  '@types/fs-extra': 9.0.11
-  '@types/jest': 26.0.22
-  '@types/js-yaml': 3.12.6
-  '@types/koa': 2.13.1
-  '@types/koa-static': 4.0.1
-  '@types/koa__router': 8.0.4
-  '@types/mini-css-extract-plugin': 1.4.1
-  '@types/prismjs': 1.16.5
-  '@types/squirrelly': 7.1.1
-  '@types/webpack': 4.41.27
-  '@types/ws': 7.4.1
-  '@typescript-eslint/eslint-plugin': 4.22.0_9acede93a3623dd7abe65c65a7010e73
-  '@typescript-eslint/parser': 4.22.0_eslint@7.24.0+typescript@4.2.4
-  ava: 3.14.0
-  babel-jest: 26.6.3_@babel+core@7.13.15
-  css-loader: 5.2.1_webpack@5.32.0
-  del: 6.0.0
-  eslint: 7.24.0
-  eslint-config-prettier: 7.2.0_eslint@7.24.0
-  eslint-plugin-prettier: 3.3.1_b144c793cc2fdccdc22afde27a813969
-  esm: 3.2.25
-  fs-extra: 9.1.0
-  glob: 7.1.6
-  gulp: 4.0.2
-  gulp-sourcemaps: 3.0.0
-  gulp-typescript: 6.0.0-alpha.1_typescript@4.2.4
-  husky: 4.3.8
-  jest: 26.6.3_ts-node@9.1.1
-  js-yaml: 3.14.1
-  merge-stream: 2.0.0
-  nyc: 15.1.0
-  prettier: 2.2.1
-  rollup: 2.45.2
-  rollup-plugin-terser: 7.0.2_rollup@2.45.2
-  rollup-plugin-visualizer: 4.2.2_rollup@2.45.2
-  strip-indent: 3.0.0
-  style-loader: 2.0.0_webpack@5.32.0
-  ts-loader: 8.1.0_typescript@4.2.4+webpack@5.32.0
-  ts-node: 9.1.1_typescript@4.2.4
-  typescript: 4.2.4
-  webpack: 5.32.0
+  packages/cli:
+    specifiers:
+      '@posttext/compiler': workspace:^0.1.0
+      '@posttext/printer': workspace:^0.1.0
+    dependencies:
+      '@posttext/compiler': link:../compiler
+      '@posttext/printer': link:../printer
+
+  packages/compiler:
+    specifiers:
+      '@posttext/modules': workspace:^0.1.0
+      '@posttext/parser': workspace:^0.1.0
+      '@posttext/printer': workspace:^0.1.0
+      '@posttext/registry': workspace:^0.1.0
+    dependencies:
+      '@posttext/modules': link:../modules
+      '@posttext/parser': link:../parser
+      '@posttext/printer': link:../printer
+      '@posttext/registry': link:../registry
+
+  packages/modules:
+    specifiers:
+      '@posttext/printer': workspace:^0.1.0
+      '@posttext/ptlib': workspace:^0.1.0
+      '@posttext/registry': workspace:^0.1.0
+    dependencies:
+      '@posttext/printer': link:../printer
+      '@posttext/ptlib': link:../ptlib
+      '@posttext/registry': link:../registry
+
+  packages/ptlib:
+    specifiers:
+      '@posttext/printer': workspace:^0.1.0
+    dependencies:
+      '@posttext/printer': link:../printer
+
+  packages/registry:
+    specifiers:
+      '@posttext/printer': workspace:^0.1.0
+    dependencies:
+      '@posttext/printer': link:../printer
 
 packages:
 

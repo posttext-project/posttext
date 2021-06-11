@@ -1,4 +1,4 @@
-import { Command } from '../printer'
+import { Command } from '@posttext/printer'
 
 export const extractParagraphs = {
   text: async function* (

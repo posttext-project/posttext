@@ -11,5 +11,8 @@
     "utilities"
   ],
   "author": "clitetailor",
-  "license": "MPL-2.0"
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@posttext/printer": "workspace:^0.1.0"
+  }
 }

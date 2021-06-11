@@ -9,7 +9,7 @@ import { Interpreter, Context } from '../interpreter'
 import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
-import * as ast from '../../ast'
+import * as ast from '@posttext/printer/ast'
 import {
   blockTransformDefault,
   inlinesTransformDefault,

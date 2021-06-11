@@ -4,7 +4,7 @@
 
 import { Command } from './command'
 import { Data } from './data'
-import { Registry } from '../registry'
+import { Registry } from '@posttext/registry'
 
 type Modifier = 'private'
 

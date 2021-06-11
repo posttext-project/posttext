@@ -11,7 +11,7 @@ import {
   ParameterNode,
   BlockNode,
   AttributeNode,
-} from '../ast'
+} from './ast'
 
 export class Parser {
   static create(): Parser {
