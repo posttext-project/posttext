@@ -2,10 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import * as ast from '@posttext/printer/ast'
+import * as ast from '@posttext/parser'
+import { Registry } from '@posttext/registry'
+
 import { Interpreter, Context } from './interpreter'
 import { Command } from './command'
-import { Registry } from '@posttext/registry'
 import { AnonymousContext } from './context'
 import { Data } from './data'
 import {

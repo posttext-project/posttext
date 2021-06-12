@@ -7,7 +7,7 @@ import path from 'path'
 
 import { CommandOptions, Command } from './command'
 import { Compiler } from '@posttext/compiler'
-import { getInterpreters } from '@posttext/printer/web'
+import { getInterpreters } from '@posttext/printer'
 
 export class CompileCommand implements Command {
   private args: string[]

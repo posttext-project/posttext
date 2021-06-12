@@ -4,12 +4,12 @@
 
 import Handlebars from '../helpers/handlebars'
 import { v4 as uuidv4 } from 'uuid'
+import * as ast from '@posttext/parser'
 
 import { Interpreter, Context } from '../interpreter'
 import { TagNode, DocumentNode, TextNode, Node } from '../ast'
 import { Command } from '../command'
 import { Data } from '../data'
-import * as ast from '@posttext/printer/ast'
 import {
   blockTransformDefault,
   inlinesTransformDefault,

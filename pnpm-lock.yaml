@@ -8,6 +8,12 @@ importers:
       '@babel/preset-env': ^7.13.15
       '@babel/preset-typescript': ^7.13.0
       '@koa/router': ^10.0.0
+      '@posttext/compiler': workspace:^0.1.0
+      '@posttext/modules': workspace:^0.1.0
+      '@posttext/parser': workspace:^0.1.0
+      '@posttext/printer': workspace:^0.1.0
+      '@posttext/ptlib': workspace:^0.1.0
+      '@posttext/registry': workspace:^0.1.0
       '@rollup/plugin-typescript': ^8.2.1
       '@types/dot': ^1.1.4
       '@types/fs-extra': ^9.0.11
@@ -72,6 +78,12 @@ importers:
       ws: ^7.4.4
     dependencies:
       '@koa/router': 10.0.0
+      '@posttext/compiler': link:packages/compiler
+      '@posttext/modules': link:packages/modules
+      '@posttext/parser': link:packages/parser
+      '@posttext/printer': link:packages/printer
+      '@posttext/ptlib': link:packages/ptlib
+      '@posttext/registry': link:packages/registry
       boxen: 4.2.0
       chalk: 4.1.0
       chokidar: 3.5.1

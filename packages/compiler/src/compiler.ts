@@ -5,7 +5,7 @@
 import { Parser } from '@posttext/parser'
 import { Printer } from '@posttext/printer'
 import { Registry } from '@posttext/registry'
-import StdModule from '@posttext/modules/std'
+import { StdModule } from '@posttext/modules'
 
 export interface CompilerComponents {
   parser: Parser

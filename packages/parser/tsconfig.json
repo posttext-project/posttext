@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": "src",
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -8,7 +9,9 @@
     "importHelpers": true,
     "alwaysStrict": true,
     "strictNullChecks": true,
-    "noUnusedLocals": true
-  },
-  "exclude": ["dist", "lib"]
+    "noUnusedLocals": true,
+    "paths": {
+      "ast/*": ["ast/*"]
+    }
+  }
 }

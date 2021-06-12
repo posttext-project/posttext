@@ -16,7 +16,7 @@
     "type": "git",
     "url": "git+https://github.com/posttext-project/posttext.git"
   },
-  "license": "MIT",
+  "license": "MPL-2.0",
   "author": "clitetailor",
   "files": [
     "lib",
@@ -36,10 +36,16 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "jest",
     "coverage": "jest --coverage",
-    "add-license": "ts-node scripts/add-license -f templates/Exhibit-A.ts src/**/*.{ts,js} *.{ts,js}"
+    "add-license": "ts-node scripts/add-license -f templates/Exhibit-A.ts packages/*/src/**/*.{ts,js} *.{ts,js}"
   },
   "dependencies": {
     "@koa/router": "^10.0.0",
+    "@posttext/compiler": "workspace:^0.1.0",
+    "@posttext/modules": "workspace:^0.1.0",
+    "@posttext/parser": "workspace:^0.1.0",
+    "@posttext/printer": "workspace:^0.1.0",
+    "@posttext/ptlib": "workspace:^0.1.0",
+    "@posttext/registry": "workspace:^0.1.0",
     "boxen": "^4.2.0",
     "chalk": "^4.1.0",
     "chokidar": "^3.5.1",

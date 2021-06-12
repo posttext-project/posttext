@@ -2,6 +2,8 @@ stats.html
 
 dist/
 lib/
+packages/*/lib/
+packages/*/types/
 node_modules/
 
 .vscode/*

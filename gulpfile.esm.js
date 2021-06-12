@@ -5,78 +5,82 @@
 import ts from 'gulp-typescript'
 import del from 'del'
 import path from 'path'
-import merge from 'merge-stream'
 import sourcemaps from 'gulp-sourcemaps'
 
-import { promises as fs } from 'fs'
-
 import { src, task, series, dest } from 'gulp'
+import merge from 'merge-stream'
 
 const reporter = ts.reporter.fullReporter(true)
 
-task('exp', async () => {
-  const packages = await fs.readdir(
-    path.resolve(__dirname, 'packages')
-  )
+const packages = [
+  'parser',
+  'registry',
+  'printer',
+  'ptlib',
+  'modules',
+  'compiler',
+  'cli',
+]
 
-  for (const pkgName of packages) {
-    console.log(path.resolve(__dirname, 'packages', pkgName))
-  }
-})
+forEachPkg(({ pkgBase, pkgName }) =>
+  task(`build:${pkgName}`, () => {
+    const tsProject = ts.createProject(pkgBase('tsconfig.json'))
 
-task('build:cjs', async () => {
-  return merge(
-    await forEachPkg(({ pkgBasePath }) => {
-      const tsProject = ts.createProject('tsconfig.json')
+    const tsResult = src(
+      pkgBase(['src/**/*.ts', '!src/**/assets/**/*']),
+      {
+        base: pkgBase('src'),
+      }
+    )
+      .pipe(sourcemaps.init())
+      .pipe(tsProject(reporter))
 
-      return merge(
-        src(
-          [
-            path.resolve(pkgBasePath, 'src/**/*.ts'),
-            '!' +
-              path.resolve(pkgBasePath, 'src/**/assets/**/*'),
-          ],
-          {
-            base: path.resolve(pkgBasePath, 'src'),
-          }
-        )
-          .pipe(sourcemaps.init())
-          .pipe(tsProject(reporter))
-          .js.pipe(
-            sourcemaps.write('.', {
-              includeContent: false,
-              sourceRoot: '../src',
-            })
-          )
-          .pipe(dest('lib')),
-        src([path.resolve(pkgBasePath, 'src/**/assets/**/*')], {
-          base: path.resolve(pkgBasePath, 'src'),
-        }).pipe(dest('lib'))
-      )
+    const assetsResult = src(pkgBase(['src/**/assets/**/*']), {
+      base: pkgBase('src'),
     })
-  )
-})
 
-task('build', series(['build:cjs']))
+    return merge(
+      tsResult.dts.pipe(dest(pkgBase('types'))),
+      tsResult.js.pipe(dest(pkgBase('lib'))),
+      assetsResult.pipe(dest(pkgBase('lib')))
+    )
+  })
+)
+
+task(
+  'build',
+  series(forEachPkg(({ pkgName }) => `build:${pkgName}`))
+)
 
 task('clean', async () => {
-  await forEachPkg(async ({ pkgBasePath }) => {
-    await del(path.resolve(pkgBasePath, 'lib'))
+  await forEachPkg(async ({ pkgBase }) => {
+    await del(pkgBase('lib'))
+    await del(pkgBase('types'))
   })
 
   await del('dist')
 })
 
-async function forEachPkg(callback) {
-  const packages = await fs.readdir(
-    path.resolve(__dirname, 'packages')
-  )
+function forEachPkg(callback) {
+  return packages.map((pkgName) => {
+    const dir = path.resolve(__dirname, 'packages', pkgName)
 
-  const dirs = []
+    return callback({
+      pkgName,
+      pkgBasePath: dir,
+      pkgBase: extractBasePath(dir),
+    })
+  })
+}
 
-  for (const pkgName of packages) {
-    dirs.push(path.resolve(__dirname, 'packages', pkgName))
+function extractBasePath(dir) {
+  return (relativePath) => {
+    if (Array.isArray(relativePath)) {
+      return relativePath.map(extractBasePath(dir))
+    }
+
+    return dir[0] === '!'
+      ? '!' + path.resolve(dir, relativePath.substring(1))
+      : path.resolve(dir, relativePath)
   }
-
-  return dirs.map((dir) => callback({ pkgBasePath: dir }))
 }

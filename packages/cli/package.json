@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "The Posttext CLI",
   "main": "index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    "./": "./lib/index.js"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
