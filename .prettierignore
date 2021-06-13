@@ -1,3 +1,5 @@
 /coverage
-/lib
 /dist
+/lib
+/packages/*/lib
+/packages/*/types
