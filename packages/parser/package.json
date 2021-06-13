@@ -5,7 +5,8 @@
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./ast": "./lib/ast.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

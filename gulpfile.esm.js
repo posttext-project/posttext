@@ -24,7 +24,12 @@ const packages = [
 
 forEachPkg(({ pkgBase, pkgName }) =>
   task(`build:${pkgName}`, () => {
-    const tsProject = ts.createProject(pkgBase('tsconfig.json'))
+    const tsProject = ts.createProject(
+      pkgBase('tsconfig.json'),
+      {
+        declaration: true,
+      }
+    )
 
     const tsResult = src(
       pkgBase(['src/**/*.ts', '!src/**/assets/**/*']),
@@ -53,10 +58,12 @@ task(
 )
 
 task('clean', async () => {
-  await forEachPkg(async ({ pkgBase }) => {
-    await del(pkgBase('lib'))
-    await del(pkgBase('types'))
-  })
+  await Promise.all(
+    forEachPkg(async ({ pkgBase }) => {
+      await del(pkgBase('lib'))
+      await del(pkgBase('types'))
+    })
+  )
 
   await del('dist')
 })

@@ -12,7 +12,7 @@ import {
   TextNode,
   TagNode,
   DocumentNode,
-} from '../../../ast'
+} from '../../src/ast'
 
 export function runParse(
   input: string,

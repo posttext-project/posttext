@@ -16,7 +16,7 @@ import { Subject } from 'rxjs'
 
 import { Command, CommandOptions } from './command'
 import { Compiler } from '@posttext/compiler'
-import { getInterpreters } from '@posttext/printer'
+import { getInterpreters } from '@posttext/printer/web'
 import { Logger } from './helpers/logger'
 
 export class ServeCommand implements Command {

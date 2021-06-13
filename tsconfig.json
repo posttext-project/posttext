@@ -1,6 +1,8 @@
 {
+  "include": ["packages/*/src", "scripts"],
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
@@ -8,7 +10,8 @@
     "importHelpers": true,
     "alwaysStrict": true,
     "strictNullChecks": true,
-    "noUnusedLocals": true
-  },
-  "exclude": ["dist", "lib"]
+    "noUnusedLocals": true,
+    "baseUrl": ".",
+    "composite": true
+  }
 }

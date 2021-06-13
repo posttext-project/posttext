@@ -9,11 +9,11 @@ import webpack from 'webpack'
 import prettier from 'prettier'
 import stripIndent from 'strip-indent'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import * as ast from '@posttext/parser'
+import { Command } from '@posttext/registry'
+import * as ast from '@posttext/parser/ast'
 
 import { interpreters as commonInterpreters } from '../common'
 import { Interpreter, Context } from '../interpreter'
-import { Command } from '../command'
 import { Data } from '../data'
 
 export interface InterpreterOptions {

@@ -1,17 +1,10 @@
 {
+  "include": ["src"],
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": "src",
-    "module": "commonjs",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "downlevelIteration": true,
-    "target": "es2018",
-    "importHelpers": true,
-    "alwaysStrict": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "paths": {
-      "std/*": ["std/*"]
-    }
+    "baseUrl": "./",
+    "rootDir": "./src",
+    "outDir": "./lib",
+    "declarationDir": "./types"
   }
 }

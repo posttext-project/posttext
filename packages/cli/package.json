@@ -4,6 +4,7 @@
   "description": "The Posttext CLI",
   "main": "index.js",
   "types": "./types/index.d.ts",
+  "bin": "./lib/bin/index.js",
   "exports": {
     "./": "./lib/index.js"
   },

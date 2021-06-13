@@ -9,8 +9,11 @@ import qrcode from 'qrcode'
 import path from 'path'
 import katex from 'katex'
 
-import { Resolver, RegistryOptions } from '@posttext/registry'
-import { Command } from '@posttext/printer'
+import {
+  Resolver,
+  RegistryOptions,
+  Command,
+} from '@posttext/registry'
 import { extractParagraphs } from '@posttext/ptlib'
 
 const KATEX_STATE = Symbol('KatexState')

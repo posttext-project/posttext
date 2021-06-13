@@ -2,9 +2,9 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { Command } from './command'
+import { Registry, Command } from '@posttext/registry'
+
 import { Data } from './data'
-import { Registry } from '@posttext/registry'
 
 type Modifier = 'private'
 

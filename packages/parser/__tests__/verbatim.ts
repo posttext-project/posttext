@@ -4,7 +4,7 @@
 
 import { Cursor } from 'cursornext'
 
-import { Parser } from '..'
+import { Parser } from '../src'
 import { runParse } from './helpers'
 
 describe('Parser', () => {

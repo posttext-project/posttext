@@ -2,10 +2,12 @@
   "name": "@posttext/printer",
   "version": "0.1.0",
   "description": "The printer for Posttext",
-  "main": "index.js",
+  "main": "./lib/index.js",
   "types": "./types/index.d.ts",
   "exports": {
-    ".": "./lib/index.js"
+    ".": "./lib/index.js",
+    "./web": "./lib/web/index.js",
+    "./common": "./lib/common/index.js"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
