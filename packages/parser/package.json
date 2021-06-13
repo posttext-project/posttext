@@ -2,6 +2,7 @@
   "name": "@posttext/parser",
   "version": "0.1.0",
   "description": "The parser for Posttext",
+  "type": "commonjs",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
@@ -16,5 +17,9 @@
     "parser"
   ],
   "author": "clitetailor",
-  "license": "MPL-2.0"
+  "license": "MPL-2.0",
+  "dependencies": {
+    "cursornext": "^0.2.4",
+    "tslib": "^2.3.0"
+  }
 }

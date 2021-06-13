@@ -2,6 +2,7 @@
   "name": "@posttext/ptlib",
   "version": "0.1.0",
   "description": "Utility library for Posttext modules",
+  "type": "commonjs",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
@@ -17,6 +18,7 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/printer": "workspace:^0.1.0"
+    "@posttext/registry": "workspace:^0.1.0",
+    "tslib": "^2.3.0"
   }
 }

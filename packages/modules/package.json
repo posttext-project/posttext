@@ -2,6 +2,7 @@
   "name": "@posttext/modules",
   "version": "0.1.0",
   "description": "The official modules for Posttext",
+  "type": "commonjs",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
@@ -18,8 +19,12 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/printer": "workspace:^0.1.0",
     "@posttext/ptlib": "workspace:^0.1.0",
-    "@posttext/registry": "workspace:^0.1.0"
+    "@posttext/registry": "workspace:^0.1.0",
+    "katex": "^0.13.11",
+    "prismjs": "^1.23.0",
+    "qrcode": "^1.4.4",
+    "strip-indent": "^3.0.0",
+    "tslib": "^2.3.0"
   }
 }

@@ -19,6 +19,10 @@ import { extractParagraphs } from '@posttext/ptlib'
 const KATEX_STATE = Symbol('KatexState')
 const CODE_BLOCK_STATE = Symbol('CodeBlockState')
 
+const resolveModules = [
+  path.resolve(__dirname, '../../node_modules'),
+]
+
 export const TOC = Symbol('Toc')
 export const tocDef = [
   null,
@@ -359,6 +363,9 @@ export const tagResolvers = (
                 src: 'prismjs/themes/prism.css',
               },
             ],
+            resolve: {
+              modules: resolveModules,
+            },
           }
         }
       },
@@ -433,6 +440,9 @@ export const tagResolvers = (
                 src: 'prismjs/themes/prism.css',
               },
             ],
+            resolve: {
+              modules: resolveModules,
+            },
           }
         }
       },
@@ -506,6 +516,9 @@ export const tagResolvers = (
                 src: 'katex/dist/katex.css',
               },
             ],
+            resolve: {
+              modules: resolveModules,
+            },
           }
         }
       },
@@ -555,6 +568,9 @@ export const tagResolvers = (
                 src: 'katex/dist/katex.css',
               },
             ],
+            resolve: {
+              modules: resolveModules,
+            },
           }
         }
       },

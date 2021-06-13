@@ -187,6 +187,10 @@ export const getInterpreters = ({
       ): AsyncGenerator<Data, any, any> {
         const deps = command.deps as any[]
 
+        const resolveModules: string[] = deps
+          .map((dep) => dep?.resolve?.modules ?? [])
+          .reduce((prev, current) => prev.concat(current), [])
+
         const jsDeps = deps
           .filter((dep) => dep.type === 'js')
           .map((dep) => dep.src)
@@ -242,8 +246,16 @@ export const getInterpreters = ({
               ],
             },
             resolve: {
-              modules: ['node_modules'],
+              modules: [
+                path.resolve(__dirname, '../../node_modules'),
+                ...new Set(resolveModules),
+              ],
               extensions: ['.ts', '.tsx', '.js', '.css'],
+            },
+            resolveLoader: {
+              modules: [
+                path.resolve(__dirname, '../../node_modules'),
+              ],
             },
             plugins: ([] as any[]).concat(
               mode === 'development'

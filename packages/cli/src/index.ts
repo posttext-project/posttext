@@ -2,7 +2,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import meow from 'meow'
+import * as meow from 'meow'
 import { CompileCommand } from './compile'
 import { ServeCommand } from './serve'
 import chalk from 'chalk'
@@ -18,7 +18,7 @@ export class CLI {
   }
 
   static new(): CLI {
-    const cli = meow(
+    const cli = meow.default(
       `
         Usage
           $ pt [command] <input>
