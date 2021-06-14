@@ -77,9 +77,7 @@ module.exports = {
   // testURL: "http://localhost",
   // timers: "real",
   // transform: undefined,
-  // transformIgnorePatterns: [
-  //   "\\\\node_modules\\\\"
-  // ],
+  transformIgnorePatterns: [],
   // unmockedModulePathPatterns: undefined,
   // verbose: undefined,
   // watchPathIgnorePatterns: [],

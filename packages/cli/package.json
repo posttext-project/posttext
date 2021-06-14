@@ -1,0 +1,37 @@
+{
+  "name": "@posttext/cli",
+  "version": "0.1.0",
+  "description": "The Posttext CLI",
+  "type": "commonjs",
+  "main": "index.js",
+  "types": "./types/index.d.ts",
+  "bin": "./lib/bin/index.js",
+  "exports": {
+    "./": "./lib/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "cli"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@koa/router": "^10.0.0",
+    "@posttext/compiler": "workspace:^0.1.0",
+    "@posttext/printer": "workspace:^0.1.0",
+    "boxen": "^5.0.1",
+    "chalk": "^4.1.1",
+    "chokidar": "^3.5.1",
+    "esm": "^3.2.25",
+    "fs-extra": "^10.0.0",
+    "koa": "^2.13.1",
+    "koa-static": "^5.0.0",
+    "meow": "^8.1.2",
+    "rxjs": "^7.1.0",
+    "tslib": "^2.3.0",
+    "ws": "^7.4.6"
+  }
+}

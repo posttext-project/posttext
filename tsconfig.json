@@ -1,15 +1,17 @@
 {
+  "include": ["packages/*/src", "scripts"],
   "compilerOptions": {
     "module": "commonjs",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,
-    "target": "es5",
+    "target": "es2018",
     "importHelpers": true,
     "alwaysStrict": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "typeRoots": ["node_modules/@types", "src/types"]
-  },
-  "exclude": ["dist", "lib"]
+    "baseUrl": ".",
+    "composite": true
+  }
 }

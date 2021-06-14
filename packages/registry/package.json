@@ -1,0 +1,23 @@
+{
+  "name": "@posttext/registry",
+  "version": "0.1.0",
+  "description": "The library for registering modules in Posttext",
+  "type": "commonjs",
+  "main": "index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": "./lib/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "registry"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "tslib": "^2.3.0"
+  }
+}

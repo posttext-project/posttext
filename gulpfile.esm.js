@@ -5,38 +5,89 @@
 import ts from 'gulp-typescript'
 import del from 'del'
 import path from 'path'
-import merge from 'merge-stream'
 import sourcemaps from 'gulp-sourcemaps'
 
 import { src, task, series, dest } from 'gulp'
+import merge from 'merge-stream'
 
 const reporter = ts.reporter.fullReporter(true)
 
-task('build:cjs', () => {
-  const tsProject = ts.createProject('tsconfig.json')
+const packages = [
+  'parser',
+  'registry',
+  'printer',
+  'ptlib',
+  'modules',
+  'compiler',
+  'cli',
+]
 
-  return merge(
-    src(['src/**/*.ts', '!src/**/assets/**/*'], {
-      base: path.resolve(__dirname, 'src'),
-    })
+forEachPkg(({ pkgBase, pkgName }) =>
+  task(`build:${pkgName}`, () => {
+    const tsProject = ts.createProject(
+      pkgBase('tsconfig.json'),
+      {
+        declaration: true,
+      }
+    )
+
+    const tsResult = src(
+      pkgBase(['src/**/*.ts', '!src/**/assets/**/*']),
+      {
+        base: pkgBase('src'),
+      }
+    )
       .pipe(sourcemaps.init())
       .pipe(tsProject(reporter))
-      .js.pipe(
-        sourcemaps.write('.', {
-          includeContent: false,
-          sourceRoot: '../src',
-        })
-      )
-      .pipe(dest('lib')),
-    src(['src/**/assets/**/*'], {
-      base: path.resolve(__dirname, 'src'),
-    }).pipe(dest('lib'))
-  )
-})
 
-task('build', series(['build:cjs']))
+    const assetsResult = src(pkgBase(['src/**/assets/**/*']), {
+      base: pkgBase('src'),
+    })
+
+    return merge(
+      tsResult.dts.pipe(dest(pkgBase('types'))),
+      tsResult.js.pipe(dest(pkgBase('lib'))),
+      assetsResult.pipe(dest(pkgBase('lib')))
+    )
+  })
+)
+
+task(
+  'build',
+  series(forEachPkg(({ pkgName }) => `build:${pkgName}`))
+)
 
 task('clean', async () => {
-  await del('lib')
+  await Promise.all(
+    forEachPkg(async ({ pkgBase }) => {
+      await del(pkgBase('lib'))
+      await del(pkgBase('types'))
+    })
+  )
+
   await del('dist')
 })
+
+function forEachPkg(callback) {
+  return packages.map((pkgName) => {
+    const dir = path.resolve(__dirname, 'packages', pkgName)
+
+    return callback({
+      pkgName,
+      pkgBasePath: dir,
+      pkgBase: extractBasePath(dir),
+    })
+  })
+}
+
+function extractBasePath(dir) {
+  return (relativePath) => {
+    if (Array.isArray(relativePath)) {
+      return relativePath.map(extractBasePath(dir))
+    }
+
+    return dir[0] === '!'
+      ? '!' + path.resolve(dir, relativePath.substring(1))
+      : path.resolve(dir, relativePath)
+  }
+}

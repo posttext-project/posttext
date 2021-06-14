@@ -1,4 +1,4 @@
-import fs from 'fs-extra'
+import { promises as fs } from 'fs'
 import glob from 'glob'
 import meow from 'meow'
 import path from 'path'

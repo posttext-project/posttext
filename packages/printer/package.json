@@ -1,0 +1,37 @@
+{
+  "name": "@posttext/printer",
+  "version": "0.1.0",
+  "description": "The printer for Posttext",
+  "type": "commonjs",
+  "main": "./lib/index.js",
+  "types": "./types/index.d.ts",
+  "exports": {
+    ".": "./lib/index.js",
+    "./web": "./lib/web/index.js",
+    "./common": "./lib/common/index.js"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "posttext",
+    "printer"
+  ],
+  "author": "clitetailor",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@posttext/parser": "workspace:^0.1.0",
+    "@posttext/registry": "workspace:^0.1.0",
+    "css-loader": "^5.2.6",
+    "fs-extra": "^10.0.0",
+    "handlebars": "^4.7.7",
+    "memoizee": "^0.4.15",
+    "mini-css-extract-plugin": "^1.6.0",
+    "strip-indent": "^3.0.0",
+    "style-loader": "^2.0.0",
+    "ts-loader": "^9.2.3",
+    "tslib": "^2.3.0",
+    "uuid": "^8.3.2",
+    "webpack": "^5.38.1"
+  }
+}
