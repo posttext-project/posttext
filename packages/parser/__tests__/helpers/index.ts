@@ -30,7 +30,7 @@ export function runParse(
 
   const ast = callback(start)
 
-  expect(normalize(ast)).toEqual(yaml.safeLoad(expected))
+  expect(normalize(ast)).toEqual(yaml.load(expected))
   expect(start.isAt(end)).toBeTruthy()
 }
 
