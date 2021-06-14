@@ -2,25 +2,28 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { Registry, Command } from '@posttext/registry'
-import * as ast from '@posttext/parser/ast'
-
-import { Interpreter, Context } from './interpreter'
-import { AnonymousContext } from './context'
-import { Data } from './data'
 import {
-  BlockNode,
+  Registry,
+  Command,
+  Data,
+  Context,
+  Interpreter,
+} from '@posttext/registry'
+import {
   DocumentNode,
+  BlockNode,
   TagNode,
   TextNode,
-} from './ast'
+} from '@posttext/parser'
+
+import { AnonymousContext } from './context'
 
 export interface PrinterComponents {
   registry: Registry
 }
 
 export interface PrinterInput {
-  ast: ast.DocumentNode
+  ast: DocumentNode
 }
 
 export class Printer {
@@ -47,11 +50,7 @@ export class Printer {
   }
 
   private copyInput(
-    node:
-      | ast.DocumentNode
-      | ast.BlockNode
-      | ast.TagNode
-      | ast.TextNode
+    node: DocumentNode | BlockNode | TagNode | TextNode
   ): DocumentNode | BlockNode | TagNode | TextNode {
     switch (node.type) {
       case 'Document': {

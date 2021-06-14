@@ -13,10 +13,10 @@ import chalk from 'chalk'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
 import { Subject } from 'rxjs'
+import { Compiler } from '@posttext/compiler'
+import { getInterpreters } from '@posttext/interpreters/web'
 
 import { Command, CommandOptions } from './command'
-import { Compiler } from '@posttext/compiler'
-import { getInterpreters } from '@posttext/printer/web'
 import { Logger } from './helpers/logger'
 
 export class ServeCommand implements Command {

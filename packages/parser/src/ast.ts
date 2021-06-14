@@ -7,11 +7,13 @@ export interface BaseNode {
 }
 
 export interface DocumentNode extends BaseNode {
+  __metadata?: Record<string, any>
   type: 'Document'
   body: (TagNode | TextNode)[]
 }
 
 export interface TagNode extends BaseNode {
+  __metadata?: Record<string | symbol, any>
   type: 'Tag'
   id: IdentifierNode
   params: ParameterNode[]

@@ -2,19 +2,27 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import Handlebars from '../helpers/handlebars'
 import fs from 'fs-extra'
 import path from 'path'
 import webpack from 'webpack'
 import prettier from 'prettier'
 import stripIndent from 'strip-indent'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
-import { Command } from '@posttext/registry'
-import * as ast from '@posttext/parser/ast'
+import {
+  Command,
+  Data,
+  Interpreter,
+  Context,
+} from '@posttext/registry'
+import {
+  DocumentNode,
+  BlockNode,
+  TagNode,
+  TextNode,
+} from '@posttext/parser'
 
+import Handlebars from '../helpers/handlebars'
 import { interpreters as commonInterpreters } from '../common'
-import { Interpreter, Context } from '../interpreter'
-import { Data } from '../data'
 
 export interface InterpreterOptions {
   output: string
@@ -46,10 +54,10 @@ export const getInterpreters = ({
         context: Context
       ): AsyncGenerator<Data, any, any> {
         const documentAst = command.ast as
-          | ast.DocumentNode
-          | ast.BlockNode
-          | ast.TagNode
-          | ast.TextNode
+          | DocumentNode
+          | BlockNode
+          | TagNode
+          | TextNode
 
         const preloadIter = context.dispatch({
           name: 'preload',

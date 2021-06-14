@@ -18,6 +18,7 @@ const packages = [
   'printer',
   'ptlib',
   'modules',
+  'interpreters',
   'compiler',
   'cli',
 ]

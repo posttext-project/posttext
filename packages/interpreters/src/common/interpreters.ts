@@ -2,14 +2,22 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import Handlebars from '../helpers/handlebars'
 import { v4 as uuidv4 } from 'uuid'
-import { Command } from '@posttext/registry'
-import * as ast from '@posttext/parser/ast'
+import {
+  Command,
+  Data,
+  Interpreter,
+  Context,
+} from '@posttext/registry'
+import {
+  DocumentNode,
+  BlockNode,
+  TagNode,
+  TextNode,
+  Node,
+} from '@posttext/parser'
 
-import { Interpreter, Context } from '../interpreter'
-import { TagNode, DocumentNode, TextNode, Node } from '../ast'
-import { Data } from '../data'
+import Handlebars from '../helpers/handlebars'
 import {
   blockTransformDefault,
   inlinesTransformDefault,
@@ -28,10 +36,10 @@ export const interpreters: Record<string, Interpreter> = {
       context: Context
     ): AsyncGenerator<Data, any, any> {
       const documentAst = command.ast as
-        | ast.DocumentNode
-        | ast.BlockNode
-        | ast.TagNode
-        | ast.TextNode
+        | DocumentNode
+        | BlockNode
+        | TagNode
+        | TextNode
 
       const preloadIter = context.dispatch({
         name: 'preload',
@@ -261,7 +269,7 @@ export const interpreters: Record<string, Interpreter> = {
         return
       }
 
-      const tagNode: ast.TagNode = {
+      const tagNode: TagNode = {
         type: 'Tag',
         id: { name: '__root__', type: 'Identifier' },
         attrs: [],
