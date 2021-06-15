@@ -4,10 +4,10 @@
 
 import fs from 'fs-extra'
 import path from 'path'
+import { Compiler } from '@posttext/compiler'
+import { getInterpreters } from '@posttext/interpreters/web'
 
 import { CommandOptions, Command } from './command'
-import { Compiler } from '@posttext/compiler'
-import { getInterpreters } from '@posttext/printer/web'
 
 export class CompileCommand implements Command {
   private args: string[]

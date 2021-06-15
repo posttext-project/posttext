@@ -5,7 +5,9 @@
   "type": "commonjs",
   "main": "index.js",
   "types": "./types/index.d.ts",
-  "bin": "./lib/bin/index.js",
+  "bin": {
+    "pt": "./lib/bin/index.js"
+  },
   "exports": {
     "./": "./lib/index.js"
   },
@@ -21,6 +23,7 @@
   "dependencies": {
     "@koa/router": "^10.0.0",
     "@posttext/compiler": "workspace:^0.1.0",
+    "@posttext/interpreters": "workspace:^0.1.0",
     "@posttext/printer": "workspace:^0.1.0",
     "boxen": "^5.0.1",
     "chalk": "^4.1.1",

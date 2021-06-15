@@ -3,6 +3,8 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 export * from './registry'
-export * from './command'
+export * from './interpreter'
 export * from './resolver'
+export * from './command'
 export * from './module'
+export * from './data'
