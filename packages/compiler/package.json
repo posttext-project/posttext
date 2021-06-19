@@ -2,7 +2,7 @@
   "name": "@posttext/compiler",
   "version": "0.1.0",
   "description": "The compiler for Posttext",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
@@ -18,7 +18,6 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/modules": "workspace:^0.1.0",
     "@posttext/parser": "workspace:^0.1.0",
     "@posttext/printer": "workspace:^0.1.0",
     "@posttext/registry": "workspace:^0.1.0",

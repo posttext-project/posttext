@@ -5,9 +5,13 @@
 import { Module } from '@posttext/registry'
 import { Resolver, RegistryOptions } from '@posttext/registry'
 
-import { tagResolvers } from './resolvers'
+import { tagResolvers } from './resolvers.js'
 
 export class StdModule implements Module {
+  static create(): Module {
+    return new StdModule()
+  }
+
   getTagResolvers(
     options: RegistryOptions
   ): Record<string, Resolver> {
@@ -15,6 +19,5 @@ export class StdModule implements Module {
   }
 }
 
-export const m = new StdModule()
-
-export default StdModule
+export const module = new StdModule()
+export const moduleFactory = StdModule

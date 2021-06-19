@@ -1,16 +1,16 @@
-import { promises as fs } from 'fs'
+import fsPkg from 'fs'
 import glob from 'glob'
-import meow from 'meow'
+import * as meow from 'meow'
 import path from 'path'
 import util from 'util'
+import url from 'url'
 
+const { promises: fs } = fsPkg
 const asyncGlob = util.promisify(glob)
 
 class AddLicenseCommand {
-  private cli: meow.Result<any>
-
-  static create(): AddLicenseCommand {
-    const cli = meow(
+  static create() {
+    const cli = meow.default(
       `
         Usage
           $ add-license -f <license-file> pattern
@@ -23,6 +23,7 @@ class AddLicenseCommand {
           --file, -f    Specify license header file.
       `,
       {
+        importMeta: import.meta,
         description: false,
         hardRejection: false,
         autoHelp: true,
@@ -32,20 +33,23 @@ class AddLicenseCommand {
     return new AddLicenseCommand({ cli })
   }
 
-  constructor({ cli }: { cli: meow.Result<any> }) {
+  constructor({ cli }) {
     this.cli = cli
   }
 
-  async run(): Promise<void> {
-    const licenseFile = (this.cli.flags.f ??
-      this.cli.flags.file) as string
-    const patterns = this.cli.input as string[]
+  async run() {
+    const licenseFile = this.cli.flags.f ?? this.cli.flags.file
+    const patterns = this.cli.input
 
-    const check = this.cli.flags.check as boolean
+    const check = this.cli.flags.check
 
     if (licenseFile) {
       const license = await fs.readFile(
-        path.resolve(__dirname, '..', licenseFile),
+        path.resolve(
+          path.dirname(url.fileURLToPath(import.meta.url)),
+          '..',
+          licenseFile
+        ),
         'utf8'
       )
 
@@ -66,11 +70,7 @@ class AddLicenseCommand {
     }
   }
 
-  private async addLicense(
-    pattern: string,
-    license: string,
-    check: boolean
-  ): Promise<boolean> {
+  async addLicense(pattern, license, check) {
     const matches = await asyncGlob(pattern)
 
     let success = true

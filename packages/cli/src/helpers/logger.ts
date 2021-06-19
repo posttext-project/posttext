@@ -13,19 +13,13 @@ export class Logger {
     const time = new Date()
     console.log(
       `[${chalk.blue(
-        `${time
-          .getHours()
-          .toString()
-          .padStart(
-            2,
-            '0'
-          )}:${time
+        `${time.getHours().toString().padStart(2, '0')}:${time
           .getMinutes()
           .toString()
-          .padStart(
-            2,
-            '0'
-          )}:${time.getSeconds().toString().padStart(2, '0')}`
+          .padStart(2, '0')}:${time
+          .getSeconds()
+          .toString()
+          .padStart(2, '0')}`
       )}]`,
       ...message
     )

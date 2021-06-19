@@ -17,12 +17,12 @@ import {
   Node,
 } from '@posttext/parser'
 
-import Handlebars from '../helpers/handlebars'
+import Handlebars from '../helpers/handlebars.js'
 import {
   blockTransformDefault,
   inlinesTransformDefault,
   textTransformDefault,
-} from './getBlockInlines'
+} from './getBlockInlines.js'
 
 const TAG_STATE = Symbol('TagState')
 const SEND_RECEIVE = Symbol('SendReceive')
@@ -761,8 +761,6 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const depsType = command.type as 'js' | 'css' | undefined
 
-      const resolve = command.resolve as any
-
       for (const dep of command.deps as any[]) {
         const type =
           depsType ?? (dep.type as 'js' | 'css' | undefined)
@@ -772,7 +770,6 @@ export const interpreters: Record<string, Interpreter> = {
           name: 'dependency',
           type,
           src,
-          resolve,
         }
       }
     },

@@ -2,7 +2,7 @@
   "name": "@posttext/printer",
   "version": "0.1.0",
   "description": "The printer for Posttext",
-  "type": "commonjs",
+  "type": "module",
   "main": "./lib/index.js",
   "types": "./types/index.d.ts",
   "exports": {

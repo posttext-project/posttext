@@ -3,11 +3,15 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import Prism from 'prismjs'
-import loadLanguages from 'prismjs/components/'
+import loadLanguages from 'prismjs/components/index.js'
 import stripIndent from 'strip-indent'
 import qrcode from 'qrcode'
 import path from 'path'
 import katex from 'katex'
+
+/**
+ * TODO: Remove `path` module from imported packages.
+ */
 
 import {
   Resolver,
@@ -18,10 +22,6 @@ import { extractParagraphs } from '@posttext/ptlib'
 
 const KATEX_STATE = Symbol('KatexState')
 const CODE_BLOCK_STATE = Symbol('CodeBlockState')
-
-const resolveModules = [
-  path.resolve(__dirname, '../../node_modules'),
-]
 
 export const TOC = Symbol('Toc')
 export const tocDef = [
@@ -363,9 +363,6 @@ export const tagResolvers = (
                 src: 'prismjs/themes/prism.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -440,9 +437,6 @@ export const tagResolvers = (
                 src: 'prismjs/themes/prism.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -516,9 +510,6 @@ export const tagResolvers = (
                 src: 'katex/dist/katex.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -568,9 +559,6 @@ export const tagResolvers = (
                 src: 'katex/dist/katex.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },

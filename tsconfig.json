@@ -1,8 +1,8 @@
 {
-  "include": ["packages/*/src", "scripts"],
+  "include": ["packages/*/src", "scripts/*"],
   "compilerOptions": {
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "es2020",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "downlevelIteration": true,

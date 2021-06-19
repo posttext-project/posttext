@@ -11,7 +11,7 @@ import {
   ParameterNode,
   BlockNode,
   AttributeNode,
-} from './ast'
+} from './ast.js'
 
 export class Parser {
   static create(): Parser {
@@ -64,9 +64,8 @@ export class Parser {
 
     this.skip(cursor)
 
-    const params: ParameterNode[] | null = this.parseParameters(
-      cursor
-    )
+    const params: ParameterNode[] | null =
+      this.parseParameters(cursor)
     if (!params) {
       cursor.moveTo(marker)
 
@@ -75,9 +74,8 @@ export class Parser {
 
     this.skip(cursor)
 
-    const attrs: AttributeNode[] | null = this.parseAttributes(
-      cursor
-    )
+    const attrs: AttributeNode[] | null =
+      this.parseAttributes(cursor)
     if (!attrs) {
       cursor.moveTo(marker)
 

@@ -3,11 +3,13 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import fs from 'fs-extra'
+import url from 'url'
 import path from 'path'
 import { Compiler } from '@posttext/compiler'
+import { resolve, StdModule } from '@posttext/modules'
 import { getInterpreters } from '@posttext/interpreters/web'
 
-import { CommandOptions, Command } from './command'
+import { CommandOptions, Command } from './command.js'
 
 export class CompileCommand implements Command {
   private args: string[]
@@ -27,10 +29,28 @@ export class CompileCommand implements Command {
 
     const compiler = Compiler.create()
 
+    compiler
+      .getPrinter()
+      .getRegistry()
+      .loadModule(StdModule.create())
     compiler.getPrinter().registerInterpreters(
       getInterpreters({
         output: outputPath,
-        css: [path.resolve(__dirname, 'assets/bundle.css')],
+        css: [
+          path.resolve(
+            path.dirname(url.fileURLToPath(import.meta.url)),
+            'assets/bundle.css'
+          ),
+        ],
+        resolve: {
+          modules: [
+            path.resolve(
+              path.dirname(url.fileURLToPath(import.meta.url)),
+              '../node_modules'
+            ),
+            ...(resolve?.modules ?? []),
+          ],
+        },
       })
     )
 

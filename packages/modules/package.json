@@ -2,7 +2,7 @@
   "name": "@posttext/modules",
   "version": "0.1.0",
   "description": "The official modules for Posttext",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
@@ -24,7 +24,7 @@
     "katex": "^0.13.11",
     "prismjs": "^1.23.0",
     "qrcode": "^1.4.4",
-    "strip-indent": "^3.0.0",
+    "strip-indent": "^4.0.0",
     "tslib": "^2.3.0"
   }
 }

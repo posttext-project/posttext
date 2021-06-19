@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "The backend interpreters for Posttext",
   "main": "index.js",
-  "type": "commonjs",
+  "type": "module",
   "types": "./types/index.d.ts",
   "exports": {
     ".": "./lib/index.js",
@@ -27,11 +27,11 @@
     "handlebars": "^4.7.7",
     "memoizee": "^0.4.15",
     "mini-css-extract-plugin": "^1.6.0",
-    "strip-indent": "^3.0.0",
+    "strip-indent": "^4.0.0",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.3",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
-    "webpack": "^5.38.1"
+    "webpack": "^5.39.1"
   }
 }
