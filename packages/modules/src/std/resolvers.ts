@@ -6,12 +6,7 @@ import Prism from 'prismjs'
 import loadLanguages from 'prismjs/components/index.js'
 import stripIndent from 'strip-indent'
 import qrcode from 'qrcode'
-import path from 'path'
 import katex from 'katex'
-
-/**
- * TODO: Remove `path` module from imported packages.
- */
 
 import {
   Resolver,
@@ -807,7 +802,7 @@ export const tagResolvers = (
           const dest = yield {
             name: 'copyFile',
             src: link,
-            dest: path.join('images', path.basename(link)),
+            dest: `images/${link.split(/[\\/]/).slice(-1)[0]}`,
           }
 
           yield {
