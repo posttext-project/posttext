@@ -24,9 +24,9 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - uses: pnpm/action-setup@v1.2.1
+    - uses: pnpm/action-setup@v2.0.1
       with:
-        version: 5.5.12
+        version: 6.7.6
     - run: pnpm m i --frozen-lockfile
     - run: pnpm build
     - run: pnpm test
