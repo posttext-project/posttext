@@ -27,7 +27,7 @@ jobs:
     - uses: pnpm/action-setup@v1.2.1
       with:
         version: 5.5.12
-    - run: pnpm i --frozen-lockfile
+    - run: pnpm m i --frozen-lockfile
     - run: pnpm build
     - run: pnpm test
       env:
