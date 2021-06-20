@@ -36,7 +36,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
-    "add-license": "node scripts/add-license -f templates/Exhibit-A.ts packages/*/src/**/*.{ts,js} packages/*/*.{ts,js} *.{ts,js}"
+    "add-license": "node scripts/add-license -f templates/Exhibit-A.ts packages/*/src/**/*.{ts,js} packages/*/*.{ts,js} *.{ts,js}",
+    "publish-all": "pnpm build && pnpm test && pnpm m --filter ./packages publish"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
