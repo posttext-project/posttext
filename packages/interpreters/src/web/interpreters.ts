@@ -7,7 +7,6 @@ import url from 'url'
 import path from 'path'
 import webpack from 'webpack'
 import prettier from 'prettier'
-import stripIndent from 'strip-indent'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import {
   Command,
@@ -105,26 +104,14 @@ export const getInterpreters = ({
           .map((data) => data.content)
           .join('')
 
-        const template = Handlebars.compile(
-          stripIndent(`
-            <!DOCTYPE html>
-            <html lang="en">
-              <head>
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>{{ metadata.title }}</title>
-                {{#if data.production}}
-                <link rel="stylesheet" href="./main.css">
-                {{/if}}
-              </head>
-              <body>
-                {{{ data.content }}}
-  
-                <script src="./main.js"></script>
-              </body>
-            </html>
-          `)
+        const htmlTemplate = await fs.readFile(
+          path.resolve(
+            path.dirname(url.fileURLToPath(import.meta.url)),
+            './assets/template.html'
+          ),
+          'utf-8'
         )
+        const template = Handlebars.compile(htmlTemplate)
 
         const rendered = template({
           metadata: {

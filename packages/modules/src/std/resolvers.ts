@@ -400,7 +400,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template:
-            '<pre><code class="language-{{ data.language }}">{{{ data.code }}}</code></pre>',
+            '<pre class="std_code"><code class="language-{{ data.language }}">{{{ data.code }}}</code></pre>',
           data: {
             language,
             code,
@@ -474,7 +474,7 @@ export const tagResolvers = (
         yield {
           name: 'html',
           template:
-            '<code class="language-{{ data.language }}">{{{ data.code }}}</code>',
+            '<code class="std_code language-{{ data.language }}">{{{ data.code }}}</code>',
           type: 'inline',
           data: {
             language,

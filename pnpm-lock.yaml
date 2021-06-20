@@ -22,11 +22,13 @@ importers:
       merge-stream: ^2.0.0
       nyc: ^15.1.0
       prettier: ^2.3.1
+      semver: ^7.3.5
       ts-node: ^10.0.0
       tslib: ^2.3.0
       typescript: ^4.3.4
     dependencies:
       cross-env: 7.0.3
+      semver: 7.3.5
     devDependencies:
       '@types/jest': 26.0.23
       '@typescript-eslint/eslint-plugin': 4.27.0_b7b1357bbf6753e7455d6ef3191d413d

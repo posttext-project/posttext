@@ -1,6 +1,6 @@
 {
   "name": "@posttext/interpreters",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The backend interpreters for Posttext",
   "main": "index.js",
   "type": "module",
@@ -10,6 +10,11 @@
     "./web": "./lib/web/index.js",
     "./common": "./lib/common/index.js"
   },
+  "files": [
+    "lib",
+    "src",
+    "types"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,6 +22,14 @@
     "posttext",
     "interpreters"
   ],
+  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "bugs": {
+    "url": "https://github.com/posttext-project/posttext/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
@@ -28,7 +41,6 @@
     "memoizee": "^0.4.15",
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "^2.3.1",
-    "strip-indent": "^4.0.0",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.3",
     "tslib": "^2.3.0",

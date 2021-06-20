@@ -1,6 +1,6 @@
 {
   "name": "@posttext/printer",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The printer for Posttext",
   "type": "module",
   "main": "./lib/index.js",
@@ -8,6 +8,11 @@
   "exports": {
     ".": "./lib/index.js"
   },
+  "files": [
+    "lib",
+    "src",
+    "types"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +20,14 @@
     "posttext",
     "printer"
   ],
+  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "bugs": {
+    "url": "https://github.com/posttext-project/posttext/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
