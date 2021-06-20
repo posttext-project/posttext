@@ -12,12 +12,14 @@ import boxen from 'boxen'
 import chalk from 'chalk'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
+import url from 'url'
 import { Subject } from 'rxjs'
 import { Compiler } from '@posttext/compiler'
+import { resolve, StdModule } from '@posttext/modules'
 import { getInterpreters } from '@posttext/interpreters/web'
 
-import { Command, CommandOptions } from './command'
-import { Logger } from './helpers/logger'
+import { Command, CommandOptions } from './command.js'
+import { Logger } from './helpers/logger.js'
 
 export class ServeCommand implements Command {
   private args: string[]
@@ -118,12 +120,29 @@ export class ServeCommand implements Command {
 
     const interpreters = getInterpreters({
       output: outputPath,
-      js: [path.resolve(__dirname, 'assets/bundle.ts')],
-      css: [path.resolve(__dirname, 'assets/bundle.css')],
+      js: [
+        path.resolve(
+          path.dirname(url.fileURLToPath(import.meta.url)),
+          'assets/bundle.ts'
+        ),
+      ],
+      css: [
+        path.resolve(
+          path.dirname(url.fileURLToPath(import.meta.url)),
+          'assets/bundle.css'
+        ),
+      ],
       mode: 'development',
+      resolve: {
+        modules: [...(resolve?.modules ?? [])],
+      },
     })
 
     const compiler = Compiler.create()
+    compiler
+      .getPrinter()
+      .getRegistry()
+      .loadModule(StdModule.create())
     compiler.getPrinter().registerInterpreters(interpreters)
 
     const input = await fs.readFile(inputPath, 'utf-8')

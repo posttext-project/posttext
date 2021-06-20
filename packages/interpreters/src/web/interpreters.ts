@@ -3,6 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import fs from 'fs-extra'
+import url from 'url'
 import path from 'path'
 import webpack from 'webpack'
 import prettier from 'prettier'
@@ -21,14 +22,17 @@ import {
   TextNode,
 } from '@posttext/parser'
 
-import Handlebars from '../helpers/handlebars'
-import { interpreters as commonInterpreters } from '../common'
+import Handlebars from '../helpers/handlebars.js'
+import { interpreters as commonInterpreters } from '../common/index.js'
 
 export interface InterpreterOptions {
   output: string
   js: string[]
   css: string[]
   mode: 'development' | 'production' | 'none' | undefined
+  resolve: Partial<{
+    modules: string[]
+  }>
 }
 
 export const getInterpreters = ({
@@ -36,6 +40,7 @@ export const getInterpreters = ({
   js = [],
   css = [],
   mode = 'development',
+  resolve = {},
 }: Partial<InterpreterOptions> = {}): Record<
   string,
   Interpreter
@@ -195,10 +200,6 @@ export const getInterpreters = ({
       ): AsyncGenerator<Data, any, any> {
         const deps = command.deps as any[]
 
-        const resolveModules: string[] = deps
-          .map((dep) => dep?.resolve?.modules ?? [])
-          .reduce((prev, current) => prev.concat(current), [])
-
         const jsDeps = deps
           .filter((dep) => dep.type === 'js')
           .map((dep) => dep.src)
@@ -255,14 +256,24 @@ export const getInterpreters = ({
             },
             resolve: {
               modules: [
-                path.resolve(__dirname, '../../node_modules'),
-                ...new Set(resolveModules),
+                path.resolve(
+                  path.dirname(
+                    url.fileURLToPath(import.meta.url)
+                  ),
+                  '../../node_modules'
+                ),
+                ...new Set(resolve?.modules),
               ],
               extensions: ['.ts', '.tsx', '.js', '.css'],
             },
             resolveLoader: {
               modules: [
-                path.resolve(__dirname, '../../node_modules'),
+                path.resolve(
+                  path.dirname(
+                    url.fileURLToPath(import.meta.url)
+                  ),
+                  '../../node_modules'
+                ),
               ],
             },
             plugins: ([] as any[]).concat(

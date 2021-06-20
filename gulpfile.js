@@ -5,10 +5,13 @@
 import ts from 'gulp-typescript'
 import del from 'del'
 import path from 'path'
+import url from 'url'
 import sourcemaps from 'gulp-sourcemaps'
 
-import { src, task, series, dest } from 'gulp'
+import gulp from 'gulp'
 import merge from 'merge-stream'
+
+const { src, task, series, dest } = gulp
 
 const reporter = ts.reporter.fullReporter(true)
 
@@ -71,7 +74,11 @@ task('clean', async () => {
 
 function forEachPkg(callback) {
   return packages.map((pkgName) => {
-    const dir = path.resolve(__dirname, 'packages', pkgName)
+    const dir = path.resolve(
+      path.dirname(url.fileURLToPath(import.meta.url)),
+      'packages',
+      pkgName
+    )
 
     return callback({
       pkgName,

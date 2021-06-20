@@ -16,7 +16,7 @@ import {
   TextNode,
 } from '@posttext/parser'
 
-import { AnonymousContext } from './context'
+import { AnonymousContext } from './context.js'
 
 export interface PrinterComponents {
   registry: Registry
@@ -37,6 +37,10 @@ export class Printer {
   constructor({ registry }: PrinterComponents) {
     this.interpreters = new Map()
     this.registry = registry
+  }
+
+  getRegistry(): Registry {
+    return this.registry
   }
 
   registerInterpreters(

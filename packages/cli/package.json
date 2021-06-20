@@ -2,7 +2,7 @@
   "name": "@posttext/cli",
   "version": "0.1.0",
   "description": "The Posttext CLI",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "bin": {
@@ -24,17 +24,18 @@
     "@koa/router": "^10.0.0",
     "@posttext/compiler": "workspace:^0.1.0",
     "@posttext/interpreters": "workspace:^0.1.0",
+    "@posttext/modules": "workspace:^0.1.0",
     "@posttext/printer": "workspace:^0.1.0",
     "boxen": "^5.0.1",
     "chalk": "^4.1.1",
-    "chokidar": "^3.5.1",
+    "chokidar": "^3.5.2",
     "esm": "^3.2.25",
     "fs-extra": "^10.0.0",
     "koa": "^2.13.1",
     "koa-static": "^5.0.0",
-    "meow": "^8.1.2",
+    "meow": "^10.0.1",
     "rxjs": "^7.1.0",
     "tslib": "^2.3.0",
-    "ws": "^7.4.6"
+    "ws": "^7.5.0"
   }
 }

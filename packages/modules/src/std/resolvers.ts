@@ -3,10 +3,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import Prism from 'prismjs'
-import loadLanguages from 'prismjs/components/'
+import loadLanguages from 'prismjs/components/index.js'
 import stripIndent from 'strip-indent'
 import qrcode from 'qrcode'
-import path from 'path'
 import katex from 'katex'
 
 import {
@@ -18,10 +17,6 @@ import { extractParagraphs } from '@posttext/ptlib'
 
 const KATEX_STATE = Symbol('KatexState')
 const CODE_BLOCK_STATE = Symbol('CodeBlockState')
-
-const resolveModules = [
-  path.resolve(__dirname, '../../node_modules'),
-]
 
 export const TOC = Symbol('Toc')
 export const tocDef = [
@@ -363,9 +358,6 @@ export const tagResolvers = (
                 src: 'prismjs/themes/prism.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -440,9 +432,6 @@ export const tagResolvers = (
                 src: 'prismjs/themes/prism.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -516,9 +505,6 @@ export const tagResolvers = (
                 src: 'katex/dist/katex.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -568,9 +554,6 @@ export const tagResolvers = (
                 src: 'katex/dist/katex.css',
               },
             ],
-            resolve: {
-              modules: resolveModules,
-            },
           }
         }
       },
@@ -819,7 +802,7 @@ export const tagResolvers = (
           const dest = yield {
             name: 'copyFile',
             src: link,
-            dest: path.join('images', path.basename(link)),
+            dest: `images/${link.split(/[\\/]/).slice(-1)[0]}`,
           }
 
           yield {

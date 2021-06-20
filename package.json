@@ -22,7 +22,7 @@
     "lib",
     "src"
   ],
-  "type": "commonjs",
+  "type": "module",
   "main": "./src/index.js",
   "bin": {
     "pt": "./index.js"
@@ -34,35 +34,33 @@
     "build": "gulp clean && pnpm format && gulp build",
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
-    "test": "jest",
-    "coverage": "jest --coverage",
-    "add-license": "ts-node scripts/add-license -f templates/Exhibit-A.ts packages/*/src/**/*.{ts,js} packages/*/*.{ts,js} *.{ts,js}"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
+    "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
+    "add-license": "node scripts/add-license -f templates/Exhibit-A.ts packages/*/src/**/*.{ts,js} packages/*/*.{ts,js} *.{ts,js}"
   },
   "devDependencies": {
-    "@babel/core": "^7.13.15",
-    "@babel/preset-env": "^7.13.15",
-    "@babel/preset-typescript": "^7.13.0",
-    "@types/jest": "^26.0.22",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "babel-jest": "^26.6.3",
+    "@types/jest": "^26.0.23",
+    "@typescript-eslint/eslint-plugin": "^4.27.0",
+    "@typescript-eslint/parser": "^4.27.0",
     "del": "^6.0.0",
-    "eslint": "^7.24.0",
-    "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-prettier": "^3.3.1",
-    "esm": "^3.2.25",
-    "glob": "^7.1.6",
+    "eslint": "^7.29.0",
+    "eslint-config-prettier": "^8.3.0",
+    "eslint-plugin-prettier": "^3.4.0",
+    "glob": "^7.1.7",
     "gulp": "^4.0.2",
     "gulp-sourcemaps": "^3.0.0",
     "gulp-typescript": "^6.0.0-alpha.1",
-    "husky": "^4.3.8",
-    "jest": "^26.6.3",
-    "meow": "^8.1.2",
+    "husky": "^6.0.0",
+    "jest": "^27.0.4",
+    "meow": "^10.0.1",
     "merge-stream": "^2.0.0",
     "nyc": "^15.1.0",
-    "prettier": "^2.2.1",
-    "ts-node": "^9.1.1",
+    "prettier": "^2.3.1",
+    "ts-node": "^10.0.0",
     "tslib": "^2.3.0",
-    "typescript": "^4.2.4"
+    "typescript": "^4.3.4"
+  },
+  "dependencies": {
+    "cross-env": "^7.0.3"
   }
 }

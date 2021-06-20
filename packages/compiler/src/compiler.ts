@@ -5,7 +5,6 @@
 import { Parser } from '@posttext/parser'
 import { Printer } from '@posttext/printer'
 import { Registry } from '@posttext/registry'
-import { StdModule } from '@posttext/modules'
 
 export interface CompilerComponents {
   parser: Parser
@@ -24,9 +23,7 @@ export class Compiler {
   static create(): Compiler {
     const parser = Parser.create()
 
-    const registry = Registry.create({
-      rootModule: new StdModule(),
-    })
+    const registry = Registry.create({})
     const printer = Printer.create({
       registry,
     })

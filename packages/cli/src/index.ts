@@ -3,10 +3,11 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import * as meow from 'meow'
-import { CompileCommand } from './compile'
-import { ServeCommand } from './serve'
 import chalk from 'chalk'
-import { Logger } from './helpers/logger'
+
+import { CompileCommand } from './compile.js'
+import { ServeCommand } from './serve.js'
+import { Logger } from './helpers/logger.js'
 
 export class CLI {
   private cli: meow.Result<any>
@@ -35,6 +36,7 @@ export class CLI {
           $ pt compile <input>
       `,
       {
+        importMeta: import.meta,
         description: false,
         hardRejection: false,
         autoHelp: false,
@@ -54,12 +56,12 @@ export class CLI {
 
       switch (command) {
         case 'compile':
-          await this.compile(args)
+          await this.compile(args, this.cli.flags)
 
           return
 
         case 'serve':
-          await this.serve(args)
+          await this.serve(args, this.cli.flags)
 
           return
 
@@ -73,7 +75,7 @@ export class CLI {
 
   async compile(
     args: string[],
-    flags: meow.Options<any> = {}
+    flags: Record<string, unknown> = {}
   ): Promise<any> {
     const command = CompileCommand.create({
       args,
@@ -85,7 +87,7 @@ export class CLI {
 
   async serve(
     args: string[],
-    flags: meow.Options<any> = {}
+    flags: Record<string, unknown> = {}
   ): Promise<any> {
     const command = ServeCommand.create({
       args,

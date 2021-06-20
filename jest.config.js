@@ -5,7 +5,7 @@
 // For a detailed explanation regarding each configuration property, visit:
 // https://jestjs.io/docs/en/configuration.html
 
-module.exports = {
+export default {
   // automock: false,
   // bail: 0,
   // browser: false,
@@ -26,6 +26,7 @@ module.exports = {
   // coverageThreshold: undefined,
   // dependencyExtractor: undefined,
   // errorOnDeprecated: false,
+  // extensionsToTreatAsEsm: ['.ts'],
   // forceCoverageMatch: [],
   // globalSetup: undefined,
   // globalTeardown: undefined,
@@ -64,10 +65,10 @@ module.exports = {
   testEnvironment: 'node',
   // testEnvironmentOptions: {},
   // testLocationInResults: false,
-  // testMatch: [
-  //   "**/__tests__/**/*.[jt]s?(x)",
-  //   "**/?(*.)+(spec|test).[tj]s?(x)"
-  // ],
+  testMatch: [
+    '**/lib/**/__tests__/**/*.[jt]s?(x)',
+    '**/lib/**/?(*.)+(spec|test).[tj]s?(x)',
+  ],
   // testPathIgnorePatterns: [
   //   "\\\\node_modules\\\\"
   // ],
@@ -76,7 +77,7 @@ module.exports = {
   // testRunner: "jasmine2",
   // testURL: "http://localhost",
   // timers: "real",
-  // transform: undefined,
+  transform: {},
   transformIgnorePatterns: [],
   // unmockedModulePathPatterns: undefined,
   // verbose: undefined,

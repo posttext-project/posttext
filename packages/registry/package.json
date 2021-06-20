@@ -2,7 +2,7 @@
   "name": "@posttext/registry",
   "version": "0.1.0",
   "description": "The library for registering modules in Posttext",
-  "type": "commonjs",
+  "type": "module",
   "main": "index.js",
   "types": "./types/index.d.ts",
   "exports": {
