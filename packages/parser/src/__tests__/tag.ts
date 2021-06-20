@@ -4,47 +4,34 @@
 
 import { Cursor } from 'cursornext'
 
-import { Parser } from '../src'
-import { runParse } from './helpers'
+import { Parser } from '../index.js'
+import { runParse } from './helpers/index.js'
 
 describe('Parser', () => {
-  describe('parseVerbatim()', () => {
+  describe('parseTag()', () => {
     let parser: Parser
 
     beforeAll(() => {
       parser = Parser.create()
     })
 
-    test('verbatim should be parsed correctly', () => {
+    test('tag should be parsed correctly', () => {
       runParse(
         `
-          🌵\\code(javascript) ==={
-            function sum(a, b) {
-              return a + b;
-            }
-
-            console.log(sum(1, 2))
-          }===;🌵
+          🌵\\bold {Hello, World!};🌵
         `,
         `
           type: Tag
           id:
             type: Identifier
-            name: code
+            name: bold
+          params: []
           attrs: []
-          params:
-            - type: Parameter
-              value: javascript
           blocks:
             - type: Block
               body:
                 - type: Text
-                  value: |-2
-                    function sum(a, b) {
-                      return a + b;
-                    }
-
-                    console.log(sum(1, 2))
+                  value: Hello, World!
         `,
         (cursor: Cursor) => parser.parseTag(cursor)
       )

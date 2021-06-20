@@ -4,8 +4,8 @@
 
 import { Cursor } from 'cursornext'
 
-import { Parser } from '../src'
-import { runParse } from './helpers'
+import { Parser } from '../index.js'
+import { runParse } from './helpers/index.js'
 
 describe('Parser', () => {
   describe('parseDocument()', () => {

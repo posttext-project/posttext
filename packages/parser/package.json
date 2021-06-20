@@ -19,6 +19,7 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
+    "@types/jest": "^26.0.23",
     "cursornext": "^0.2.4",
     "tslib": "^2.3.0"
   },
