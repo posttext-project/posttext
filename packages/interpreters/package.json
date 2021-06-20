@@ -27,6 +27,7 @@
     "handlebars": "^4.7.7",
     "memoizee": "^0.4.15",
     "mini-css-extract-plugin": "^1.6.0",
+    "prettier": "^2.3.1",
     "strip-indent": "^4.0.0",
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.3",

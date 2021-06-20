@@ -60,6 +60,7 @@ importers:
       chalk: ^4.1.1
       chokidar: ^3.5.2
       esm: ^3.2.25
+      find-up: ^5.0.0
       fs-extra: ^10.0.0
       koa: ^2.13.1
       koa-static: ^5.0.0
@@ -77,6 +78,7 @@ importers:
       chalk: 4.1.1
       chokidar: 3.5.2
       esm: 3.2.25
+      find-up: 5.0.0
       fs-extra: 10.0.0
       koa: 2.13.1
       koa-static: 5.0.0
@@ -106,6 +108,7 @@ importers:
       handlebars: ^4.7.7
       memoizee: ^0.4.15
       mini-css-extract-plugin: ^1.6.0
+      prettier: ^2.3.1
       strip-indent: ^4.0.0
       style-loader: ^2.0.0
       ts-loader: ^9.2.3
@@ -120,6 +123,7 @@ importers:
       handlebars: 4.7.7
       memoizee: 0.4.15
       mini-css-extract-plugin: 1.6.0_webpack@5.39.1
+      prettier: 2.3.1
       strip-indent: 4.0.0
       style-loader: 2.0.0_webpack@5.39.1
       ts-loader: 9.2.3_webpack@5.39.1
@@ -6403,7 +6407,6 @@ packages:
     resolution: {integrity: sha512-p+vNbgpLjif/+D+DwAZAbndtRrR0md0MwfmOVN9N+2RgyACMT+7tfaRnT+WDPkqnuVwleyuBIG2XBxKDme3hPA==}
     engines: {node: '>=10.13.0'}
     hasBin: true
-    dev: true
 
   /pretty-format/26.6.2:
     resolution: {integrity: sha512-7AeGuCYNGmycyQbCqd/3PWH4eOoX/OiCa0uphp57NVTeAGdJGaAliecxwBDHYQCIvrW7aDBZCYeNTP/WX69mkg==}
