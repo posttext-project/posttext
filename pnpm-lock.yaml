@@ -12,7 +12,6 @@ importers:
       eslint: ^7.29.0
       eslint-config-prettier: ^8.3.0
       eslint-plugin-prettier: ^3.4.0
-      esm: ^3.2.25
       glob: ^7.1.7
       gulp: ^4.0.2
       gulp-sourcemaps: ^3.0.0
@@ -36,7 +35,6 @@ importers:
       eslint: 7.29.0
       eslint-config-prettier: 8.3.0_eslint@7.29.0
       eslint-plugin-prettier: 3.4.0_de2986b0c29d2faa795004f5443c76d1
-      esm: 3.2.25
       glob: 7.1.7
       gulp: 4.0.2
       gulp-sourcemaps: 3.0.0
@@ -3524,6 +3522,7 @@ packages:
   /esm/3.2.25:
     resolution: {integrity: sha512-U1suiZ2oDVWv4zPO56S0NcR5QriEahGtdN2OR6FiOG4WJvcjBVFB0qI4+eKoWFH483PKGuLuu6V8Z4T5g63UVA==}
     engines: {node: '>=6'}
+    dev: false
 
   /espree/7.3.1:
     resolution: {integrity: sha512-v3JCNCE64umkFpmkFGqzVKsOT0tN1Zr+ueqLZfpV1Ob8e+CEgPWa+OxCoGH3tnhimMKIaBm4m/vaRpJ/krRz2g==}
