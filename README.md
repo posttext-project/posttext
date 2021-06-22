@@ -1,4 +1,12 @@
-# PostText
+<div align="center">
+  <h1>PostText</h1>
+
+  <p>A formal markup language for rich-text editing</p>
+
+[![MPL-2.0 License](https://img.shields.io/github/license/posttext-project/posttext?color=blue)](https://www.mozilla.org/en-US/MPL/2.0/)
+[![From Vietnam with <3](https://raw.githubusercontent.com/webuild-community/badge/master/svg/love.svg)](https://webuild.community)
+
+</div>
 
 > **Note**: This library is a work-in-progress. Some features are not available yet.
 
