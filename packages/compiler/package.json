@@ -31,9 +31,9 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/parser": "workspace:^0.1.0",
-    "@posttext/printer": "workspace:^0.1.0",
-    "@posttext/registry": "workspace:^0.1.0",
+    "@posttext/parser": "workspace:^",
+    "@posttext/printer": "workspace:^",
+    "@posttext/registry": "workspace:^",
     "tslib": "^2.3.0"
   }
 }

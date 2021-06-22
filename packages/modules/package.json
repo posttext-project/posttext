@@ -32,8 +32,8 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/ptlib": "workspace:^0.1.0",
-    "@posttext/registry": "workspace:^0.1.0",
+    "@posttext/ptlib": "workspace:^",
+    "@posttext/registry": "workspace:^",
     "katex": "^0.13.11",
     "prismjs": "^1.23.0",
     "qrcode": "^1.4.4",
