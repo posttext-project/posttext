@@ -1,6 +1,6 @@
 {
   "name": "@posttext/parser",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The parser for Posttext",
   "type": "module",
   "main": "index.js",

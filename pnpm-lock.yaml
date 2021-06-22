@@ -103,33 +103,35 @@ importers:
 
   packages/interpreters:
     specifiers:
-      '@posttext/parser': workspace:^0.1.0
-      '@posttext/registry': workspace:^0.1.0
+      '@posttext/parser': workspace:^
+      '@posttext/registry': workspace:^
       css-loader: ^5.2.6
+      find-up: ^5.0.0
       fs-extra: ^10.0.0
       handlebars: ^4.7.7
       memoizee: ^0.4.15
       mini-css-extract-plugin: ^1.6.0
       prettier: ^2.3.1
-      strip-indent: ^4.0.0
       style-loader: ^2.0.0
       ts-loader: ^9.2.3
       tslib: ^2.3.0
+      typescript: ^4.3.4
       uuid: ^8.3.2
       webpack: ^5.39.1
     dependencies:
       '@posttext/parser': link:../parser
       '@posttext/registry': link:../registry
       css-loader: 5.2.6_webpack@5.39.1
+      find-up: 5.0.0
       fs-extra: 10.0.0
       handlebars: 4.7.7
       memoizee: 0.4.15
       mini-css-extract-plugin: 1.6.0_webpack@5.39.1
       prettier: 2.3.1
-      strip-indent: 4.0.0
       style-loader: 2.0.0_webpack@5.39.1
-      ts-loader: 9.2.3_webpack@5.39.1
+      ts-loader: 9.2.3_typescript@4.3.4+webpack@5.39.1
       tslib: 2.3.0
+      typescript: 4.3.4
       uuid: 8.3.2
       webpack: 5.39.1
 
@@ -7432,7 +7434,7 @@ packages:
     resolution: {integrity: sha512-GJtWyq9InR/2HRiLZgpIKv+ufIKrVrvjQWEj7PxAXNc5dwbNJkqhAUoAGgzRmULAnoOM5EIpveYd3J2VeSAIew==}
     engines: {node: '>=12'}
 
-  /ts-loader/9.2.3_webpack@5.39.1:
+  /ts-loader/9.2.3_typescript@4.3.4+webpack@5.39.1:
     resolution: {integrity: sha512-sEyWiU3JMHBL55CIeC4iqJQadI0U70A5af0kvgbNLHVNz2ACztQg0j/9x10bjjIht8WfFYLKfn4L6tkZ+pu+8Q==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -7443,6 +7445,7 @@ packages:
       enhanced-resolve: 5.8.2
       micromatch: 4.0.4
       semver: 7.3.5
+      typescript: 4.3.4
       webpack: 5.39.1
     dev: false
 
@@ -7565,7 +7568,6 @@ packages:
     resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: true
 
   /uglify-js/3.13.9:
     resolution: {integrity: sha512-wZbyTQ1w6Y7fHdt8sJnHfSIuWeDgk6B5rCb4E/AM6QNNPbOMIZph21PW5dRB3h7Df0GszN+t7RuUH6sWK5bF0g==}

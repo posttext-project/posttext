@@ -1,6 +1,6 @@
 {
   "name": "@posttext/cli",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The Posttext CLI",
   "type": "module",
   "main": "index.js",

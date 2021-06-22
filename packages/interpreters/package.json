@@ -1,6 +1,6 @@
 {
   "name": "@posttext/interpreters",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The backend interpreters for Posttext",
   "main": "index.js",
   "type": "module",
@@ -36,6 +36,7 @@
     "@posttext/parser": "workspace:^",
     "@posttext/registry": "workspace:^",
     "css-loader": "^5.2.6",
+    "find-up": "^5.0.0",
     "fs-extra": "^10.0.0",
     "handlebars": "^4.7.7",
     "memoizee": "^0.4.15",
@@ -44,6 +45,7 @@
     "style-loader": "^2.0.0",
     "ts-loader": "^9.2.3",
     "tslib": "^2.3.0",
+    "typescript": "^4.3.4",
     "uuid": "^8.3.2",
     "webpack": "^5.39.1"
   }

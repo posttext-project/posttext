@@ -1,6 +1,6 @@
 {
   "name": "@posttext/modules",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "The official modules for Posttext",
   "type": "module",
   "main": "index.js",
