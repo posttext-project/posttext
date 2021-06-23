@@ -3,13 +3,43 @@
 }
 
 body {
-  padding-bottom: 300px;
   font-family: Nimbus Sans L;
+}
+
+#document {
+  margin: 2em;
+  padding-bottom: 20em;
+  max-width: 48em;
+}
+
+@media screen and (max-width: 980px) {
+  #document {
+    max-width: 36em;
+  }
 }
 
 code {
   font-family: JetBrains Mono;
-  font-size: 0.92rem;
+  font-size: 0.94em !important;
+}
+
+.std_code {
+  background: lightyellow !important;
+  border-radius: 0.2em;
+}
+
+pre.std_code {
+  padding: 1.25em 1.5em;
+  margin: 1em 0;
+}
+
+code.std_code {
+  padding: 0.2em 0.4em;
+}
+
+.std_code span {
+  background: none !important;
+  text-shadow: none !important;
 }
 
 .std_toc__list {
@@ -30,7 +60,7 @@ code {
   border-left: 0.25em solid #dfe2e5;
   color: #6a737d;
   padding: 0 1em;
-  margin: 0;
+  margin: 1em 0;
 }
 
 .std_qrcode {

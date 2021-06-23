@@ -10,12 +10,13 @@ import path from 'path'
 import serve from 'koa-static'
 import boxen from 'boxen'
 import chalk from 'chalk'
+import findUp from 'find-up'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
 import url from 'url'
 import { Subject } from 'rxjs'
 import { Compiler } from '@posttext/compiler'
-import { resolve, StdModule } from '@posttext/modules'
+import { importMeta, StdModule } from '@posttext/modules'
 import { getInterpreters } from '@posttext/interpreters/web'
 
 import { Command, CommandOptions } from './command.js'
@@ -118,12 +119,17 @@ export class ServeCommand implements Command {
   ): Promise<void> {
     await fs.ensureDir(outputPath)
 
+    const pathToNodeModules = await findUp('node_modules', {
+      cwd: url.fileURLToPath(importMeta.url),
+      type: 'directory',
+    })
+
     const interpreters = getInterpreters({
       output: outputPath,
       js: [
         path.resolve(
           path.dirname(url.fileURLToPath(import.meta.url)),
-          'assets/bundle.ts'
+          'assets/bundle.js'
         ),
       ],
       css: [
@@ -134,7 +140,7 @@ export class ServeCommand implements Command {
       ],
       mode: 'development',
       resolve: {
-        modules: [...(resolve?.modules ?? [])],
+        modules: pathToNodeModules ? [pathToNodeModules] : [],
       },
     })
 

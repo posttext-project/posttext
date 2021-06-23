@@ -1,6 +1,6 @@
 {
   "name": "@posttext/printer",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "The printer for Posttext",
   "type": "module",
   "main": "./lib/index.js",
@@ -8,18 +8,32 @@
   "exports": {
     ".": "./lib/index.js"
   },
+  "files": [
+    "lib",
+    "src",
+    "types"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
     "posttext",
-    "printer"
+    "printer",
+    "tsconfig.json"
   ],
+  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "bugs": {
+    "url": "https://github.com/posttext-project/posttext/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/parser": "workspace:^0.1.0",
-    "@posttext/registry": "workspace:^0.1.0",
+    "@posttext/parser": "workspace:*",
+    "@posttext/registry": "workspace:*",
     "tslib": "^2.3.0"
   }
 }

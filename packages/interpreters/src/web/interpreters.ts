@@ -5,9 +5,9 @@
 import fs from 'fs-extra'
 import url from 'url'
 import path from 'path'
+import findUp from 'find-up'
 import webpack from 'webpack'
 import prettier from 'prettier'
-import stripIndent from 'strip-indent'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import {
   Command,
@@ -105,26 +105,14 @@ export const getInterpreters = ({
           .map((data) => data.content)
           .join('')
 
-        const template = Handlebars.compile(
-          stripIndent(`
-            <!DOCTYPE html>
-            <html lang="en">
-              <head>
-                <meta charset="UTF-8" />
-                <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-                <title>{{ metadata.title }}</title>
-                {{#if data.production}}
-                <link rel="stylesheet" href="./main.css">
-                {{/if}}
-              </head>
-              <body>
-                {{{ data.content }}}
-  
-                <script src="./main.js"></script>
-              </body>
-            </html>
-          `)
+        const htmlTemplate = await fs.readFile(
+          path.resolve(
+            path.dirname(url.fileURLToPath(import.meta.url)),
+            './assets/template.html'
+          ),
+          'utf-8'
         )
+        const template = Handlebars.compile(htmlTemplate)
 
         const rendered = template({
           metadata: {
@@ -210,6 +198,11 @@ export const getInterpreters = ({
           .map((dep) => dep.src)
           .concat(externalCssDeps) as string[]
 
+        const pathToNodeModules = await findUp('node_modules', {
+          cwd: url.fileURLToPath(import.meta.url),
+          type: 'directory',
+        })
+
         if (jsDeps.length + cssDeps.length > 0) {
           const compiler = webpack({
             entry: [...jsDeps, ...cssDeps],
@@ -222,17 +215,6 @@ export const getInterpreters = ({
             target: 'web',
             module: {
               rules: [
-                {
-                  test: /\.ts$/i,
-                  use: [
-                    {
-                      loader: 'ts-loader',
-                      options: {
-                        transpileOnly: true,
-                      },
-                    },
-                  ],
-                },
                 {
                   test: /\.css$/i,
                   use: [
@@ -256,24 +238,18 @@ export const getInterpreters = ({
             },
             resolve: {
               modules: [
-                path.resolve(
-                  path.dirname(
-                    url.fileURLToPath(import.meta.url)
-                  ),
-                  '../../node_modules'
-                ),
+                ...(pathToNodeModules
+                  ? [pathToNodeModules]
+                  : []),
                 ...new Set(resolve?.modules),
               ],
               extensions: ['.ts', '.tsx', '.js', '.css'],
             },
             resolveLoader: {
               modules: [
-                path.resolve(
-                  path.dirname(
-                    url.fileURLToPath(import.meta.url)
-                  ),
-                  '../../node_modules'
-                ),
+                ...(pathToNodeModules
+                  ? [pathToNodeModules]
+                  : []),
               ],
             },
             plugins: ([] as any[]).concat(

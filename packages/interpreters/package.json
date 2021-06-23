@@ -1,6 +1,6 @@
 {
   "name": "@posttext/interpreters",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "The backend interpreters for Posttext",
   "main": "index.js",
   "type": "module",
@@ -10,6 +10,14 @@
     "./web": "./lib/web/index.js",
     "./common": "./lib/common/index.js"
   },
+  "files": [
+    "lib",
+    "src",
+    "types",
+    "common.d.ts",
+    "web.d.ts",
+    "tsconfig.json"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -17,19 +25,27 @@
     "posttext",
     "interpreters"
   ],
+  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "bugs": {
+    "url": "https://github.com/posttext-project/posttext/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/parser": "workspace:^0.1.0",
-    "@posttext/registry": "workspace:^0.1.0",
+    "@posttext/parser": "workspace:*",
+    "@posttext/registry": "workspace:*",
     "css-loader": "^5.2.6",
+    "find-up": "^5.0.0",
     "fs-extra": "^10.0.0",
     "handlebars": "^4.7.7",
     "memoizee": "^0.4.15",
     "mini-css-extract-plugin": "^1.6.0",
-    "strip-indent": "^4.0.0",
+    "prettier": "^2.3.1",
     "style-loader": "^2.0.0",
-    "ts-loader": "^9.2.3",
     "tslib": "^2.3.0",
     "uuid": "^8.3.2",
     "webpack": "^5.39.1"

@@ -1,6 +1,6 @@
 {
   "name": "@posttext/modules",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "The official modules for Posttext",
   "type": "module",
   "main": "index.js",
@@ -9,6 +9,13 @@
     ".": "./lib/index.js",
     "./std": "./lib/std/index.js"
   },
+  "files": [
+    "lib",
+    "src",
+    "types",
+    "std.d.ts",
+    "tsconfig.json"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -16,11 +23,19 @@
     "posttext",
     "modules"
   ],
+  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "bugs": {
+    "url": "https://github.com/posttext-project/posttext/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/ptlib": "workspace:^0.1.0",
-    "@posttext/registry": "workspace:^0.1.0",
+    "@posttext/ptlib": "workspace:*",
+    "@posttext/registry": "workspace:*",
     "katex": "^0.13.11",
     "prismjs": "^1.23.0",
     "qrcode": "^1.4.4",
