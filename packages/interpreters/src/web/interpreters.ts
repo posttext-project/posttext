@@ -216,17 +216,6 @@ export const getInterpreters = ({
             module: {
               rules: [
                 {
-                  test: /\.ts$/i,
-                  use: [
-                    {
-                      loader: 'ts-loader',
-                      options: {
-                        transpileOnly: true,
-                      },
-                    },
-                  ],
-                },
-                {
                   test: /\.css$/i,
                   use: [
                     mode === 'development'

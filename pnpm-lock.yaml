@@ -53,10 +53,10 @@ importers:
   packages/cli:
     specifiers:
       '@koa/router': ^10.0.0
-      '@posttext/compiler': workspace:^
-      '@posttext/interpreters': workspace:^
-      '@posttext/modules': workspace:^
-      '@posttext/printer': workspace:^
+      '@posttext/compiler': workspace:*
+      '@posttext/interpreters': workspace:*
+      '@posttext/modules': workspace:*
+      '@posttext/printer': workspace:*
       boxen: ^5.0.1
       chalk: ^4.1.1
       chokidar: ^3.5.2
@@ -88,9 +88,9 @@ importers:
 
   packages/compiler:
     specifiers:
-      '@posttext/parser': workspace:^
-      '@posttext/printer': workspace:^
-      '@posttext/registry': workspace:^
+      '@posttext/parser': workspace:*
+      '@posttext/printer': workspace:*
+      '@posttext/registry': workspace:*
       tslib: ^2.3.0
     dependencies:
       '@posttext/parser': link:../parser
@@ -100,8 +100,8 @@ importers:
 
   packages/interpreters:
     specifiers:
-      '@posttext/parser': workspace:^
-      '@posttext/registry': workspace:^
+      '@posttext/parser': workspace:*
+      '@posttext/registry': workspace:*
       css-loader: ^5.2.6
       find-up: ^5.0.0
       fs-extra: ^10.0.0
@@ -110,9 +110,7 @@ importers:
       mini-css-extract-plugin: ^1.6.0
       prettier: ^2.3.1
       style-loader: ^2.0.0
-      ts-loader: ^9.2.3
       tslib: ^2.3.0
-      typescript: ^4.3.4
       uuid: ^8.3.2
       webpack: ^5.39.1
     dependencies:
@@ -126,16 +124,14 @@ importers:
       mini-css-extract-plugin: 1.6.0_webpack@5.39.1
       prettier: 2.3.1
       style-loader: 2.0.0_webpack@5.39.1
-      ts-loader: 9.2.3_typescript@4.3.4+webpack@5.39.1
       tslib: 2.3.0
-      typescript: 4.3.4
       uuid: 8.3.2
       webpack: 5.39.1
 
   packages/modules:
     specifiers:
-      '@posttext/ptlib': workspace:^
-      '@posttext/registry': workspace:^
+      '@posttext/ptlib': workspace:*
+      '@posttext/registry': workspace:*
       katex: ^0.13.11
       prismjs: ^1.23.0
       qrcode: ^1.4.4
@@ -167,8 +163,8 @@ importers:
 
   packages/printer:
     specifiers:
-      '@posttext/parser': workspace:^
-      '@posttext/registry': workspace:^
+      '@posttext/parser': workspace:*
+      '@posttext/registry': workspace:*
       tslib: ^2.3.0
     dependencies:
       '@posttext/parser': link:../parser
@@ -177,7 +173,7 @@ importers:
 
   packages/ptlib:
     specifiers:
-      '@posttext/registry': workspace:^
+      '@posttext/registry': workspace:*
       tslib: ^2.3.0
     dependencies:
       '@posttext/registry': link:../registry
@@ -4834,6 +4830,7 @@ packages:
     dependencies:
       braces: 3.0.2
       picomatch: 2.3.0
+    dev: true
 
   /mime-db/1.48.0:
     resolution: {integrity: sha512-FM3QwxV+TnZYQ2aRqhlKBMHxk10lTbMt3bBkMAp54ddrNeVSfcQYOOKuGuy3Ddrm38I04If834fOUSq1yzslJQ==}
@@ -6495,21 +6492,6 @@ packages:
     resolution: {integrity: sha512-GJtWyq9InR/2HRiLZgpIKv+ufIKrVrvjQWEj7PxAXNc5dwbNJkqhAUoAGgzRmULAnoOM5EIpveYd3J2VeSAIew==}
     engines: {node: '>=12'}
 
-  /ts-loader/9.2.3_typescript@4.3.4+webpack@5.39.1:
-    resolution: {integrity: sha512-sEyWiU3JMHBL55CIeC4iqJQadI0U70A5af0kvgbNLHVNz2ACztQg0j/9x10bjjIht8WfFYLKfn4L6tkZ+pu+8Q==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      typescript: '*'
-      webpack: ^5.0.0
-    dependencies:
-      chalk: 4.1.1
-      enhanced-resolve: 5.8.2
-      micromatch: 4.0.4
-      semver: 7.3.5
-      typescript: 4.3.4
-      webpack: 5.39.1
-    dev: false
-
   /ts-node/10.0.0_typescript@4.3.4:
     resolution: {integrity: sha512-ROWeOIUvfFbPZkoDis0L/55Fk+6gFQNZwwKPLinacRl6tsxstTF1DbAcLKkovwnpKMVvOMHP1TIbnwXwtLg1gg==}
     engines: {node: '>=12.0.0'}
@@ -6629,6 +6611,7 @@ packages:
     resolution: {integrity: sha512-uauPG7XZn9F/mo+7MrsRjyvbxFpzemRjKEZXS4AK83oP2KKOJPvb+9cO/gmnv8arWZvhnjVOXz7B49m1l0e9Ew==}
     engines: {node: '>=4.2.0'}
     hasBin: true
+    dev: true
 
   /uglify-js/3.13.9:
     resolution: {integrity: sha512-wZbyTQ1w6Y7fHdt8sJnHfSIuWeDgk6B5rCb4E/AM6QNNPbOMIZph21PW5dRB3h7Df0GszN+t7RuUH6sWK5bF0g==}

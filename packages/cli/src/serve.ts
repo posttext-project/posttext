@@ -129,7 +129,7 @@ export class ServeCommand implements Command {
       js: [
         path.resolve(
           path.dirname(url.fileURLToPath(import.meta.url)),
-          'assets/bundle.ts'
+          'assets/bundle.js'
         ),
       ],
       css: [

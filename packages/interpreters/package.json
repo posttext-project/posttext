@@ -1,6 +1,6 @@
 {
   "name": "@posttext/interpreters",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "description": "The backend interpreters for Posttext",
   "main": "index.js",
   "type": "module",
@@ -13,7 +13,10 @@
   "files": [
     "lib",
     "src",
-    "types"
+    "types",
+    "common.d.ts",
+    "web.d.ts",
+    "tsconfig.json"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -33,8 +36,8 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/parser": "workspace:^",
-    "@posttext/registry": "workspace:^",
+    "@posttext/parser": "workspace:*",
+    "@posttext/registry": "workspace:*",
     "css-loader": "^5.2.6",
     "find-up": "^5.0.0",
     "fs-extra": "^10.0.0",
@@ -43,9 +46,7 @@
     "mini-css-extract-plugin": "^1.6.0",
     "prettier": "^2.3.1",
     "style-loader": "^2.0.0",
-    "ts-loader": "^9.2.3",
     "tslib": "^2.3.0",
-    "typescript": "^4.3.4",
     "uuid": "^8.3.2",
     "webpack": "^5.39.1"
   }
