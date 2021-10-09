@@ -137,6 +137,10 @@ export class ServeCommand implements Command {
           path.dirname(url.fileURLToPath(import.meta.url)),
           'assets/bundle.css'
         ),
+        path.resolve(
+          path.dirname(url.fileURLToPath(import.meta.url)),
+          'assets/fonts/fonts.css'
+        ),
       ],
       mode: 'development',
       resolve: {

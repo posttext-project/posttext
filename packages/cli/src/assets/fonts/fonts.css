@@ -1,0 +1,51 @@
+@font-face {
+  font-family: 'NimbusSanL';
+  src: url(./NimbusSanL/NimbusSanL-Reg.otf);
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'NimbusSanL';
+  src: url(./NimbusSanL/NimbusSanL-RegIta.otf);
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'NimbusSanL';
+  src: url(./NimbusSanL/NimbusSanL-Bol.otf);
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'NimbusSanL';
+  src: url(./NimbusSanL/NimbusSanL-BolIta.otf);
+  font-weight: bold;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url(./JetBrainsMono/JetBrainsMono-Regular.ttf);
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url(./JetBrainsMono/JetBrainsMono-Italic.ttf);
+  font-weight: normal;
+  font-style: italic;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url(./JetBrainsMono/JetBrainsMono-Bold.ttf);
+  font-weight: bold;
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url(./JetBrainsMono/JetBrainsMono-BoldItalic.ttf);
+  font-weight: bold;
+  font-style: italic;
+}
