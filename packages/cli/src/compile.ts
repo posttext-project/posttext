@@ -5,7 +5,7 @@
 import fs from 'fs-extra'
 import url from 'url'
 import path from 'path'
-import findUp from 'find-up'
+import { findUpMultiple } from 'find-up'
 import { Compiler } from '@posttext/compiler'
 import { importMeta, StdModule } from '@posttext/modules'
 import { getInterpreters } from '@posttext/interpreters/web'
@@ -30,10 +30,13 @@ export class CompileCommand implements Command {
 
     const compiler = Compiler.create()
 
-    const pathToNodeModules = await findUp('node_modules', {
-      cwd: url.fileURLToPath(importMeta.url),
-      type: 'directory',
-    })
+    const pathsToNodeModules = await findUpMultiple(
+      'node_modules',
+      {
+        cwd: url.fileURLToPath(importMeta.url),
+        type: 'directory',
+      }
+    )
 
     compiler
       .getPrinter()
@@ -58,7 +61,7 @@ export class CompileCommand implements Command {
               path.dirname(url.fileURLToPath(import.meta.url)),
               '../node_modules'
             ),
-            ...(pathToNodeModules ? [pathToNodeModules] : []),
+            ...(pathsToNodeModules ? pathsToNodeModules : []),
           ],
         },
       })

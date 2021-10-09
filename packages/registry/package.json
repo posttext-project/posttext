@@ -1,6 +1,6 @@
 {
   "name": "@posttext/registry",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "The library for registering modules in Posttext",
   "type": "module",
   "main": "index.js",
