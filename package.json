@@ -22,7 +22,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "node packages/cli/lib/bin/index.js",
-    "dev": "gulp clean && gulp build:cjs && node packages/cli/lib/bin/index.js",
+    "dev": "gulp clean && gulp build && node packages/cli/lib/bin/index.js",
     "debug": "gulp clean && gulp build && node --inspect-brk packages/cli/lib/bin/index.js",
     "build": "gulp clean && pnpm format && gulp build",
     "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
