@@ -1,6 +1,6 @@
 {
   "name": "@posttext/ptlib",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Utility library for Posttext modules",
   "type": "module",
   "main": "index.js",

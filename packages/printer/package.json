@@ -1,6 +1,6 @@
 {
   "name": "@posttext/printer",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The printer for Posttext",
   "type": "module",
   "main": "./lib/index.js",

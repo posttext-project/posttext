@@ -1,6 +1,6 @@
 {
   "name": "@posttext/build",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "The next generation markup language for everyone!",
   "keywords": [
     "text",
@@ -31,7 +31,7 @@
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",
     "add-license": "node scripts/add-license -f templates/Exhibit-A.ts packages/*/src/**/*.{ts,js} packages/*/*.{ts,js} *.{ts,js}",
     "publish-all": "pnpm build && pnpm test && pnpm m --filter ./packages publish --access public --tag beta",
-    "bump-version": "node scripts/bump-version.js && pnpm format"
+    "bump-version": "node scripts/bump-version.js"
   },
   "devDependencies": {
     "@types/jest": "^26.0.23",
