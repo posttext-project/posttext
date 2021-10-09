@@ -10,7 +10,7 @@ import path from 'path'
 import serve from 'koa-static'
 import boxen from 'boxen'
 import chalk from 'chalk'
-import findUp from 'find-up'
+import { findUpMultiple } from 'find-up'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
 import url from 'url'
@@ -119,10 +119,13 @@ export class ServeCommand implements Command {
   ): Promise<void> {
     await fs.ensureDir(outputPath)
 
-    const pathToNodeModules = await findUp('node_modules', {
-      cwd: url.fileURLToPath(importMeta.url),
-      type: 'directory',
-    })
+    const pathsToNodeModules = await findUpMultiple(
+      'node_modules',
+      {
+        cwd: url.fileURLToPath(importMeta.url),
+        type: 'directory',
+      }
+    )
 
     const interpreters = getInterpreters({
       output: outputPath,
@@ -144,7 +147,7 @@ export class ServeCommand implements Command {
       ],
       mode: 'development',
       resolve: {
-        modules: pathToNodeModules ? [pathToNodeModules] : [],
+        modules: pathsToNodeModules ? pathsToNodeModules : [],
       },
     })
 

@@ -1,6 +1,6 @@
 {
   "name": "@posttext/cli",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "The Posttext CLI",
   "type": "module",
   "main": "index.js",
@@ -43,7 +43,7 @@
     "boxen": "^5.0.1",
     "chalk": "^4.1.1",
     "chokidar": "^3.5.2",
-    "find-up": "^5.0.0",
+    "find-up": "^6.2.0",
     "fs-extra": "^10.0.0",
     "koa": "^2.13.1",
     "koa-static": "^5.0.0",
