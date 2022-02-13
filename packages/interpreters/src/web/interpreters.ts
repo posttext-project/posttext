@@ -5,7 +5,7 @@
 import fs from 'fs-extra'
 import url from 'url'
 import path from 'path'
-import findUp from 'find-up'
+import { findUpMultiple } from 'find-up'
 import webpack from 'webpack'
 import prettier from 'prettier'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
@@ -198,10 +198,13 @@ export const getInterpreters = ({
           .map((dep) => dep.src)
           .concat(externalCssDeps) as string[]
 
-        const pathToNodeModules = await findUp('node_modules', {
-          cwd: url.fileURLToPath(import.meta.url),
-          type: 'directory',
-        })
+        const pathsToNodeModules = await findUpMultiple(
+          'node_modules',
+          {
+            cwd: url.fileURLToPath(import.meta.url),
+            type: 'directory',
+          }
+        )
 
         if (jsDeps.length + cssDeps.length > 0) {
           const compiler = webpack({
@@ -238,8 +241,8 @@ export const getInterpreters = ({
             },
             resolve: {
               modules: [
-                ...(pathToNodeModules
-                  ? [pathToNodeModules]
+                ...(pathsToNodeModules
+                  ? pathsToNodeModules
                   : []),
                 ...new Set(resolve?.modules),
               ],
@@ -247,8 +250,8 @@ export const getInterpreters = ({
             },
             resolveLoader: {
               modules: [
-                ...(pathToNodeModules
-                  ? [pathToNodeModules]
+                ...(pathsToNodeModules
+                  ? pathsToNodeModules
                   : []),
               ],
             },

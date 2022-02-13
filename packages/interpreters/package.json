@@ -1,6 +1,6 @@
 {
   "name": "@posttext/interpreters",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "The backend interpreters for Posttext",
   "main": "index.js",
   "type": "module",
@@ -39,7 +39,7 @@
     "@posttext/parser": "workspace:*",
     "@posttext/registry": "workspace:*",
     "css-loader": "^5.2.6",
-    "find-up": "^5.0.0",
+    "find-up": "^6.2.0",
     "fs-extra": "^10.0.0",
     "handlebars": "^4.7.7",
     "memoizee": "^0.4.15",

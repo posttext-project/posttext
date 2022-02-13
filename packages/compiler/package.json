@@ -1,6 +1,6 @@
 {
   "name": "@posttext/compiler",
-  "version": "0.1.4",
+  "version": "0.1.7",
   "description": "The compiler for Posttext",
   "type": "module",
   "main": "index.js",
