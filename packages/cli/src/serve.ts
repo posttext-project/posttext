@@ -10,22 +10,16 @@ import path from 'path'
 import serve from 'koa-static'
 import boxen from 'boxen'
 import chalk from 'chalk'
-import { findUpMultiple } from 'find-up'
 import Router from '@koa/router'
 import chokidar from 'chokidar'
-import url from 'url'
 import { Subject } from 'rxjs'
-import { Compiler } from '@posttext/compiler'
-import { importMeta, StdModule } from '@posttext/modules'
-import { getInterpreters } from '@posttext/interpreters/web'
+import { Compiler, Registry } from '@posttext/posttext'
 
 import { Command, CommandOptions } from './command.js'
-import { Logger } from './helpers/logger.js'
+import StdPackage from '@posttext/package-std'
 
 export class ServeCommand implements Command {
   private args: string[]
-
-  private logger: Logger = Logger.create()
 
   constructor({ args }: CommandOptions) {
     this.args = args
@@ -46,6 +40,8 @@ export class ServeCommand implements Command {
 
     const reload$ = new Subject<boolean>()
 
+    const url = 'http://localhost:8080'
+
     await this.build(inputPath, outputPath)
 
     app
@@ -55,35 +51,11 @@ export class ServeCommand implements Command {
 
     chokidar.watch(inputPath).on('change', async () => {
       try {
-        this.logger.log(
-          `Starting compiling ${chalk.blue(
-            `'${this.args[0]}'`
-          )}`
-        )
-        const startTime = new Date()
-
         await this.build(inputPath, outputPath)
-
-        const endTime = new Date()
-
-        this.logger.log(
-          `Finished compiling ${chalk.blue(
-            `'${this.args[0]}'`
-          )} after ${chalk.magenta(
-            `${(
-              (endTime.getTime() - startTime.getTime()) /
-              1000
-            ).toPrecision(2)} s`
-          )}`
-        )
-
-        this.logger.log(
-          `Reloading ${chalk.blue(`'${this.args[0]}'`)}`
-        )
 
         reload$.next(true)
       } catch (error) {
-        this.logger.log(chalk.bgRed(' ERROR '), error)
+        console.log(error)
       }
     })
 
@@ -99,16 +71,11 @@ export class ServeCommand implements Command {
 
     server.listen(8080, () => {
       console.log(
-        boxen(
-          chalk.yellow('serve') +
-            '      ' +
-            'http://localhost:8080',
-          {
-            borderColor: 'yellow',
-            margin: 1,
-            padding: 1,
-          }
-        )
+        boxen(`${chalk.yellow('serve')}      ${url}`, {
+          borderColor: 'yellow',
+          margin: 1,
+          padding: 1,
+        })
       )
     })
   }
@@ -117,48 +84,22 @@ export class ServeCommand implements Command {
     inputPath: string,
     outputPath: string
   ): Promise<void> {
-    await fs.ensureDir(outputPath)
+    try {
+      const input = await fs.readFile(inputPath, 'utf8')
 
-    const pathsToNodeModules = await findUpMultiple(
-      'node_modules',
-      {
-        cwd: url.fileURLToPath(importMeta.url),
-        type: 'directory',
-      }
-    )
+      const registry = new Registry()
+      registry.addPackage('std', new StdPackage())
 
-    const interpreters = getInterpreters({
-      output: outputPath,
-      js: [
-        path.resolve(
-          path.dirname(url.fileURLToPath(import.meta.url)),
-          'assets/bundle.js'
-        ),
-      ],
-      css: [
-        path.resolve(
-          path.dirname(url.fileURLToPath(import.meta.url)),
-          'assets/bundle.css'
-        ),
-        path.resolve(
-          path.dirname(url.fileURLToPath(import.meta.url)),
-          'assets/fonts/fonts.css'
-        ),
-      ],
-      mode: 'development',
-      resolve: {
-        modules: pathsToNodeModules ? pathsToNodeModules : [],
-      },
-    })
+      const compiler = Compiler.create({
+        registry,
+        plugins: [],
+      })
 
-    const compiler = Compiler.create()
-    compiler
-      .getPrinter()
-      .getRegistry()
-      .loadModule(StdModule.create())
-    compiler.getPrinter().registerInterpreters(interpreters)
+      const htmlResult = await compiler.compile(input)
 
-    const input = await fs.readFile(inputPath, 'utf-8')
-    await compiler.compile(input)
+      await fs.writeFile(outputPath, htmlResult.html)
+    } catch (err) {
+      console.log(err)
+    }
   }
 }

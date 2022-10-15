@@ -1,0 +1,25 @@
+{
+  "name": "@posttext/plugin-static-site",
+  "version": "1.0.0-alpha.0",
+  "description": "PostText plugin for static site",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "clitetailor",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "@posttext/posttext": "workspace:*",
+    "find-up": "^6.3.0",
+    "fs-extra": "^10.1.0",
+    "handlebars": "^4.7.7",
+    "mini-css-extract-plugin": "^2.6.1",
+    "prettier": "^2.7.1",
+    "webpack": "^5.74.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.8.3"
+  }
+}

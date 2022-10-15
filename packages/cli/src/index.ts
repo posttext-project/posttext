@@ -3,16 +3,12 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import * as meow from 'meow'
-import chalk from 'chalk'
 
 import { CompileCommand } from './compile.js'
 import { ServeCommand } from './serve.js'
-import { Logger } from './helpers/logger.js'
 
 export class CLI {
   private cli: meow.Result<any>
-
-  private logger: Logger = Logger.create()
 
   constructor({ cli }: { cli: meow.Result<any> }) {
     this.cli = cli
@@ -69,7 +65,7 @@ export class CLI {
           this.cli.showHelp()
       }
     } catch (error) {
-      this.logger.log(chalk.bgRed(' ERROR '), error)
+      console.log(error)
     }
   }
 

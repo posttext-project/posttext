@@ -1,6 +1,6 @@
 {
   "name": "@posttext/build",
-  "version": "0.1.7",
+  "version": "1.0.0-alpha.0",
   "description": "The next generation markup language for everyone!",
   "keywords": [
     "text",
@@ -25,7 +25,7 @@
     "dev": "gulp clean && gulp build && node packages/cli/lib/bin/index.js",
     "debug": "gulp clean && gulp build && node --inspect-brk packages/cli/lib/bin/index.js",
     "build": "gulp clean && pnpm format && gulp build",
-    "format": "prettier -c .prettierrc.yaml --write **/*.{html,ts,js,json}",
+    "format": "prettier --config .prettierrc.yaml --write **/*.{html,ts,js,json}",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "cross-env NODE_OPTIONS=--experimental-vm-modules jest",
     "coverage": "cross-env NODE_OPTIONS=--experimental-vm-modules jest --coverage",

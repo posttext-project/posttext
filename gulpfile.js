@@ -16,13 +16,9 @@ const { src, task, series, dest } = gulp
 const reporter = ts.reporter.fullReporter(true)
 
 const packages = [
-  'parser',
-  'registry',
-  'printer',
-  'ptlib',
-  'modules',
-  'interpreters',
-  'compiler',
+  'posttext',
+  'package-std',
+  'plugin-static-site',
   'cli',
 ]
 

@@ -1,55 +1,27 @@
 {
   "name": "@posttext/cli",
-  "version": "0.1.7",
-  "description": "The Posttext CLI",
-  "type": "module",
-  "main": "index.js",
-  "types": "./types/index.d.ts",
-  "bin": {
-    "pt": "./lib/bin/index.js"
-  },
-  "exports": {
-    "./": "./lib/index.js"
-  },
-  "files": [
-    "lib",
-    "src",
-    "types",
-    "tsconfig.json"
-  ],
+  "version": "1.0.0-alpha.0",
+  "description": "CLI for PostText",
+  "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [
-    "posttext",
-    "cli"
-  ],
-  "homepage": "https://github.com/posttext-project/posttext#readme",
-  "bugs": {
-    "url": "https://github.com/posttext-project/posttext/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/posttext-project/posttext.git"
-  },
+  "keywords": [],
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@koa/router": "^10.0.0",
-    "@posttext/compiler": "workspace:*",
-    "@posttext/interpreters": "workspace:*",
-    "@posttext/modules": "workspace:*",
-    "@posttext/printer": "workspace:*",
-    "boxen": "^5.0.1",
-    "chalk": "^4.1.1",
-    "chokidar": "^3.5.2",
-    "find-up": "^6.2.0",
-    "fs-extra": "^10.0.0",
-    "koa": "^2.13.1",
+    "@koa/router": "^12.0.0",
+    "@posttext/package-std": "workspace:*",
+    "@posttext/posttext": "workspace:*",
+    "@types/node": "^18.8.3",
+    "boxen": "^7.0.0",
+    "chalk": "^5.1.0",
+    "chokidar": "3",
+    "find-up": "^6.3.0",
+    "fs-extra": "^10.1.0",
+    "koa": "^2.13.4",
     "koa-static": "^5.0.0",
-    "meow": "^10.0.1",
-    "rxjs": "^7.1.0",
-    "tslib": "^2.3.0",
-    "ws": "^7.5.0"
+    "rxjs": "^7.5.7",
+    "ws": "^8.9.0"
   }
 }
