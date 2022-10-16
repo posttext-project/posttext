@@ -2,6 +2,7 @@
   "name": "@posttext/cli",
   "version": "1.0.0-alpha.0",
   "description": "CLI for PostText",
+  "type": "module",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

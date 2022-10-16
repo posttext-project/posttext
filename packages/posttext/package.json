@@ -2,6 +2,7 @@
   "name": "@posttext/posttext",
   "version": "1.0.0-alpha.0",
   "description": "PostText",
+  "type": "module",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
