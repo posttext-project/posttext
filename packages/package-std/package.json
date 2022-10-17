@@ -3,12 +3,11 @@
   "version": "1.0.0-alpha.0",
   "description": "The standard package for PostText",
   "type": "module",
-  "main": "src/index.js",
+  "main": "lib/index.js",
   "files": [
     "lib",
     "src",
     "types",
-    "std.d.ts",
     "tsconfig.json"
   ],
   "scripts": {
@@ -16,7 +15,7 @@
   },
   "keywords": [
     "posttext",
-    "modules"
+    "std"
   ],
   "homepage": "https://github.com/posttext-project/posttext#readme",
   "bugs": {
@@ -29,11 +28,11 @@
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
-    "@posttext/posttext": "workspace:*",
-    "katex": "^0.13.11",
-    "prismjs": "^1.23.0",
-    "qrcode": "^1.4.4",
+    "@posttext/posttext": "workspace:1.0.0-alpha.0",
+    "katex": "^0.16.2",
+    "prismjs": "^1.29.0",
+    "qrcode": "^1.5.1",
     "strip-indent": "^4.0.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.4.0"
   }
 }

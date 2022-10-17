@@ -3,7 +3,7 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
 import ts from 'gulp-typescript'
-import del from 'del'
+import { deleteAsync } from 'del'
 import path from 'path'
 import url from 'url'
 import sourcemaps from 'gulp-sourcemaps'
@@ -60,12 +60,12 @@ task(
 task('clean', async () => {
   await Promise.all(
     forEachPkg(async ({ pkgBase }) => {
-      await del(pkgBase('lib'))
-      await del(pkgBase('types'))
+      await deleteAsync(pkgBase('lib'))
+      await deleteAsync(pkgBase('types'))
     })
   )
 
-  await del('dist')
+  await deleteAsync('dist')
 })
 
 function forEachPkg(callback) {

@@ -3,21 +3,38 @@
   "version": "1.0.0-alpha.0",
   "description": "CLI for PostText",
   "type": "module",
-  "main": "src/index.js",
+  "main": "lib/index.js",
+  "files": [
+    "lib",
+    "src",
+    "types",
+    "tsconfig.json"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
+  "keywords": [
+    "posttext",
+    "cli"
+  ],
+  "homepage": "https://github.com/posttext-project/posttext#readme",
+  "bugs": {
+    "url": "https://github.com/posttext-project/posttext/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/posttext-project/posttext.git"
+  },
   "author": "clitetailor",
   "license": "MPL-2.0",
   "dependencies": {
     "@koa/router": "^12.0.0",
-    "@posttext/package-std": "workspace:*",
-    "@posttext/posttext": "workspace:*",
-    "@types/node": "^18.8.3",
+    "@posttext/package-std": "workspace:1.0.0-alpha.0",
+    "@posttext/posttext": "workspace:1.0.0-alpha.0",
+    "@types/node": "^18.11.0",
     "boxen": "^7.0.0",
-    "chalk": "^5.1.0",
-    "chokidar": "3",
+    "chalk": "^5.1.2",
+    "chokidar": "^3.5.3",
     "find-up": "^6.3.0",
     "fs-extra": "^10.1.0",
     "koa": "^2.13.4",
