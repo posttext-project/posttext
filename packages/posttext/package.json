@@ -4,6 +4,7 @@
   "description": "PostText",
   "type": "module",
   "main": "lib/index.js",
+  "types": "types/index.d.ts",
   "files": [
     "lib",
     "src",
