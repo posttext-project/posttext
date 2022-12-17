@@ -2,11 +2,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { Interpreter } from './interpreter'
-import { Parser } from './parser'
-import { Plugin } from './plugin'
-import { CommonPlugin } from './plugins'
-import { Registry } from './registry'
+import { Interpreter } from './interpreter.js'
+import { Parser } from './parser/index.js'
+import { Plugin } from './plugin.js'
+import { CommonPlugin } from './plugins/index.js'
+import { Registry } from './registry.js'
 
 export interface CompilerOptions {
   parser?: Parser

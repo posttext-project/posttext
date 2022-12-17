@@ -124,37 +124,37 @@ export class RegistryPlugin implements Plugin {
           : null
       },
 
-      async *queryData(
+      async *queryTag(
         _command: Command
       ): AsyncGenerator<Command, any, any> {
         return null
       },
 
-      async *queryAllData(
+      async *queryTags(
         _command: Command
       ): AsyncGenerator<Command, any, any> {
         return null
       },
 
-      async *queryChildData(
+      async *queryChildTag(
         _command: Command
       ): AsyncGenerator<Command, any, any> {
         return null
       },
 
-      async *queryAllChildData(
+      async *queryChildTags(
         _command: Command
       ): AsyncGenerator<Command, any, any> {
         return null
       },
 
-      async *queryParentData(
+      async *queryParentTag(
         _command: Command
       ): AsyncGenerator<Command, any, any> {
         return null
       },
 
-      async *queryAllParentData(
+      async *queryParentTags(
         _command: Command
       ): AsyncGenerator<Command, any, any> {
         return null

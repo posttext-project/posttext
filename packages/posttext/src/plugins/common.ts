@@ -10,7 +10,7 @@ import { HtmlPlugin } from './html.js'
 import {
   RegistryPluginOptions,
   RegistryPlugin,
-} from './registry'
+} from './registry.js'
 import { StatePlugin } from './state.js'
 
 export type CommonPluginOptions = RegistryPluginOptions & {

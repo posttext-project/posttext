@@ -2,100 +2,26 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-import { DocumentNode, Node, TagNode } from '../parser/ast.js'
+import {
+  TagNode,
+} from '../parser/ast.js'
 import { Command } from '../command.js'
 import { Plugin } from '../plugin.js'
 import { CommandResolver } from '../resolver.js'
 
-export interface HtmlRenderResult {
+export interface Html {
   html: string
 }
 
 export class HtmlPlugin implements Plugin {
   getCommandResolvers(): Record<string, CommandResolver> {
     return {
-      async *render(
-        command: Command
-      ): AsyncGenerator<any, any, Command> {
-        const node = command.node as Node
-
-        switch (node.type) {
-          case 'Document': {
-            return yield {
-              name: 'renderDocument',
-              node,
-            }
-          }
-
-          case 'Tag': {
-            return yield {
-              name: 'renderTag',
-              node,
-            }
-          }
-
-          case 'Text': {
-            return yield {
-              name: 'renderTagText',
-              node,
-            }
-          }
-
-          case 'Block': {
-            return yield {
-              name: 'renderTagBlock',
-              node,
-            }
-          }
-        }
-      },
-
-      async *renderDocument(
+      async *getNumberOfBlocks(
         command: Command
       ): AsyncGenerator<Command, any, any> {
-        const node = command.node as DocumentNode
+        const node = command.node as TagNode
 
-        const childHtmlResults: HtmlRenderResult[] = []
-        for (const childNode of node.body) {
-          const childHtmlResult: HtmlRenderResult = yield {
-            name: 'render',
-            node: childNode,
-          }
-
-          childHtmlResults.push(childHtmlResult)
-        }
-
-        const childrenHtml = childHtmlResults
-          .map((item) => item.html)
-          .join('')
-
-        return {
-          html: childrenHtml,
-        } as HtmlRenderResult
-      },
-
-      async *renderTagText(): AsyncGenerator<
-        Command,
-        any,
-        any
-      > {
-        return null
-      },
-
-      async *renderTagInlines(): AsyncGenerator<
-        Command,
-        any,
-        any
-      > {
-        return null
-      },
-
-      async *renderTag(): AsyncGenerator<Command, any, any> {
-        return null
-      },
-
-      async *blockCount(): AsyncGenerator<Command, any, any> {
-        return null
+        return node.blocks.length
       },
 
       async *getHtml(
@@ -109,25 +35,25 @@ export class HtmlPlugin implements Plugin {
           return
         }
 
-        const childNodesHtml: HtmlRenderResult[] = []
-        for (const childNode of block.body) {
-          for await (const childNodeHtml of yield {
-            name: 'render',
-            node: childNode,
-          }) {
-            childNodesHtml.push(childNodeHtml)
-          }
-        }
+        const html: Html[] = []
 
-        return childNodesHtml
+        return html
       },
 
       async *getText(): AsyncGenerator<Command, any, any> {
-        return []
+        return ''
       },
 
       async *getInlines(): AsyncGenerator<Command, any, any> {
-        return []
+        return ''
+      },
+
+      async *getBlockAndInlines(): AsyncGenerator<
+        Command,
+        any,
+        any
+      > {
+        return ''
       },
 
       async *metadata(): AsyncGenerator<Command, any, any> {
