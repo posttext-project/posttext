@@ -2,17 +2,17 @@ import { Renderer, createRenderer } from './renderer'
 import fs from 'fs-extra'
 import { Parser, createParser } from '../parser'
 
-interface Web {
+export interface Web {
   build(): Promise<void>
 }
 
-type BuilderFactory = () => Web
+export type BuilderFactory = () => Web
 
-function createBuilderFactory(): BuilderFactory {
+export function createBuilderFactory(): BuilderFactory {
   return createBuilder
 }
 
-function createBuilder(): Web {
+export function createBuilder(): Web {
   const parser = createParser()
   const renderer = createRenderer()
 

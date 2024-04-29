@@ -9,7 +9,6 @@ import qrcode from 'qrcode'
 import katex from 'katex'
 
 import { Resolver } from '../resolver'
-import { extractParagraphs } from '../ptlib'
 
 const KATEX_STATE = Symbol('KatexState')
 const CODE_BLOCK_STATE = Symbol('CodeBlockState')
@@ -27,282 +26,204 @@ export const resolvers = (
 ): Record<string, Resolver> => {
   return {
     __root__: {
-      resolve: async (context: any, tag: any): Promise<void> => {
+      tag: async (context: any, tag: any): Promise<void> => {
         const writer = context.plugins.get('writer')
         const renderer = context.plugins.get('renderer')
 
-        writer.write(content)
+        const content = renderer.render(tag)
+
+        await writer.write(content)
       },
     },
 
     posttext: {
-      resolve: async (): Promise<void> => {
-        const attrs: Record<string, string> = yield {
-          name: 'getAttrs',
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const title = tag.attrs.title
 
-        const title: string | undefined = attrs.title
-
-        yield {
-          name: 'metadata',
-          metadata: {
-            title,
-          },
-        }
+        await writer.metadata.add({
+          title,
+        })
       },
     },
 
     comment: {
-      resolve: async (): Promise<void> => {
+      tag: async (): Promise<void> => {
         /* pass */
       },
     },
 
     title: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<h1>{{{ data.content }}}</h1>',
-          data: {
-            content: content ?? '',
-          },
-        }
+        await writer.write(`<h1>${content}</h1>`)
       },
     },
 
     section: {
-      preload: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      data: {
+        [TOC]: async (context: any, tag: any): Promise<any> => {
+          const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'send',
-          topic: TOC,
-          data: {
-            tagName: 'section',
+          return {
+            type: 'section',
             content,
-          },
-        }
+          }
+        },
       },
 
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<h2>{{{ data.content }}}</h2>',
-          data: {
-            content: content ?? '',
-          },
-        }
+        await writer.write(`<h2>${content}</h2>`)
       },
     },
 
     subsection: {
-      preload: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      data: {
+        [TOC]: async (context: any, tag: any): Promise<any> => {
+          const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'send',
-          topic: TOC,
-          data: {
-            tagName: 'subsection',
+          return {
+            type: 'subsection',
             content,
-          },
-        }
+          }
+        },
       },
 
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<h3>{{{ data.content }}}</h3>',
-          data: {
-            content: content ?? '',
-          },
-        }
+        await writer.write(`<h3>${content}</h3>`)
       },
     },
 
     subsubsection: {
-      preload: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      data: {
+        [TOC]: async (context: any, tag: any): Promise<any> => {
+          const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'send',
-          topic: TOC,
-          data: {
-            tagName: 'subsubsection',
+          return {
+            type: 'subsubsection',
             content,
-          },
-        }
+          }
+        },
       },
 
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<h4>{{{ data.content }}}</h4>',
-          data: {
-            content: content ?? '',
-          },
-        }
+        await writer.write(`<h4>${content}</h4>`)
       },
     },
 
     bold: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      data: {
+        [TOC]: async (context: any, tag: any): Promise<any> => {
+          const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<b>{{{ data.content }}}</b>',
-          type: 'inline',
-          data: {
-            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
-          },
-        }
+          return {
+            type: 'bold',
+            content,
+          }
+        },
+      },
+
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
+
+        await writer.write(
+          `<b>${content?.replace(/\s\s\n/g, '<br>') ?? ''}</b>`
+        )
       },
     },
 
     italic: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<i>{{{ data.content }}}</i>',
-          type: 'inline',
-          data: {
-            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
-          },
-        }
+        await writer.write(
+          `<i>${content?.replace(/\s\s\n/g, '<br>') ?? ''}</i>`
+        )
       },
     },
 
     underline: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<u>{{{ data.content }}}<u>',
-          type: 'inline',
-          data: {
-            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
-          },
-        }
+        await writer.write(
+          `<u>${content?.replace(/\s\s\n/g, '<br>') ?? ''}</u>`
+        )
       },
     },
 
     list: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: '<ul>{{{ data.content }}}</ul>',
-          data: {
-            content: content ?? '',
-          },
-        }
+        await writer.write(`<ul>${content}</ul>`)
       },
     },
 
     item: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
-        yield {
-          name: 'html',
-          template: '<li>{{{ data.content }}}</li>',
-          data: {
-            content: content?.replace(/\s\s\n/g, '<br>') ?? '',
-          },
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content: string | undefined = tag.blocks
+          .index(0)
+          .text()
+
+        await writer.write(
+          `<li>${
+            content?.replace(/\s\s\n/g, '<br>') ?? ''
+          }</li>`
+        )
       },
     },
 
     code: {
-      preload: async (): Promise<void> => {
-        const state: Record<string, any> = yield {
-          name: 'getState',
-          symbol: CODE_BLOCK_STATE,
-        }
-        if (!state.languagesLoaded) {
-          state.languagesLoaded = true
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+
+        const languageLoaded =
+          context.state[CODE_BLOCK_STATE]?.languagesLoaded ??
+          false
+        if (!languageLoaded) {
+          context.state[CODE_BLOCK_STATE] = {
+            languagesLoaded: true,
+          }
 
           loadLanguages()
 
-          yield {
-            name: 'addDeps',
-            deps: [
-              {
-                type: 'css',
-                src: 'prismjs/themes/prism.css',
-              },
-            ],
-          }
+          writer.addDependency({
+            type: 'css',
+            src: 'prismjs/themes/prism.css',
+          })
         }
-      },
 
-      resolve: async (): Promise<void> => {
-        const params: string[] = yield {
-          name: 'getParams',
-        }
-        const language: string =
-          params[0] &&
-          Object.keys(Prism.languages).indexOf(params[0])
-            ? params[0]
+        const language =
+          tag.params.length > 0 &&
+          Object.keys(Prism.languages).indexOf(
+            tag.params.index(0)
+          )
+            ? tag.params.index(0)
             : 'text'
 
         const BEGIN_NEWLINE = /^\r?\n/
         const END_NEWLINE = /\r?\n[\t ]+$/
 
-        const rawTextContent: string | undefined = yield {
-          name: 'textContent',
-          index: 0,
-        }
-        const textContent: string = rawTextContent
-          ? stripIndent(rawTextContent)
+        const content = tag.blocks.index(0).text()
+        const strippedContent: string = content
+          ? stripIndent(content)
               .replace(BEGIN_NEWLINE, '')
               .replace(END_NEWLINE, '')
           : ''
@@ -310,65 +231,52 @@ export const resolvers = (
         const code: string =
           language !== 'text'
             ? Prism.highlight(
-                textContent,
+                strippedContent,
                 Prism.languages[language],
                 language
               )
-            : textContent
-        yield {
-          name: 'html',
-          template:
-            '<pre class="std_code"><code class="language-{{ data.language }}">{{{ data.code }}}</code></pre>',
-          data: {
-            language,
-            code,
-          },
-        }
+            : strippedContent
+
+        await writer.write(
+          `<pre class="std_code"><code class="language-${language}">${code}</code></pre>`
+        )
       },
     },
 
     "code'": {
-      preload: async (): Promise<void> => {
-        const state: Record<string, any> = yield {
-          name: 'getState',
-          symbol: CODE_BLOCK_STATE,
-        }
-        if (!state.languagesLoaded) {
-          state.languagesLoaded = true
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+
+        const languageLoaded =
+          context.state[CODE_BLOCK_STATE]?.languagesLoaded ??
+          false
+        if (!languageLoaded) {
+          context.state[CODE_BLOCK_STATE] = {
+            languagesLoaded: true,
+          }
 
           loadLanguages()
 
-          yield {
-            name: 'addDeps',
-            deps: [
-              {
-                type: 'css',
-                src: 'prismjs/themes/prism.css',
-              },
-            ],
-          }
+          writer.addDependency({
+            type: 'css',
+            src: 'prismjs/themes/prism.css',
+          })
         }
-      },
 
-      resolve: async (): Promise<void> => {
-        const params: string[] = yield {
-          name: 'getParams',
-        }
-        const language: string =
-          params[0] &&
-          Object.keys(Prism.languages).indexOf(params[0])
-            ? params[0]
+        const language =
+          tag.params.length > 0 &&
+          Object.keys(Prism.languages).indexOf(
+            tag.params.index(0)
+          )
+            ? tag.params.index(0)
             : 'text'
 
         const BEGIN_NEWLINE = /^\r?\n/
         const END_NEWLINE = /\r?\n[\t ]+$/
 
-        const rawTextContent: string | undefined = yield {
-          name: 'textContent',
-          index: 0,
-        }
-        const textContent: string = rawTextContent
-          ? stripIndent(rawTextContent)
+        const content = tag.blocks.index(0).text()
+        const strippedContent: string = content
+          ? stripIndent(content)
               .replace(BEGIN_NEWLINE, '')
               .replace(END_NEWLINE, '')
           : ''
@@ -376,112 +284,79 @@ export const resolvers = (
         const code: string =
           language !== 'text'
             ? Prism.highlight(
-                textContent,
+                strippedContent,
                 Prism.languages[language],
                 language
               )
-            : textContent
-        yield {
-          name: 'html',
-          template:
-            '<code class="std_code language-{{ data.language }}">{{{ data.code }}}</code>',
-          type: 'inline',
-          data: {
-            language,
-            code,
-          },
-        }
+            : strippedContent
+
+        await writer.write(
+          `<code class="std_code language-${language}">${code}</code>`
+        )
       },
     },
 
     katex: {
-      preload: async (): Promise<void> => {
-        const state: Record<string, any> = yield {
-          name: 'getState',
-          symbol: KATEX_STATE,
-        }
-        if (!state.katexLoaded) {
-          state.katexLoaded = true
-
-          yield {
-            name: 'addDeps',
-            deps: [
-              {
-                type: 'css',
-                src: 'katex/dist/katex.css',
-              },
-            ],
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const katexLoaded =
+          context.state[KATEX_STATE]?.katexLoaded ?? false
+        if (!katexLoaded) {
+          context.state[KATEX_STATE] = {
+            katexLoaded: true,
           }
-        }
-      },
 
-      resolve: async (): Promise<void> => {
-        const rawTextContent: string | undefined = yield {
-          name: 'textContent',
+          await writer.addDependency({
+            type: 'css',
+            src: 'katex/dist/katex.css',
+          })
         }
 
-        const content = katex.renderToString(rawTextContent, {
+        const rawContent = tag.blocks.index(0).text()
+
+        // TODO: Handle errors
+        const content = katex.renderToString(rawContent, {
           throwOnError: false,
           displayMode: true,
         })
 
-        yield {
-          name: 'html',
-          template: `{{{ data.content }}}`,
-          data: {
-            content,
-          },
-        }
+        await writer.write(content)
       },
     },
 
     "katex'": {
-      preload: async (): Promise<void> => {
-        const state: Record<string, any> = yield {
-          name: 'getState',
-          symbol: KATEX_STATE,
-        }
-        if (!state.katexLoaded) {
-          state.katexLoaded = true
-
-          yield {
-            name: 'addDeps',
-            deps: [
-              {
-                type: 'css',
-                src: 'katex/dist/katex.css',
-              },
-            ],
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const katexLoaded =
+          context.state[KATEX_STATE]?.katexLoaded ?? false
+        if (!katexLoaded) {
+          context.state[KATEX_STATE] = {
+            katexLoaded: true,
           }
-        }
-      },
 
-      resolve: async (): Promise<void> => {
-        const rawTextContent: string | undefined = yield {
-          name: 'textContent',
+          await writer.addDependency({
+            type: 'css',
+            src: 'katex/dist/katex.css',
+          })
         }
 
-        const content = katex.renderToString(rawTextContent, {
+        const rawContent = tag.blocks.index(0).text()
+
+        // TODO: Handle errors
+        const content = katex.renderToString(rawContent, {
           throwOnError: false,
+          displayMode: true,
         })
 
-        yield {
-          name: 'html',
-          template: `{{{ data.content }}}`,
-          type: 'inline',
-          data: {
-            content,
-          },
-        }
+        await writer.write(content)
       },
     },
 
     toc: {
-      resolve: async (): Promise<void> => {
-        const tocItems: any[] = yield {
-          name: 'receive',
-          topic: TOC,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+
+        const tocItems = context.query(TOC)
 
         const stack: any[] = []
 
@@ -495,39 +370,34 @@ export const resolvers = (
           let currentItem = stack.pop()
 
           const nextItem = tocItems.shift()
-          const nextItemLevel = nextItem?.tagName
-            ? tocDef.indexOf(nextItem.tagName)
+          const nextItemLevel = nextItem?.type
+            ? tocDef.indexOf(nextItem.type)
             : -1
 
           if (nextItemLevel === stack.length) {
-            const counter = stack
+            const index = stack
               .concat([currentItem])
               .slice(1)
               .map((item) => item.previous.length + 1)
               .join('.')
 
-            const renderedItem = yield {
-              name: 'html',
-              template: `
-                <li class="std_toc__item">
-                  <span class="std_toc__number">{{ data.counter }}</span>
-                  <span class="std_toc__text">{{ data.content }}</span>
-                  {{#if data.children.length}}
-                  <ul class="std_toc__list">
-                    {{#each data.children}}
-                      {{{ this }}}
-                    {{/each}}
-                  </ul>
-                  {{/if}}
-                </li>
-              `,
-              emit: false,
-              data: {
-                content: currentItem.content,
-                children: currentItem.children,
-                counter,
-              },
-            }
+            const renderedItem = `
+              <li class="std_toc__item">
+                <span class="std_toc__number">${index}</span>
+                <span class="std_toc__text">${
+                  currentItem.content
+                }</span>
+                ${
+                  currentItem.children.length
+                    ? `<ul class="std_toc__list">${currentItem.children.join(
+                        '\n'
+                      )}</ul>`
+                    : ''
+                }
+                {{/if}}
+              </li>
+            `
+
             currentItem = {
               content: nextItem.content,
               children: [],
@@ -554,7 +424,7 @@ export const resolvers = (
               previous: [],
             })
           } else {
-            const counter = stack
+            const index = stack
               .concat([currentItem])
               .slice(1)
               .map((item) => item.previous.length + 1)
@@ -565,28 +435,23 @@ export const resolvers = (
             }
             let parentItem = stack.pop()
 
-            const renderedItem = yield {
-              name: 'html',
-              template: `
-                <li class="std_toc__item">
-                  <span class="std_toc__number">{{ data.counter }}</span>
-                  <span class="std_toc__text">{{ data.content }}</span>
-                  {{#if data.children.length}}
-                  <ul class="std_toc__list">
-                    {{#each data.children}}
-                      {{{ this }}}
-                    {{/each}}
-                  </ul>
-                  {{/if}}
-                </li>
-              `,
-              emit: false,
-              data: {
-                content: currentItem.content,
-                children: currentItem.children,
-                counter,
-              },
-            }
+            const renderedItem = `
+              <li class="std_toc__item">
+                <span class="std_toc__number">${index}</span>
+                <span class="std_toc__text">${
+                  currentItem.content
+                }</span>
+                {{#if data.children.length}}
+                <ul class="std_toc__list">
+                  ${
+                    currentItem.children.length
+                      ? currentItem.children.join('\n')
+                      : ''
+                  }
+                </ul>
+                {{/if}}
+              </li>
+            `
 
             parentItem = {
               content: parentItem.content,
@@ -600,66 +465,41 @@ export const resolvers = (
         }
 
         const rootItem = stack.pop()
+        const content = tag.blocks.index(0).text()
 
-        const content: string | undefined = yield {
-          name: 'getBlock',
-          index: 0,
-        }
-
-        yield {
-          name: 'html',
-          template: `
+        await writer.write(
+          `
             <h2 class="std_toc__title">
-              {{{ data.content }}}
+              ${content}
             </h2>
             <ul class="std_toc__list">
-              {{#each data.items}}
-                {{{ this }}}
-              {{/each}}
+              ${rootItem.children.join('\n')}
             </ul>
-          `,
-          data: {
-            items: rootItem.children,
-            content,
-          },
-        }
+          `
+        )
       },
     },
 
     blockquote: {
-      resolve: async (): Promise<void> => {
-        const content = yield {
-          name: 'getBlockInlines',
-          transform: {
-            ...extractParagraphs,
-          },
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
-        yield {
-          name: 'html',
-          template: `
+        await writer.write(
+          `
             <blockquote class="std_blockquote">
-              {{{ data.content }}}
+              ${content}
             </blockquote>
-          `,
-          data: {
-            content,
-          },
-        }
+          `
+        )
       },
     },
 
     image: {
-      resolve: async (): Promise<void> => {
-        const link: string | undefined = yield {
-          name: 'textContent',
-          index: 0,
-        } ?? ''
-
-        const alt: string | undefined = yield {
-          name: 'textContent',
-          index: 1,
-        }
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const link = tag.blocks.index(0).text()
+        const alt = tag.blocks.index(1).text()
 
         if (!link) {
           return
@@ -668,47 +508,32 @@ export const resolvers = (
         const isUrl = link.match(/(^|^http:|^https:)\/\//)
 
         if (isUrl) {
-          yield {
-            name: 'html',
-            template: `
-              <div class="std_image">
-                <img src="{{ data.link }}"{{#if data.alt}} alt="{{ data.alt }}"{{/if}}>
-              </div>
-            `,
-            data: {
-              link,
-              alt,
-            },
-          }
+          await writer.write(`
+            <div class="std_image">
+              <img src="${link}"${alt ? ` alt="${alt}"` : ''}>
+            </div>
+          `)
         } else {
-          const dest = yield {
-            name: 'copyFile',
-            src: link,
-            dest: `images/${link.split(/[\\/]/).slice(-1)[0]}`,
-          }
+          await writer.copyFile(
+            link,
+            `images/${link.split(/[\\/]/).slice(-1)[0]}`
+          )
 
-          yield {
-            name: 'html',
-            template: `
-              <div class="std_image">
-                <img src="{{ data.link }}"{{#if data.alt}} alt="{{ data.alt }}"{{/if}}>
-              </div>
-            `,
-            data: {
-              link: dest,
-              alt,
-            },
-          }
+          await writer.write(`
+            <div class="std_image">
+              <img src="images/${
+                link.split(/[\\/]/).slice(-1)[0]
+              }"${alt ? ` alt="${alt}"` : ''}>
+            </div>
+          `)
         }
       },
     },
 
     qrcode: {
-      resolve: async (): Promise<void> => {
-        const content: string | undefined = yield {
-          name: 'textContent',
-          index: 0,
-        } ?? ''
+      tag: async (context: any, tag: any): Promise<void> => {
+        const writer = context.plugins.get('writer')
+        const content = tag.blocks.index(0).text()
 
         const svg = await new Promise((resolve, reject) => {
           qrcode.toString(
@@ -727,37 +552,11 @@ export const resolvers = (
           )
         })
 
-        yield {
-          name: 'html',
-          template:
-            '<div class="std_qrcode">{{{ data.content }}}</div>',
-          data: {
-            content: svg,
-          },
-        }
-      },
-    },
-
-    box: {
-      resolve: async (): Promise<void> => {
-        const content = yield {
-          name: 'getBlockInlines',
-          transform: {
-            ...extractParagraphs,
-          },
-        }
-
-        yield {
-          name: 'html',
-          template: `
-            <div class="std_box">
-              {{{ data.content }}}
-            </div>
-          `,
-          data: {
-            content,
-          },
-        }
+        await writer.write(`
+          <div class="std_qrcode">
+            ${svg}
+          </div>
+        `)
       },
     },
   }
