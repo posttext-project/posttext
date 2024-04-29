@@ -12,6 +12,7 @@
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "baseUrl": ".",
-    "composite": true
+    "composite": true,
+    "skipLibCheck": true
   }
 }
