@@ -25,21 +25,10 @@ export const resolvers = (
   _options: RegistryOptions
 ): Record<string, Resolver> => {
   return {
-    __root__: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
-        const renderer = context.plugins.get('renderer')
-
-        const content = renderer.render(tag)
-
-        await writer.write(content)
-      },
-    },
-
     posttext: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
-        const title = tag.attrs.title
+        const writer = context.helpers.get('writer')
+        const title = tag.attributes.title
 
         await writer.metadata.add({
           title,
@@ -55,7 +44,7 @@ export const resolvers = (
 
     title: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(`<h1>${content}</h1>`)
@@ -75,7 +64,7 @@ export const resolvers = (
       },
 
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(`<h2>${content}</h2>`)
@@ -95,7 +84,7 @@ export const resolvers = (
       },
 
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(`<h3>${content}</h3>`)
@@ -115,7 +104,7 @@ export const resolvers = (
       },
 
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(`<h4>${content}</h4>`)
@@ -135,7 +124,7 @@ export const resolvers = (
       },
 
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(
@@ -146,7 +135,7 @@ export const resolvers = (
 
     italic: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(
@@ -157,7 +146,7 @@ export const resolvers = (
 
     underline: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(
@@ -168,7 +157,7 @@ export const resolvers = (
 
     list: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(`<ul>${content}</ul>`)
@@ -177,7 +166,7 @@ export const resolvers = (
 
     item: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content: string | undefined = tag.blocks
           .index(0)
           .text()
@@ -192,7 +181,7 @@ export const resolvers = (
 
     code: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
 
         const languageLoaded =
           context.state[CODE_BLOCK_STATE]?.languagesLoaded ??
@@ -211,11 +200,11 @@ export const resolvers = (
         }
 
         const language =
-          tag.params.length > 0 &&
+          tag.arguments.length > 0 &&
           Object.keys(Prism.languages).indexOf(
-            tag.params.index(0)
+            tag.arguments.index(0)
           )
-            ? tag.params.index(0)
+            ? tag.arguments.index(0)
             : 'text'
 
         const BEGIN_NEWLINE = /^\r?\n/
@@ -245,7 +234,7 @@ export const resolvers = (
 
     "code'": {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
 
         const languageLoaded =
           context.state[CODE_BLOCK_STATE]?.languagesLoaded ??
@@ -264,11 +253,11 @@ export const resolvers = (
         }
 
         const language =
-          tag.params.length > 0 &&
+          tag.arguments.length > 0 &&
           Object.keys(Prism.languages).indexOf(
-            tag.params.index(0)
+            tag.arguments.index(0)
           )
-            ? tag.params.index(0)
+            ? tag.arguments.index(0)
             : 'text'
 
         const BEGIN_NEWLINE = /^\r?\n/
@@ -298,7 +287,7 @@ export const resolvers = (
 
     katex: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const katexLoaded =
           context.state[KATEX_STATE]?.katexLoaded ?? false
         if (!katexLoaded) {
@@ -326,7 +315,7 @@ export const resolvers = (
 
     "katex'": {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const katexLoaded =
           context.state[KATEX_STATE]?.katexLoaded ?? false
         if (!katexLoaded) {
@@ -354,7 +343,7 @@ export const resolvers = (
 
     toc: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
 
         const tocItems = context.query(TOC)
 
@@ -482,7 +471,7 @@ export const resolvers = (
 
     blockquote: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         await writer.write(
@@ -497,7 +486,7 @@ export const resolvers = (
 
     image: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const link = tag.blocks.index(0).text()
         const alt = tag.blocks.index(1).text()
 
@@ -532,7 +521,7 @@ export const resolvers = (
 
     qrcode: {
       tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.plugins.get('writer')
+        const writer = context.helpers.get('writer')
         const content = tag.blocks.index(0).text()
 
         const svg = await new Promise((resolve, reject) => {

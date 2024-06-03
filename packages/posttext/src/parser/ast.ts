@@ -2,56 +2,68 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-export interface BaseNode {
-  type: string
-}
-
-export interface DocumentNode extends BaseNode {
-  __metadata?: Record<string, any>
+export interface Document {
   type: 'Document'
-  body: (TagNode | TextNode)[]
+  body: Element[]
 }
 
-export interface TagNode extends BaseNode {
-  __metadata?: Record<string | symbol, any>
+export interface Tag {
   type: 'Tag'
-  id: IdentifierNode
-  params: ParameterNode[]
-  blocks: BlockNode[]
-  attrs: AttributeNode[]
+  identifier: Identifier
+  arguments: Argument[]
+  blocks: Block[]
+  attributes: Attribute[]
 }
 
-export interface IdentifierNode extends BaseNode {
+export interface Argument {
+  type: 'Argument'
+  value: Literal
+}
+
+export interface Literal {
+  type: 'Literal'
+  value: string
+}
+
+export interface Identifier {
   type: 'Identifier'
   name: string
 }
 
-export interface ParameterNode extends BaseNode {
-  type: 'Parameter'
-  value: string
-}
-
-export interface AttributeNode extends BaseNode {
+export interface Attribute {
   type: 'Attribute'
-  id: IdentifierNode
-  value: string
+  identifier: Identifier
+  value: Literal
 }
 
-export interface TextNode extends BaseNode {
+export interface Text {
   type: 'Text'
   value: string
 }
 
-export interface BlockNode extends BaseNode {
+export interface Block {
   type: 'Block'
-  body: (TagNode | TextNode)[]
+  body: Element[]
 }
 
+export type ElementType = 'Tag' | 'Text'
+export type Element = Tag | Text
+
+export type NodeType =
+  | 'Document'
+  | 'Tag'
+  | 'Argument'
+  | 'Literal'
+  | 'Identifier'
+  | 'Attribute'
+  | 'Text'
+  | 'Block'
+
 export type Node =
-  | DocumentNode
-  | TagNode
-  | TextNode
-  | BlockNode
-  | ParameterNode
-  | AttributeNode
-  | IdentifierNode
+  | Document
+  | Tag
+  | Text
+  | Block
+  | Argument
+  | Attribute
+  | Identifier

@@ -25,8 +25,8 @@ describe('Parser', () => {
           id:
             type: Identifier
             name: bold
-          params: []
-          attrs: []
+          args: []
+          attributes: []
           blocks:
             - type: Block
               body:

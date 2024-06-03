@@ -8,10 +8,10 @@ import stripIndent from 'strip-indent'
 
 import {
   Node,
-  BlockNode,
-  TextNode,
-  TagNode,
-  DocumentNode,
+  Block,
+  Text,
+  Tag,
+  Document,
 } from '../../ast.js'
 
 export function runParse(
@@ -45,31 +45,31 @@ function normalize(ast: Node | Node[]): Node | Node[] {
     case 'Document':
       return {
         ...ast,
-        body: (ast as DocumentNode).body.map((node) =>
+        body: (ast as Document).body.map((node) =>
           normalize(node)
-        ) as (TextNode | TagNode)[],
+        ) as (Text | Tag)[],
       }
 
     case 'Tag':
       return {
         ...ast,
-        blocks: (ast as TagNode).blocks.map((block) =>
+        blocks: (ast as Tag).blocks.map((block) =>
           normalize(block)
         ),
-      } as TagNode
+      } as Tag
 
     case 'Block':
       return {
         ...ast,
-        body: (ast as BlockNode).body.map((node) =>
+        body: (ast as Block).body.map((node) =>
           normalize(node)
         ),
-      } as BlockNode
+      } as Block
 
     case 'Text':
       return {
         ...ast,
-        value: stripIndent((ast as TextNode).value).trim(),
+        value: stripIndent((ast as Text).value).trim(),
       }
 
     default:

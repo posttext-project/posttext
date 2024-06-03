@@ -50,8 +50,8 @@ describe('Parser', () => {
               id:
                 type: Identifier
                 name: title
-              params: []
-              attrs: []
+              args: []
+              attributes: []
               blocks:
                 - type: Block
                   body:
@@ -63,8 +63,8 @@ describe('Parser', () => {
               id:
                 type: Identifier
                 name: section
-              params: []
-              attrs: []
+              args: []
+              attributes: []
               blocks:
                 - type: Block
                   body:
@@ -74,8 +74,8 @@ describe('Parser', () => {
                       id:
                         type: Identifier
                         name: title
-                      params: []
-                      attrs: []
+                      args: []
+                      attributes: []
                       blocks:
                         - type: Block
                           body:
@@ -87,8 +87,8 @@ describe('Parser', () => {
                       id:
                         type: Identifier
                         name: paragraph
-                      params: []
-                      attrs: []
+                      args: []
+                      attributes: []
                       blocks:
                         - type: Block
                           body:

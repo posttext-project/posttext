@@ -272,8 +272,8 @@ export const interpreters: Record<string, Interpreter> = {
       const tagNode: TagNode = {
         type: 'Tag',
         id: { name: '__root__', type: 'Identifier' },
-        attrs: [],
-        params: [],
+        attributes: [],
+        args: [],
         blocks: [
           {
             type: 'Block',
@@ -388,14 +388,14 @@ export const interpreters: Record<string, Interpreter> = {
     },
   },
 
-  getParams: {
+  getArgs: {
     interpret: async function* (
       command: Command,
       _context: Context
     ): AsyncGenerator<Data, any, any> {
       const tagNode = command.node as TagNode
 
-      return tagNode.params.map((param) => param.value)
+      return tagNode.args.map((param) => param.value)
     },
   },
 
@@ -406,11 +406,11 @@ export const interpreters: Record<string, Interpreter> = {
     ): AsyncGenerator<Data, any, any> {
       const tagNode = command.node as TagNode
 
-      return tagNode.attrs
+      return tagNode.attributes
         .filter((attr) => attr.id.name.indexOf(':') === -1)
         .reduce(
-          (attrs, currAttr) => ({
-            ...attrs,
+          (attributes, currAttr) => ({
+            ...attributes,
             [currAttr.id.name]: currAttr.value,
           }),
           {}

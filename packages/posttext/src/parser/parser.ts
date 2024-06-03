@@ -4,13 +4,13 @@
 
 import { Cursor } from 'cursornext'
 import {
-  TextNode,
-  TagNode,
-  DocumentNode as Node,
-  IdentifierNode,
-  ParameterNode,
-  BlockNode,
-  AttributeNode,
+  Text,
+  Tag,
+  Document as Node,
+  Identifier,
+  Argument,
+  Block,
+  Attribute,
 } from './ast.js'
 
 export interface Parser {
@@ -28,7 +28,7 @@ function parse(cursor: Cursor): Node {
 }
 
 function parseDocument(cursor: Cursor): Node {
-  const body: (TagNode | TextNode)[] = []
+  const body: (Tag | Text)[] = []
 
   while (!cursor.isEof()) {
     const node = parseTag(cursor) || parseText(cursor)
@@ -46,7 +46,7 @@ function parseDocument(cursor: Cursor): Node {
   }
 }
 
-function parseTag(cursor: Cursor): TagNode | null {
+function parseTag(cursor: Cursor): Tag | null {
   const marker = cursor.clone()
 
   if (cursor.startsWith('\\')) {
@@ -66,8 +66,8 @@ function parseTag(cursor: Cursor): TagNode | null {
 
   skip(cursor)
 
-  const params: ParameterNode[] | null = parseParameters(cursor)
-  if (!params) {
+  const args: Argument[] | null = parseArguments(cursor)
+  if (!args) {
     cursor.moveTo(marker)
 
     return null
@@ -75,14 +75,14 @@ function parseTag(cursor: Cursor): TagNode | null {
 
   skip(cursor)
 
-  const attrs: AttributeNode[] | null = parseAttributes(cursor)
-  if (!attrs) {
+  const attributes: Attribute[] | null = parseAttributes(cursor)
+  if (!attributes) {
     cursor.moveTo(marker)
 
     return null
   }
 
-  const blocks: BlockNode[] = []
+  const blocks: Block[] = []
 
   while (!cursor.isEof()) {
     const block =
@@ -107,16 +107,14 @@ function parseTag(cursor: Cursor): TagNode | null {
 
   return {
     type: 'Tag',
-    id,
-    params,
-    attrs,
+    identifier: id,
+    arguments: args,
+    attributes,
     blocks,
   }
 }
 
-function parseIdentifier(
-  cursor: Cursor
-): IdentifierNode | null {
+function parseIdentifier(cursor: Cursor): Identifier | null {
   const execArr = cursor.exec(/[a-zA-Z][a-zA-Z0-9_'-]+/gy)
 
   if (execArr) {
@@ -133,9 +131,7 @@ function parseIdentifier(
   return null
 }
 
-function parseParameters(
-  cursor: Cursor
-): ParameterNode[] | null {
+function parseArguments(cursor: Cursor): Argument[] | null {
   if (cursor.startsWith('(')) {
     cursor.next(1)
   } else {
@@ -143,17 +139,17 @@ function parseParameters(
   }
 
   const marker = cursor.clone()
-  const params: ParameterNode[] = []
+  const args: Argument[] = []
 
   if (cursor.startsWith(')')) {
     cursor.next(1)
 
-    return params
+    return args
   }
 
-  const param = parseParameter(cursor)
+  const param = parseArgument(cursor)
   if (param) {
-    params.push(param)
+    args.push(param)
   } else {
     cursor.moveTo(marker)
 
@@ -169,9 +165,9 @@ function parseParameters(
       return null
     }
 
-    const param = parseParameter(cursor)
+    const param = parseArgument(cursor)
     if (param) {
-      params.push(param)
+      args.push(param)
     } else {
       cursor.moveTo(marker)
 
@@ -187,10 +183,10 @@ function parseParameters(
     return null
   }
 
-  return params
+  return args
 }
 
-function parseParameter(cursor: Cursor): ParameterNode | null {
+function parseArgument(cursor: Cursor): Argument | null {
   const chunks: string[] = []
 
   if (
@@ -232,14 +228,15 @@ function parseParameter(cursor: Cursor): ParameterNode | null {
   chunks.push(tempMarker.takeUntil(cursor))
 
   return {
-    type: 'Parameter',
-    value: chunks.join('').trim(),
+    type: 'Argument',
+    value: {
+      type: 'Literal',
+      value: chunks.join('').trim(),
+    },
   }
 }
 
-function parseAttributes(
-  cursor: Cursor
-): AttributeNode[] | null {
+function parseAttributes(cursor: Cursor): Attribute[] | null {
   if (cursor.startsWith('[')) {
     cursor.next(1)
   } else {
@@ -250,11 +247,11 @@ function parseAttributes(
 
   skip(cursor)
 
-  const attrs: AttributeNode[] = []
+  const attributes: Attribute[] = []
   if (cursor.startsWith(']')) {
     cursor.next(1)
 
-    return attrs
+    return attributes
   }
 
   const attr = parseAttribute(cursor)
@@ -264,7 +261,7 @@ function parseAttributes(
     return null
   }
 
-  attrs.push(attr)
+  attributes.push(attr)
 
   skip(cursor)
 
@@ -290,7 +287,7 @@ function parseAttributes(
       return null
     }
 
-    attrs.push(attr)
+    attributes.push(attr)
 
     skip(cursor)
   }
@@ -303,10 +300,10 @@ function parseAttributes(
     return null
   }
 
-  return attrs
+  return attributes
 }
 
-function parseAttribute(cursor: Cursor): AttributeNode | null {
+function parseAttribute(cursor: Cursor): Attribute | null {
   const marker = cursor.clone()
 
   skip(cursor)
@@ -339,8 +336,11 @@ function parseAttribute(cursor: Cursor): AttributeNode | null {
 
   return {
     type: 'Attribute',
-    id,
-    value,
+    identifier: id,
+    value: {
+      type: 'Literal',
+      value,
+    },
   }
 }
 
@@ -395,7 +395,7 @@ function parseAttributeValue(cursor: Cursor): string | null {
   return chunks.join('')
 }
 
-function parseBlock(cursor: Cursor): BlockNode | null {
+function parseBlock(cursor: Cursor): Block | null {
   const marker = cursor.clone()
 
   if (cursor.startsWith('{')) {
@@ -406,7 +406,7 @@ function parseBlock(cursor: Cursor): BlockNode | null {
     return null
   }
 
-  const body: (TagNode | TextNode)[] = []
+  const body: (Tag | Text)[] = []
   const tempMarker = cursor.clone()
   while (!cursor.startsWith('}') && !cursor.isEof()) {
     const node = parseTag(cursor) || parseText(cursor)
@@ -435,7 +435,7 @@ function parseBlock(cursor: Cursor): BlockNode | null {
   }
 }
 
-function parseVerbatimBlock(cursor: Cursor): BlockNode | null {
+function parseVerbatimBlock(cursor: Cursor): Block | null {
   const marker = cursor.clone()
   const verbatimDecorator = cursor.exec(/=*/gy)?.[0] ?? []
 
@@ -453,7 +453,7 @@ function parseVerbatimBlock(cursor: Cursor): BlockNode | null {
     return null
   }
 
-  const body: (TagNode | TextNode)[] = []
+  const body: (Tag | Text)[] = []
   const startMarker = cursor.clone()
   const endMarker = cursor.clone()
   do {
@@ -492,7 +492,7 @@ function parseVerbatimBlock(cursor: Cursor): BlockNode | null {
   }
 }
 
-function parseText(cursor: Cursor): TextNode | null {
+function parseText(cursor: Cursor): Text | null {
   const execArr = cursor.exec(/[^\\{}]+/gy)
 
   if (execArr) {

@@ -31,8 +31,8 @@ describe('Parser', () => {
           id:
             type: Identifier
             name: code
-          attrs: []
-          params:
+          attributes: []
+          args:
             - type: Parameter
               value: javascript
           blocks:
