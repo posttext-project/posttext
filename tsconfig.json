@@ -1,7 +1,7 @@
 {
   "include": ["packages/*/src", "scripts/*"],
   "compilerOptions": {
-    "module": "es2020",
+    "module": "ESNext",
     "moduleResolution": "Node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,

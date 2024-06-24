@@ -8,7 +8,9 @@ import stripIndent from 'strip-indent'
 import qrcode from 'qrcode'
 import katex from 'katex'
 
-import { Resolver } from '../resolver'
+import { DataResolverContext, TagDefinition } from '../tag'
+import { TagResolverContext } from '../tag'
+import { ModuleDefinition } from '../module'
 
 const KATEX_STATE = Symbol('KatexState')
 const CODE_BLOCK_STATE = Symbol('CodeBlockState')
@@ -21,40 +23,49 @@ export const tocDef = [
   'subsubsection',
 ]
 
-export const resolvers = (
-  _options: RegistryOptions
-): Record<string, Resolver> => {
+function createTagDefinitions(): Record<string, TagDefinition> {
   return {
     posttext: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const title = tag.attributes.title
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const writer = context.helpers.getHelper('writer')
+        const title = context.attributes.title
 
         await writer.metadata.add({
           title,
         })
+
+        return ''
       },
     },
 
     comment: {
-      tag: async (): Promise<void> => {
-        /* pass */
+      tag: async (): Promise<string> => {
+        return ''
       },
     },
 
     title: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(`<h1>${content}</h1>`)
+        return `<h1>${content}</h1>`
       },
     },
 
     section: {
       data: {
-        [TOC]: async (context: any, tag: any): Promise<any> => {
-          const content = tag.blocks.index(0).text()
+        [TOC]: async (
+          context: DataResolverContext
+        ): Promise<any> => {
+          const content = await context.blocks
+            .get(0)
+            .renderToString()
 
           return {
             type: 'section',
@@ -63,18 +74,25 @@ export const resolvers = (
         },
       },
 
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(`<h2>${content}</h2>`)
+        return `<h2>${content}</h2>`
       },
     },
 
     subsection: {
       data: {
-        [TOC]: async (context: any, tag: any): Promise<any> => {
-          const content = tag.blocks.index(0).text()
+        [TOC]: async (
+          context: DataResolverContext
+        ): Promise<any> => {
+          const content = await context.blocks
+            .get(0)
+            .renderToString()
 
           return {
             type: 'subsection',
@@ -83,18 +101,25 @@ export const resolvers = (
         },
       },
 
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(`<h3>${content}</h3>`)
+        return `<h3>${content}</h3>`
       },
     },
 
     subsubsection: {
       data: {
-        [TOC]: async (context: any, tag: any): Promise<any> => {
-          const content = tag.blocks.index(0).text()
+        [TOC]: async (
+          context: DataResolverContext
+        ): Promise<any> => {
+          const content = await context.blocks
+            .get(0)
+            .renderToString()
 
           return {
             type: 'subsubsection',
@@ -103,18 +128,25 @@ export const resolvers = (
         },
       },
 
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(`<h4>${content}</h4>`)
+        return `<h4>${content}</h4>`
       },
     },
 
     bold: {
       data: {
-        [TOC]: async (context: any, tag: any): Promise<any> => {
-          const content = tag.blocks.index(0).text()
+        [TOC]: async (
+          context: DataResolverContext
+        ): Promise<any> => {
+          const content = await context.blocks
+            .get(0)
+            .renderToString()
 
           return {
             type: 'bold',
@@ -123,66 +155,78 @@ export const resolvers = (
         },
       },
 
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(
-          `<b>${content?.replace(/\s\s\n/g, '<br>') ?? ''}</b>`
-        )
+        return `<b>${
+          content?.replace(/\s\s\n/g, '<br>') ?? ''
+        }</b>`
       },
     },
 
     italic: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(
-          `<i>${content?.replace(/\s\s\n/g, '<br>') ?? ''}</i>`
-        )
+        return `<i>${
+          content?.replace(/\s\s\n/g, '<br>') ?? ''
+        }</i>`
       },
     },
 
     underline: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(
-          `<u>${content?.replace(/\s\s\n/g, '<br>') ?? ''}</u>`
-        )
+        return `<u>${
+          content?.replace(/\s\s\n/g, '<br>') ?? ''
+        }</u>`
       },
     },
 
     list: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(`<ul>${content}</ul>`)
+        return `<ul>${content}</ul>`
       },
     },
 
     item: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content: string | undefined = tag.blocks
-          .index(0)
-          .text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content: string | undefined = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(
-          `<li>${
-            content?.replace(/\s\s\n/g, '<br>') ?? ''
-          }</li>`
-        )
+        return `<li>${
+          content?.replace(/\s\s\n/g, '<br>') ?? ''
+        }</li>`
       },
     },
 
     code: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const writer = context.helpers.getHelper('writer')
         const languageLoaded =
           context.state[CODE_BLOCK_STATE]?.languagesLoaded ??
           false
@@ -200,17 +244,19 @@ export const resolvers = (
         }
 
         const language =
-          tag.arguments.length > 0 &&
+          context.arguments.length > 0 &&
           Object.keys(Prism.languages).indexOf(
-            tag.arguments.index(0)
+            context.arguments[0]
           )
-            ? tag.arguments.index(0)
+            ? context.arguments[0]
             : 'text'
 
         const BEGIN_NEWLINE = /^\r?\n/
         const END_NEWLINE = /\r?\n[\t ]+$/
 
-        const content = tag.blocks.index(0).text()
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
         const strippedContent: string = content
           ? stripIndent(content)
               .replace(BEGIN_NEWLINE, '')
@@ -226,16 +272,15 @@ export const resolvers = (
               )
             : strippedContent
 
-        await writer.write(
-          `<pre class="std_code"><code class="language-${language}">${code}</code></pre>`
-        )
+        return `<pre class="std_code"><code class="language-${language}">${code}</code></pre>`
       },
     },
 
     "code'": {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const writer = context.helpers.getHelper('writer')
         const languageLoaded =
           context.state[CODE_BLOCK_STATE]?.languagesLoaded ??
           false
@@ -253,17 +298,19 @@ export const resolvers = (
         }
 
         const language =
-          tag.arguments.length > 0 &&
+          context.arguments.length > 0 &&
           Object.keys(Prism.languages).indexOf(
-            tag.arguments.index(0)
+            context.arguments[0]
           )
-            ? tag.arguments.index(0)
+            ? context.arguments[0]
             : 'text'
 
         const BEGIN_NEWLINE = /^\r?\n/
         const END_NEWLINE = /\r?\n[\t ]+$/
 
-        const content = tag.blocks.index(0).text()
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
         const strippedContent: string = content
           ? stripIndent(content)
               .replace(BEGIN_NEWLINE, '')
@@ -279,15 +326,15 @@ export const resolvers = (
               )
             : strippedContent
 
-        await writer.write(
-          `<code class="std_code language-${language}">${code}</code>`
-        )
+        return `<code class="std_code language-${language}">${code}</code>`
       },
     },
 
     katex: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const writer = context.helpers.getHelper('writer')
         const katexLoaded =
           context.state[KATEX_STATE]?.katexLoaded ?? false
         if (!katexLoaded) {
@@ -301,7 +348,9 @@ export const resolvers = (
           })
         }
 
-        const rawContent = tag.blocks.index(0).text()
+        const rawContent = await context.blocks
+          .get(0)
+          .renderToString()
 
         // TODO: Handle errors
         const content = katex.renderToString(rawContent, {
@@ -309,13 +358,15 @@ export const resolvers = (
           displayMode: true,
         })
 
-        await writer.write(content)
+        return content
       },
     },
 
     "katex'": {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const writer = context.helpers.getHelper('writer')
         const katexLoaded =
           context.state[KATEX_STATE]?.katexLoaded ?? false
         if (!katexLoaded) {
@@ -329,7 +380,9 @@ export const resolvers = (
           })
         }
 
-        const rawContent = tag.blocks.index(0).text()
+        const rawContent = await context.blocks
+          .get(0)
+          .renderToString()
 
         // TODO: Handle errors
         const content = katex.renderToString(rawContent, {
@@ -337,15 +390,15 @@ export const resolvers = (
           displayMode: true,
         })
 
-        await writer.write(content)
+        return content
       },
     },
 
     toc: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-
-        const tocItems = context.query(TOC)
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const tocItems = await context.document.query(TOC)
 
         const stack: any[] = []
 
@@ -454,10 +507,11 @@ export const resolvers = (
         }
 
         const rootItem = stack.pop()
-        const content = tag.blocks.index(0).text()
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(
-          `
+        return `
             <h2 class="std_toc__title">
               ${content}
             </h2>
@@ -465,64 +519,71 @@ export const resolvers = (
               ${rootItem.children.join('\n')}
             </ul>
           `
-        )
       },
     },
 
     blockquote: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
-        await writer.write(
-          `
+        return `
             <blockquote class="std_blockquote">
               ${content}
             </blockquote>
           `
-        )
       },
     },
 
     image: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const link = tag.blocks.index(0).text()
-        const alt = tag.blocks.index(1).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const writer = context.helpers.getHelper('writer')
+        const link = await context.blocks
+          .get(0)
+          .renderToString()
+        const alt = await context.blocks.get(1).renderToString()
 
         if (!link) {
-          return
+          return ''
         }
 
         const isUrl = link.match(/(^|^http:|^https:)\/\//)
 
         if (isUrl) {
-          await writer.write(`
+          return `
             <div class="std_image">
               <img src="${link}"${alt ? ` alt="${alt}"` : ''}>
             </div>
-          `)
+          `
         } else {
           await writer.copyFile(
             link,
             `images/${link.split(/[\\/]/).slice(-1)[0]}`
           )
 
-          await writer.write(`
+          return `
             <div class="std_image">
               <img src="images/${
                 link.split(/[\\/]/).slice(-1)[0]
               }"${alt ? ` alt="${alt}"` : ''}>
             </div>
-          `)
+          `
         }
       },
     },
 
     qrcode: {
-      tag: async (context: any, tag: any): Promise<void> => {
-        const writer = context.helpers.get('writer')
-        const content = tag.blocks.index(0).text()
+      tag: async (
+        context: TagResolverContext
+      ): Promise<string> => {
+        const content = await context.blocks
+          .get(0)
+          .renderToString()
 
         const svg = await new Promise((resolve, reject) => {
           qrcode.toString(
@@ -541,12 +602,17 @@ export const resolvers = (
           )
         })
 
-        await writer.write(`
+        return `
           <div class="std_qrcode">
             ${svg}
           </div>
-        `)
+        `
       },
     },
   }
 }
+
+export default {
+  name: 'std',
+  tagDefinitionsFactory: createTagDefinitions,
+} as ModuleDefinition

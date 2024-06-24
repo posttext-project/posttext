@@ -4,9 +4,7 @@
 
 import * as meow from 'meow'
 import chalk from 'chalk'
-
-import { CompileCommand } from './compile.js'
-import { ServeCommand, createServeCommand } from './serve.js'
+import { createBuildCommand } from './build'
 
 export interface CLI {
   run(): Promise<void>
@@ -16,18 +14,16 @@ export function createCLI(): CLI {
   const cli = meow.default(
     `
       Usage
-        $ pt [command] <input>
+        $ pt [command]
 
       Options
         --help, -h    Show this help message.
 
       Commands
-        compile       Build an input file.
-        serve         Build and serve an input file.
+        build         Run build project.
 
       Examples
-        $ pt serve <input>
-        $ pt compile <input>
+        $ pt build
     `,
     {
       importMeta: import.meta,
@@ -48,12 +44,9 @@ async function run(cli: meow.Result<any>): Promise<void> {
     const command = cli?.input?.[0]?.toLowerCase() ?? 'help'
 
     switch (command) {
-      case 'compile':
-        await compile(args, cli.flags)
-        return
-      case 'serve':
-        await serve(args, cli.flags)
-        return
+      case 'build':
+        await build(args, cli.flags)
+        break
       default:
         cli.showHelp()
     }
@@ -62,23 +55,11 @@ async function run(cli: meow.Result<any>): Promise<void> {
   }
 }
 
-async function compile(
+async function build(
   args: string[],
   flags: Record<string, unknown> = {}
-): Promise<any> {
-  const command = CompileCommand.create({
-    args,
-    flags,
-  })
-
-  await command.run()
-}
-
-async function serve(
-  args: string[],
-  flags: Record<string, unknown> = {}
-): Promise<any> {
-  const command = createServeCommand({
+): Promise<void> {
+  const command = createBuildCommand({
     args,
     flags,
   })

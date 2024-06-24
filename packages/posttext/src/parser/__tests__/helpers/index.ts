@@ -6,13 +6,7 @@ import { t, Cursor } from 'cursornext'
 import yaml from 'js-yaml'
 import stripIndent from 'strip-indent'
 
-import {
-  Node,
-  Block,
-  Text,
-  Tag,
-  Document,
-} from '../../ast.js'
+import { Node, Block, Text, Tag, Document } from '../../ast.js'
 
 export function runParse(
   input: string,

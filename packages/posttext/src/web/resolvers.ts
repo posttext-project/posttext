@@ -1,10 +1,15 @@
-import { Resolver } from '../resolver'
+/* This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-const resolvers = (): Record<string, Resolver> => {
+import { ModuleDefinition } from '../module'
+import { TagDefinition } from '../tag'
+
+function createTagDefinitions(): Record<string, TagDefinition> {
   return {}
 }
 
 export default {
   name: 'web',
-  resolvers,
-}
+  tagDefinitionsFactory: createTagDefinitions,
+} as ModuleDefinition

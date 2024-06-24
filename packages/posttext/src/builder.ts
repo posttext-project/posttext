@@ -2,4 +2,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/. */
 
-export * from './paragraph.js'
+export interface Builder {
+  build(): Promise<void>
+}
+
+export type BuilderFactory = () => Builder
+
+export interface BuilderDefinition {
+  name: string
+  builderFactory: BuilderFactory
+}
