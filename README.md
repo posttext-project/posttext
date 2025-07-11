@@ -1,104 +1,63 @@
-<div align="center">
-  <h1>PostText</h1>
+# PostText
 
-  <p>A formal markup language for rich-text editing</p>
+A TypeScript library project.
 
-[![MPL-2.0 License](https://img.shields.io/github/license/posttext-project/posttext?color=blue)](https://www.mozilla.org/en-US/MPL/2.0/)
-[![From Vietnam with <3](https://raw.githubusercontent.com/webuild-community/badge/master/svg/love.svg)](https://webuild.community)
+## Installation
 
-</div>
+```bash
+# Using npm
+npm install posttext
 
-> **Note**: This library is a work-in-progress. Some features are not available yet.
+# Using yarn
+yarn add posttext
 
-## What is PostText?
-
-**PostText** is a markup language and document preparation system. Its aim is to overcome the limitation of Markdown syntax at the minimal cost. PostText provides you with the powerful and expressive editing syntax which can be used in chatting systems, text-editors or storing rich-text in database.
-
-PostText is inspired greatly by Latex, Markdown, XML and other markup languages.
-
-## Features
-
-### Tags
-
-Tags are the most essential building blocks of a PostText document. A tag often consists of four parts:
-
-- Tag name
-- Parameters
-- Attributes
-- Blocks
-
-```
-\tag-name () [] {} {};
- 1        2  3  4
+# Using pnpm
+pnpm add posttext
 ```
 
-An example of how to use tag to format text in PostText:
+## Usage
 
-```
-\title{PostText};
+```typescript
+import { add, PostText } from 'posttext';
 
-\section{Introduce};
+// Using the add function
+const sum = add(1, 2); // 3
 
-\p {
-  Hi! Welcome to \bold{PostText};! \emoji{smile};
-};
-```
+// Using the PostText class
+const instance = new PostText('custom-name');
+console.log(instance.getName()); // 'custom-name'
+instance.setName('updated-name');
+console.log(instance.getName()); // 'updated-name'
 
-Tag properties can be specified using parameters or attributes. Tag parameters are seperated by commas while tag attributes are seperated by semicolons:
-
-```
-\p[
-  font-family=Arial, Helvectica, sans-serif;
-  font-size=14px;
-] {
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-};
-
-\math {
-  A = \matrix(2, 3) {
-    1   2   3
-    -5  7   8
-  };
-};
+// Using the default export
+import posttext from 'posttext';
+console.log(posttext.getName()); // 'default'
 ```
 
-### Namespaces and Directives
+## Development
 
-Namespaces provide unique names for tags and attributes from possible extra packages. In additional, a directive - an attribute with namespace - can add more functionalities to the target tag, which makes PostText truely extensible.
+This project uses PNPM as the package manager.
 
+```bash
+# Install dependencies
+pnpm install
+
+# Build the library
+pnpm build
+
+# Run tests
+pnpm test
+
+# Run linting
+pnpm lint
+
+# Type checking
+pnpm typecheck
+
+# Development mode with watch
+pnpm dev
 ```
-\use{chart};
-\use{highlight};
 
-\chart:pie {
-  Apple   30%
-  Orange  40%
-  Grape   rest
-};
+## License
 
-\p [highlight:color=yellow] {
-  Caution: Please watch your step!
-};
-```
-
-### Verbatims
-
-Verbatims are non-formatted text blocks without escaping every special characters. Using verbatim is useful when you want to include source code or specify other language section inside PostText.
-
-A verbatim block is specified by prefixing and postfixing the block with the same number of "=" characters. The prefix or postfix length is arbitrary so that PostText is flexible enough to include itself inside code block.
-
-```
-\code(javascript) ==={
-  function sum(a, b) {
-    return a + b
-  };
-
-  console.log(sum(5, 6))
-}===;
-
-\code(posttext) ==={
-  \code(posttext) =={
-    Nested verbatim block.
-  }==;
-}===;
-```
+ISC
