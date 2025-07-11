@@ -8,6 +8,9 @@
   "files": [
     "dist"
   ],
+  "bin": {
+    "posttext": "./bin/posttext.js"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -22,7 +25,8 @@
     "lint": "eslint src --ext .ts",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,json}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\""
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,js,jsx,json}\"",
+    "cli": "node bin/posttext.js"
   },
   "keywords": [
     "typescript",
@@ -45,5 +49,8 @@
     "tslib": "^2.8.1",
     "tsup": "^8.5.0",
     "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "commander": "^14.0.0"
   }
 }
