@@ -1,0 +1,7 @@
+\chapter{Chapter 1: Getting Started};
+
+\section{Section 1: Adding a new section};
+
+A chapter is started by using the `\\chapter` command following by the title of the chapter. To add a new section, use the `\\section` command following by the title of the section.
+
+You can use the \bold{bold};, \italic{italic}; and the \underline{underline}; commands to format the document.

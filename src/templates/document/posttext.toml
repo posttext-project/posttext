@@ -1,0 +1,17 @@
+[publication]
+title = "<title>"
+author = "<author>"
+date = "<date>"
+
+table_of_contents = [
+  "./docs/introduction.pt",
+  "./docs/chapter-1.pt",
+  "./docs/chapter-2.pt",
+]
+
+[compiler]
+target = "document"
+output = "./build"
+
+[packages]
+std = "1.0.0"
