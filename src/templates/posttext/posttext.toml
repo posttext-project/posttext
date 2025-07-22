@@ -10,7 +10,7 @@ table_of_contents = [
 ]
 
 [compiler]
-target = "epub"
+target = "<target>"
 output = "./build"
 
 [packages]

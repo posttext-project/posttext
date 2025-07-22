@@ -1,5 +1,0 @@
-\chapter{Introduction: Welcome to PostText!};
-
-PostText is a typesetting system that allows you to write documents in a simple and easy way.
-
-You can add a new file by creating a new file under the `docs` directory and then adding it to the list of files in the `table_of_contents` in the `posttext.toml` file.
