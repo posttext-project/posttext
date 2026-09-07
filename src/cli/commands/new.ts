@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import path from 'path';
-import { createProjectGenerator } from '../../project/projectGenerator';
+import { createProjectGenerator } from '../../project/project_generator';
 
 /**
  * Execute the `new` command to scaffold a new PostText project.

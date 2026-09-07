@@ -6,4 +6,4 @@ export {
   type TemplateFile,
   TemplateNotFoundError,
   DirectoryNotEmptyError,
-} from './project/projectGenerator';
+} from './project/project_generator';
